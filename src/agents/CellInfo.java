@@ -1,10 +1,10 @@
 package agents;
 
-import pplanning.simviewer.model.GridState;
+import pplanning.simviewer.model.GridCell;
 
 class CellInfo implements Comparable<CellInfo> {
 		private CellInfo parent = null;
-		private final State node;
+		private final GridCell cell;
 		private float gCost;
 		private float hCost;
 		private float fCost;
@@ -12,10 +12,10 @@ class CellInfo implements Comparable<CellInfo> {
 
 		/** Read only. */
 		public GridCell getCell() {
-			return this.node;
+			return this.cell;
 		}
 
-		public GridCell getParent() {
+		public CellInfo getParent() {
 			return this.parent;
 		}
 		public void setParent(CellInfo parent) {
@@ -51,7 +51,7 @@ class CellInfo implements Comparable<CellInfo> {
 		}
 
 		/**
-		 * Compare the f cost of this node to another.
+		 * Compare the f cost of this cell to another.
 		 * @other the CellInfo to be compared
 		 */
 		public int compareTo(CellInfo other) {
@@ -62,12 +62,26 @@ class CellInfo implements Comparable<CellInfo> {
 
 		/**
 		 * Create a new CellInfo for specified cell with specified g and h costs.
-		 * @node  the node
-		 * @gCost the cost of the path from start to node
-		 * @hCost the heuristic estimate of the remaining cost to the goal
+		 * @cell   the cell
+		 * @gCost  the cost of the path from start to cell
+		 * @hCost  the heuristic estimate of the remaining cost to the goal
+		 * @set    the set that this node should start in
+		 * @parent the parent node of this cell
 		 */
-		public CellInfo(GridCell, float gCost, float hCost, Set set) {
-			this.node = node;
+		public CellInfo(GridCell cell, float gCost, float hCost, Set set, CellInfo parent) {
+			this(cell, gCost, hCost, set);
+			this.parent = parent;
+		}
+
+		/**
+		 * Create a new CellInfo for specified cell with specified g and h costs.
+		 * @cell  the cell
+		 * @gCost the cost of the path from start to cell
+		 * @hCost the heuristic estimate of the remaining cost to the goal
+		 * @set   the set that this node should start in
+		 */
+		public CellInfo(GridCell cell, float gCost, float hCost, Set set) {
+			this.cell = cell;
 			this.gCost = gCost;
 			this.fCost = gCost + hCost;
 			this.set = set;

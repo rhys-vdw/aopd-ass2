@@ -14,4 +14,4 @@ echo ================================================
 
 
 echo
-java -cp bin/:lib/JPathPlan-v1.5.jar:lib/Apparate-v2.6.jar pplanning.simviewer.controller.Launcher $fileName
+java -ea -cp bin/:lib/JPathPlan-v1.5.jar:lib/Apparate-v2.6.jar pplanning.simviewer.controller.Launcher $fileName
