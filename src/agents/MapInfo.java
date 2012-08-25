@@ -2,6 +2,7 @@ package agents;
 
 import java.util.PriorityQueue;
 // TODO:
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -31,9 +32,18 @@ import pplanning.simviewer.model.GridCoord;
 public class MapInfo {
 	private CellInfo[][] cells;
 	private PriorityQueue<CellInfo> openQueue;
+	
+	// Added this data for debugging - probably not useful in our actual algorithm,
+	// is just to aid analysis.
+	private int width;
+	private int height;
+	
+	private int nClosedCount = 0;
 
 	public MapInfo(GridDomain map) {
-		this.cells = new CellInfo[map.getWidth()][map.getHeight()];
+		this.width = map.getWidth();
+		this.height = map.getHeight();
+		this.cells = new CellInfo[width][height];
 		this.openQueue = new PriorityQueue<CellInfo>();
 	}
 
@@ -70,7 +80,7 @@ public class MapInfo {
 		// add new node to array and open queue
 		CellInfo cellInfo = new CellInfo(cell, gCost, hCost, CellSetMembership.OPEN);
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
-		openQueue.add(cellInfo);
+		openQueue.offer(cellInfo);
 	}
 
 	/**
@@ -114,6 +124,15 @@ public class MapInfo {
 	public int openCount() {
 		return openQueue.size();
 	}
+	
+	/*
+	 * This function just points out that we need a structure for closed list.
+	 * It is only used for debugging of the output of closed list.
+	 */
+	public int closedCount()
+	{
+		return(nClosedCount);
+	}
 
 	/**
 	 * Move cheapest open cell to the closed set and return it.
@@ -125,6 +144,10 @@ public class MapInfo {
 		assert(cellInfo != null);
 
 		cellInfo.setCellMembership(CellSetMembership.CLOSED);
+		
+		// We will have better closed list management, but for now, just tally the number of CLOSED entries - 
+		// this will help with analysis.
+		++nClosedCount;
 
 		return cellInfo.getCell();
 	}
@@ -214,5 +237,36 @@ public class MapInfo {
 		GridCoord gc = cell.getCoord();
 		if (cells == null) System.out.println("cells is null");
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
+	}
+	
+	/*
+	 * Return a container for visualising the Open and Closed Sets
+	 * Very expensive function!
+	 * @param Open and Closed Sets
+	 * @return none
+	 */
+	public void GetSearchSetsAsArrayList(ArrayList<GridCell> _conOpen, ArrayList<GridCell> _conClosed)
+	{
+		//ArrayList<CellInfo> conOpenSet = new ArrayList<CellInfo>();
+		//ArrayList<CellInfo> conClosedSet = new ArrayList<CellInfo>();
+		
+		for (int x = 0; x < width; x++)
+		{
+			for (int y = 0; y < height; y++)
+			{
+				CellInfo currCell = cells[x][y];
+				if (currCell != null)
+				{
+					if (currCell.getCellMembership() == CellSetMembership.OPEN)
+					{
+						_conOpen.add(currCell.getCell());
+					}
+					else if (currCell.getCellMembership() == CellSetMembership.CLOSED)
+					{
+						_conClosed.add(currCell.getCell());
+					}
+				}
+			}
+		}
 	}
 }

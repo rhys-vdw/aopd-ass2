@@ -18,20 +18,33 @@ import pplanning.simviewer.model.GridDomain;
 public class RhysAStar implements PlanningAgent {
 	// plan to execute
 	private ComputedPlan plan;
+	
+	MapInfo mapinfo;
+	
+    private int	stepNo = 0;
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
 			int stepLeft, long stepTime, long timeLeft) {
 
 		try {
-
+			GridCell nextStep = null;
+			
 			if (plan == null) {
 				plan = generatePlan(map, start, goal);
 			}
 
-			GridCell nextStep = (GridCell) plan.getNextStep();
+			if (stepNo < plan.getLength())
+			{
 
-			if (nextStep == null) System.out.println("next step is null!");
+				nextStep = (GridCell) plan.getStep(stepNo++);
+				
+				if (nextStep == null) 
+				{
+					System.out.println("next step is null!");
+				}
+			}
+			
 			return nextStep;
 
 		} catch (Exception e) {
@@ -43,21 +56,21 @@ public class RhysAStar implements PlanningAgent {
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
 			GridCell goal) {
 
-		MapInfo mapInfo = new MapInfo(map);
+		mapinfo = new MapInfo(map);
 
 		// initialize open set with start node
-		mapInfo.add(start, 0f, map.hCost(start, goal));
+		mapinfo.add(start, 0f, map.hCost(start, goal));
 
 		// repeat while states are left in open set
-		while (mapInfo.isOpenEmpty() == false) {
-			GridCell current = mapInfo.closeCheapestOpen();
+		while (mapinfo.isOpenEmpty() == false) {
+			GridCell current = mapinfo.closeCheapestOpen();
 
 			System.err.println(current);
 
 			// if goal has been reached, return path
 			if (current == goal) {
 				System.out.println("found goal!");
-				return mapInfo.computePlan(goal);
+				return mapinfo.computePlan(goal);
 			}
 
 			// iterate through neighboring nodes
@@ -65,15 +78,15 @@ public class RhysAStar implements PlanningAgent {
 
 				// consider node if it can be entered and is not in closed list
 				if (map.isBlocked(neighbor) == false &&
-				    mapInfo.isClosed((GridCell) neighbor) == false) {
+				    mapinfo.isClosed((GridCell) neighbor) == false) {
 
 					// get g cost of neighbor
-					float gCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
+					float gCost = mapinfo.getGCost(current) + map.cost(current, neighbor);
 
-					if (mapInfo.isOpen((GridCell) neighbor) == false) {
+					if (mapinfo.isOpen((GridCell) neighbor) == false) {
 						// node not previously encountered, add it to the open set
-						mapInfo.add((GridCell) neighbor, gCost, map.hCost(neighbor, goal), current);
-					} else if (gCost < mapInfo.getGCost((GridCell) neighbor)) {
+						mapinfo.add((GridCell) neighbor, gCost, map.hCost(neighbor, goal), current);
+					} else if (gCost < mapinfo.getGCost((GridCell) neighbor)) {
 						// more direct route to node found, update it
 						// NOTE: this can never happen with an admissible heuristic!
 						assert false;
@@ -92,32 +105,51 @@ public class RhysAStar implements PlanningAgent {
 	// Do we want to show extra info? (e.g., close and open nodes, current path)
 	@Override
 	public Boolean showInfo() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public ArrayList<GridCell> expandedNodes() {
-		//return new ArrayList<GridCell>(closed);
-		return null;
+		
+		ArrayList<GridCell> open = new ArrayList<GridCell>();
+		ArrayList<GridCell> closed = new ArrayList<GridCell>();
+		
+		if (mapinfo != null)
+		{
+			System.out.println("Open Set has" + mapinfo.openCount() + " entries");
+			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
+			// to being called at unexpanded nodes too!!
+			mapinfo.GetSearchSetsAsArrayList(open, closed);
+		}
+
+
+		
+		return(closed);
 	}
 
 	@Override
-	public ArrayList<GridCell> unexpandedNodes() {
-		/*
-		ArrayList<GridCell> cells = new ArrayList<GridCell>(open.size());
-		for (StateInfo nodeInfo : open) {
-			cells.add((GridCell) nodeInfo.gegoal());
+	public ArrayList<GridCell> unexpandedNodes() {	
+		ArrayList<GridCell> open = new ArrayList<GridCell>();
+		ArrayList<GridCell> closed = new ArrayList<GridCell>();
+		
+		if (mapinfo != null)
+		{
+			System.out.println("Closed Set has" + mapinfo.closedCount() + " entries");
+			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
+			// to being called at expanded nodes too!!
+			mapinfo.GetSearchSetsAsArrayList(open, closed);
+			
+
 		}
-		return cells;
-		*/
-		return null;
+		
+		return(open);
+
 	}
 
 
 	@Override
 	public ComputedPlan getPath() {
-		//return plan;
-		return null;
+		return plan;
 	}
 
 }
