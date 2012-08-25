@@ -75,7 +75,7 @@ public class RhysAStar implements PlanningAgent {
 						mapInfo.add((GridCell) neighbor, gCost, map.hCost(neighbor, goal), current);
 					} else if (gCost < mapInfo.getGCost((GridCell) neighbor)) {
 						// more direct route to node found, update it
-						// NOTE: this can never happen with an admissable heuristic!
+						// NOTE: this can never happen with an admissible heuristic!
 						assert false;
 						/*
 						mapInfo.setCosts(neighbor, gCost, map.hCost(neighbor, goal));

@@ -68,7 +68,7 @@ public class MapInfo {
 		assert getCellInfo(cell) == null;
 
 		// add new node to array and open queue
-		CellInfo cellInfo = new CellInfo(cell, gCost, hCost, Set.OPEN);
+		CellInfo cellInfo = new CellInfo(cell, gCost, hCost, CellSetMembership.OPEN);
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.add(cellInfo);
 	}
@@ -124,7 +124,7 @@ public class MapInfo {
 
 		assert(cellInfo != null);
 
-		cellInfo.setSet(Set.CLOSED);
+		cellInfo.setCellMembership(CellSetMembership.CLOSED);
 
 		return cellInfo.getCell();
 	}
@@ -160,7 +160,7 @@ public class MapInfo {
 	public void setGCost(GridCell cell, float gCost) {
 		CellInfo cellInfo = getCellInfo(cell);
 		assert cellInfo != null;
-		assert cellInfo.getSet() != Set.OPEN;
+		assert cellInfo.getCellMembership() != CellSetMembership.OPEN;
 		cellInfo.setGCost(gCost);
 	}
 
@@ -174,7 +174,7 @@ public class MapInfo {
 		CellInfo cellInfo = getCellInfo(cell);
 
 		assert cellInfo != null;
-		assert cellInfo.getSet() != Set.OPEN;
+		assert cellInfo.getCellMembership() != CellSetMembership.OPEN;
 
 		cellInfo.setHCost(hCost);
 	}
@@ -183,7 +183,7 @@ public class MapInfo {
 		CellInfo cellInfo = getCellInfo(cell);
 
 		assert cellInfo != null;
-		assert cellInfo.getSet() != Set.OPEN;
+		assert cellInfo.getCellMembership() != CellSetMembership.OPEN;
 
 		cellInfo.setGCost(gCost);
 		cellInfo.setHCost(hCost);
@@ -196,7 +196,7 @@ public class MapInfo {
 	 */
 	public boolean isOpen(GridCell cell) {
 		CellInfo cellInfo = getCellInfo(cell);
-		return (cellInfo == null) ? false : cellInfo.getSet() == Set.OPEN;
+		return (cellInfo == null) ? false : cellInfo.getCellMembership() == CellSetMembership.OPEN;
 	}
 
 	/**
@@ -206,7 +206,7 @@ public class MapInfo {
 	 */
 	public boolean isClosed(GridCell cell) {
 		CellInfo cellInfo = getCellInfo(cell);
-		return (cellInfo == null) ? false : cellInfo.getSet() == Set.CLOSED;
+		return (cellInfo == null) ? false : cellInfo.getCellMembership() == CellSetMembership.CLOSED;
 	}
 
 	/* get cell info associated with cell. */

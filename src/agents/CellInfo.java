@@ -8,7 +8,7 @@ class CellInfo implements Comparable<CellInfo> {
 		private float gCost;
 		private float hCost;
 		private float fCost;
-		private Set set;
+		private CellSetMembership cellSetMembership;
 
 		/** Read only. */
 		public GridCell getCell() {
@@ -39,15 +39,15 @@ class CellInfo implements Comparable<CellInfo> {
 
 		/** Read only. */
 		public float getFCost() {
-			return this.gCost + this.hCost;
+			return (this.gCost + this.hCost);
 		}
 
-		public Set getSet() {
-			return this.set;
+		public CellSetMembership getCellMembership() {
+			return this.cellSetMembership;
 		}
 
-		public void setSet(Set set) {
-			this.set = set;
+		public void setCellMembership(CellSetMembership cellMembership) {
+			this.cellSetMembership = cellMembership;
 		}
 
 		/**
@@ -65,11 +65,11 @@ class CellInfo implements Comparable<CellInfo> {
 		 * @cell   the cell
 		 * @gCost  the cost of the path from start to cell
 		 * @hCost  the heuristic estimate of the remaining cost to the goal
-		 * @set    the set that this node should start in
+		 * @cellCategory    the set that this node should start in
 		 * @parent the parent node of this cell
 		 */
-		public CellInfo(GridCell cell, float gCost, float hCost, Set set, CellInfo parent) {
-			this(cell, gCost, hCost, set);
+		public CellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership, CellInfo parent) {
+			this(cell, gCost, hCost, cellMembership);
 			this.parent = parent;
 		}
 
@@ -78,12 +78,12 @@ class CellInfo implements Comparable<CellInfo> {
 		 * @cell  the cell
 		 * @gCost the cost of the path from start to cell
 		 * @hCost the heuristic estimate of the remaining cost to the goal
-		 * @set   the set that this node should start in
+		 * @cellCategory   the set that this node should start in
 		 */
-		public CellInfo(GridCell cell, float gCost, float hCost, Set set) {
+		public CellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership) {
 			this.cell = cell;
 			this.gCost = gCost;
 			this.fCost = gCost + hCost;
-			this.set = set;
+			this.cellSetMembership = cellMembership;
 		}
 	}
