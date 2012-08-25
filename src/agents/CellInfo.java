@@ -8,7 +8,7 @@ class CellInfo implements Comparable<CellInfo> {
 		private float gCost;
 		private float hCost;
 		private float fCost;
-		private CellSetMembership cellSetMembership = CellSetMembership.NONE;
+		private CellSetMembership cellSetMembership;
 
 		/** Read only. */
 		public GridCell getCell() {

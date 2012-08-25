@@ -1,3 +1,3 @@
 package agents;
 
-public enum CellSetMembership { OPEN, CLOSED, NONE }
+public enum CellSetMembership { OPEN, CLOSED}
