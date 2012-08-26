@@ -50,17 +50,17 @@ public class MapInfo {
 	public ComputedPlan computePlan(GridCell goal) {
 		ComputedPlan plan = new ComputedPlan();
 
-		System.out.println("Generating plan...");
+		Trace.print("Generating plan...");
 
 		for (CellInfo cell = getCellInfo(goal);
 		     cell.getParent() != null;
 		     cell = cell.getParent()) {
 			GridCell gc = cell.getCell();
-			System.out.println("Prepending " + gc);
+			Trace.print("Prepending " + gc);
 			plan.prependStep(gc);
 		}
 
-		System.out.println("...Done.");
+		Trace.print("...Done.");
 
 		plan.setCost(getGCost(goal));
 		return plan;
@@ -235,7 +235,7 @@ public class MapInfo {
 	/* get cell info associated with cell. */
 	private CellInfo getCellInfo(GridCell cell) {
 		GridCoord gc = cell.getCoord();
-		if (cells == null) System.out.println("cells is null");
+		if (cells == null) Trace.print("cells is null");
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 	

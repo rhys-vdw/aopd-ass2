@@ -21,17 +21,28 @@ public class RhysAStar implements PlanningAgent {
 	
 	MapInfo mapinfo;
 	
-    private int	stepNo = 0;
+    private int stepNo = 0;
+    
+    private GridCell lastGoal = null;
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
 			int stepLeft, long stepTime, long timeLeft) {
 
 		try {
+			Trace.Enable(false);
 			GridCell nextStep = null;
 			
-			if (plan == null) {
+			boolean bReplan = 
+					plan == null ||			// no last path stored, have yet notr planned before?
+					map.getChangedEdges().size() > 0 ||	// map has had changes 
+					!lastGoal.equals(goal) || // Goal has changed (equals not implemented?)
+					!plan.contains(start); // sNode is not in the path (sNode out of track)
+			
+			if (bReplan) {
 				plan = generatePlan(map, start, goal);
+				stepNo = 0;
+				lastGoal = goal;
 			}
 
 			if (stepNo < plan.getLength())
@@ -41,13 +52,15 @@ public class RhysAStar implements PlanningAgent {
 				
 				if (nextStep == null) 
 				{
-					System.out.println("next step is null!");
+					Trace.print("next step is null!");
 				}
 			}
 			
 			return nextStep;
 
-		} catch (Exception e) {
+		} 
+		catch (Exception e) 
+		{
 			e.printStackTrace();
 			return start;
 		}
@@ -65,11 +78,11 @@ public class RhysAStar implements PlanningAgent {
 		while (mapinfo.isOpenEmpty() == false) {
 			GridCell current = mapinfo.closeCheapestOpen();
 
-			System.err.println(current);
+			Trace.print(current);
 
 			// if goal has been reached, return path
 			if (current == goal) {
-				System.out.println("found goal!");
+				Trace.print("found goal!");
 				return mapinfo.computePlan(goal);
 			}
 
@@ -116,7 +129,7 @@ public class RhysAStar implements PlanningAgent {
 		
 		if (mapinfo != null)
 		{
-			System.out.println("Open Set has" + mapinfo.openCount() + " entries");
+			Trace.print("Open Set has" + mapinfo.openCount() + " entries");
 			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
 			// to being called at unexpanded nodes too!!
 			mapinfo.GetSearchSetsAsArrayList(open, closed);
@@ -134,7 +147,7 @@ public class RhysAStar implements PlanningAgent {
 		
 		if (mapinfo != null)
 		{
-			System.out.println("Closed Set has" + mapinfo.closedCount() + " entries");
+			Trace.print("Closed Set has" + mapinfo.closedCount() + " entries");
 			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
 			// to being called at expanded nodes too!!
 			mapinfo.GetSearchSetsAsArrayList(open, closed);
