@@ -56,7 +56,7 @@ public class MapInfo {
 		     cell.getParent() != null;
 		     cell = cell.getParent()) {
 			GridCell gc = cell.getCell();
-			Trace.print("Prepending " + gc);
+			//Trace.print("Prepending " + gc);
 			plan.prependStep(gc);
 		}
 
@@ -145,7 +145,7 @@ public class MapInfo {
 
 		cellInfo.setCellMembership(CellSetMembership.CLOSED);
 		
-		// We will have better closed list management, but for now, just tally the number of CLOSED entries - 
+		// We will have better closed list management, but for now, just tally the number of times we close an entry - 
 		// this will help with analysis.
 		++nClosedCount;
 

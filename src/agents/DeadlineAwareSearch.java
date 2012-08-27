@@ -16,9 +16,9 @@ import pplanning.interfaces.PlanningAgent;
 import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
 
+
 public class DeadlineAwareSearch implements PlanningAgent 
 {
-
 	private ComputedPlan plan;
 	
 	MapInfo mapinfo;
@@ -26,13 +26,15 @@ public class DeadlineAwareSearch implements PlanningAgent
     private int stepNo = 0;
     
     private GridCell lastGoal = null;
-
+    
+    final private long MS_TO_NS_CONV_FACT = 1000000;
+    
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
 			int stepLeft, long stepTime, long timeLeft) {
 
 		try {
-			Trace.Enable(false);
+			Trace.Enable(true);
 			GridCell nextStep = null;
 			
 			boolean bReplan = 
@@ -41,8 +43,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 					!lastGoal.equals(goal) || // Goal has changed (equals not implemented?)
 					!plan.contains(start); // sNode is not in the path (sNode out of track)
 			
-			if (bReplan) {
-				plan = generatePlan(map, start, goal);
+			if (bReplan) 
+			{
+				long timeCurrent = System.nanoTime();
+				long timeDeadline = timeCurrent + timeLeft * MS_TO_NS_CONV_FACT;
+				Trace.print("current time (ns): " + timeCurrent);
+				Trace.print("deadline: " + timeDeadline);
+				plan = generatePlan(map, start, goal, timeDeadline);
 				stepNo = 0;
 				lastGoal = goal;
 			}
@@ -69,7 +76,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	}
 
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
-			GridCell goal) {
+			GridCell goal, long deadline) {
 
 		mapinfo = new MapInfo(map);
 
@@ -80,7 +87,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		while (mapinfo.isOpenEmpty() == false) {
 			GridCell current = mapinfo.closeCheapestOpen();
 
-			Trace.print(current);
+			//Trace.print(current);
 
 			// if goal has been reached, return path
 			if (current == goal) {
@@ -131,7 +138,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		
 		if (mapinfo != null)
 		{
-			Trace.print("Open Set has" + mapinfo.openCount() + " entries");
+			//Trace.print("Open Set has" + mapinfo.openCount() + " entries");
 			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
 			// to being called at unexpanded nodes too!!
 			mapinfo.GetSearchSetsAsArrayList(open, closed);
@@ -149,7 +156,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		
 		if (mapinfo != null)
 		{
-			Trace.print("Closed Set has" + mapinfo.closedCount() + " entries");
+			//Trace.print("Closed Set has" + mapinfo.closedCount() + " entries");
 			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
 			// to being called at expanded nodes too!!
 			mapinfo.GetSearchSetsAsArrayList(open, closed);
