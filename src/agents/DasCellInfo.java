@@ -2,8 +2,8 @@ package agents;
 
 import pplanning.simviewer.model.GridCell;
 
-class CellInfo implements Comparable<CellInfo> {
-		private CellInfo parent = null;
+class DasCellInfo implements Comparable<DasCellInfo> {
+		private DasCellInfo parent = null;
 		private final GridCell cell;
 		private float gCost;
 		private float hCost;
@@ -15,10 +15,10 @@ class CellInfo implements Comparable<CellInfo> {
 			return this.cell;
 		}
 
-		public CellInfo getParent() {
+		public DasCellInfo getParent() {
 			return this.parent;
 		}
-		public void setParent(CellInfo parent) {
+		public void setParent(DasCellInfo parent) {
 			this.parent = parent;
 		}
 
@@ -56,10 +56,14 @@ class CellInfo implements Comparable<CellInfo> {
 		 * Compare the f cost of this cell to another.
 		 * @other the CellInfo to be compared
 		 */
-		public int compareTo(CellInfo other) {
+		public int compareTo(DasCellInfo other) {
 			// compare f cost of either cell
 			if (this.fCost < other.fCost) return -1;
 			if (this.fCost > other.fCost) return  1;
+			// in the event of a tie, return the cell with the lowest h cost
+			if (this.hCost < other.hCost) return -1;
+			if (this.hCost > other.hCost) return  1;
+			// both values are the same
 			return 0;
 		}
 
@@ -75,8 +79,8 @@ class CellInfo implements Comparable<CellInfo> {
 		 * @cellMembership the set that this node should start in
 		 * @parent         the parent node of this cell
 		 */
-		public CellInfo(GridCell cell, float gCost, float hCost,
-				CellSetMembership cellMembership, CellInfo parent) {
+		public DasCellInfo(GridCell cell, float gCost, float hCost,
+				CellSetMembership cellMembership, DasCellInfo parent) {
 			this(cell, gCost, hCost, cellMembership);
 			this.parent = parent;
 		}
@@ -88,7 +92,7 @@ class CellInfo implements Comparable<CellInfo> {
 		 * @hCost          the heuristic estimate of the remaining cost to the goal
 		 * @cellMembership the set that this node should start in
 		 */
-		public CellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership) {
+		public DasCellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership) {
 			this.cell = cell;
 			this.gCost = gCost;
 			updateFCost();

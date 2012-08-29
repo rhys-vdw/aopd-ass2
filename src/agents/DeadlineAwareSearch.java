@@ -188,7 +188,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			//Trace.print("Open Set has" + mapinfo.openCount() + " entries");
 			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
 			// to being called at unexpanded nodes too!!
-			mapinfo.GetSearchSetsAsArrayList(open, closed);
+			mapinfo.getSearchSetsAsArrayList(open, closed);
 		}
 
 
@@ -197,7 +197,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	}
 
 	@Override
-	public ArrayList<GridCell> unexpandedNodes() {	
+	public ArrayList<GridCell> unexpandedNodes() {
 		ArrayList<GridCell> open = new ArrayList<GridCell>();
 		ArrayList<GridCell> closed = new ArrayList<GridCell>();
 
@@ -206,7 +206,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			//Trace.print("Closed Set has" + mapinfo.closedCount() + " entries");
 			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
 			// to being called at expanded nodes too!!
-			mapinfo.GetSearchSetsAsArrayList(open, closed);
+			mapinfo.getSearchSetsAsArrayList(open, closed);
 
 
 		}

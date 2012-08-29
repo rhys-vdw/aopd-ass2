@@ -30,8 +30,8 @@ import pplanning.simviewer.model.GridCoord;
  * them on run).
  */
 public class DasMapInfo {
-	private CellInfo[][] cells;
-	private PriorityQueue<CellInfo> openQueue;
+	private DasCellInfo[][] cells;
+	private PriorityQueue<DasCellInfo> openQueue;
 	
 	// Added this data for debugging - probably not useful in our actual algorithm,
 	// is just to aid analysis.
@@ -43,8 +43,8 @@ public class DasMapInfo {
 	public DasMapInfo(GridDomain map) {
 		this.width = map.getWidth();
 		this.height = map.getHeight();
-		this.cells = new CellInfo[width][height];
-		this.openQueue = new PriorityQueue<CellInfo>();
+		this.cells = new DasCellInfo[width][height];
+		this.openQueue = new PriorityQueue<DasCellInfo>();
 	}
 
 	public ComputedPlan computePlan(GridCell goal) {
@@ -52,7 +52,7 @@ public class DasMapInfo {
 
 		Trace.print("Generating plan...");
 
-		for (CellInfo cell = getCellInfo(goal);
+		for (DasCellInfo cell = getCellInfo(goal);
 		     cell.getParent() != null;
 		     cell = cell.getParent()) {
 			GridCell gc = cell.getCell();
@@ -78,7 +78,7 @@ public class DasMapInfo {
 		assert getCellInfo(cell) == null;
 
 		// add new node to array and open queue
-		CellInfo cellInfo = new CellInfo(cell, gCost, hCost, CellSetMembership.OPEN);
+		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost, CellSetMembership.OPEN);
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.offer(cellInfo);
 	}
@@ -100,7 +100,7 @@ public class DasMapInfo {
 	 */
 	/*
 	public void setCellOpen(GridCell cell) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 		// TODO: add to priority queue
 
 		// must have cell to 
@@ -139,7 +139,7 @@ public class DasMapInfo {
 	 * @return the cell formerly the cheapest from the open set
 	 */
 	public GridCell closeCheapestOpen() {
-		CellInfo cellInfo = openQueue.poll();
+		DasCellInfo cellInfo = openQueue.poll();
 
 		assert(cellInfo != null);
 
@@ -158,7 +158,7 @@ public class DasMapInfo {
 	 * @param cell the cell to be pruned.
 	 */
 	public void pruneCell(GridCell cell) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 
 		assert cellInfo != null;
 		assert cellInfo.getCellMembership() == CellSetMembership.CLOSED;
@@ -167,14 +167,14 @@ public class DasMapInfo {
 	}
 
 	public GridCell getParent(GridCell cell) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 		assert cellInfo != null;
 		return cellInfo.getParent().getCell();
 	}
 
 	public void setParent(GridCell cell, GridCell parent) {
-		CellInfo cellInfo = getCellInfo(cell);
-		CellInfo parentInfo = getCellInfo(parent);
+		DasCellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo parentInfo = getCellInfo(parent);
 
 		assert cellInfo != null;
 		assert parentInfo != null;
@@ -183,32 +183,32 @@ public class DasMapInfo {
 	}
 
 	public float getFCost(GridCell cell) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 		assert cellInfo != null;
 		return cellInfo.getFCost();
 	}
 
 	public float getGCost(GridCell cell) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 		assert cellInfo != null;
 		return cellInfo.getGCost();
 	}
 
 	public void setGCost(GridCell cell, float gCost) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 		assert cellInfo != null;
 		assert cellInfo.getCellMembership() != CellSetMembership.OPEN;
 		cellInfo.setGCost(gCost);
 	}
 
 	public float getHCost(GridCell cell) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 		assert cellInfo != null;
 		return cellInfo.getHCost();
 	}
 
 	public void setHCost(GridCell cell, float hCost) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 
 		assert cellInfo != null;
 		assert cellInfo.getCellMembership() != CellSetMembership.OPEN;
@@ -217,7 +217,7 @@ public class DasMapInfo {
 	}
 
 	public void setCosts(GridCell cell, float gCost, float hCost) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 
 		assert cellInfo != null;
 		assert cellInfo.getCellMembership() != CellSetMembership.OPEN;
@@ -232,7 +232,7 @@ public class DasMapInfo {
 	 * @return true if cell is in open set, otherwise false
 	 */
 	public boolean isOpen(GridCell cell) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 		return (cellInfo == null) ? false : cellInfo.getCellMembership() == CellSetMembership.OPEN;
 	}
 
@@ -242,12 +242,12 @@ public class DasMapInfo {
 	 * @return true if cell is in closed set, otherwise false
 	 */
 	public boolean isClosed(GridCell cell) {
-		CellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = getCellInfo(cell);
 		return (cellInfo == null) ? false : cellInfo.getCellMembership() == CellSetMembership.CLOSED;
 	}
 
 	/* get cell info associated with cell. */
-	private CellInfo getCellInfo(GridCell cell) {
+	private DasCellInfo getCellInfo(GridCell cell) {
 		GridCoord gc = cell.getCoord();
 		if (cells == null) Trace.print("cells is null");
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
@@ -259,16 +259,16 @@ public class DasMapInfo {
 	 * @param Open and Closed Sets
 	 * @return none
 	 */
-	public void GetSearchSetsAsArrayList(ArrayList<GridCell> _conOpen, ArrayList<GridCell> _conClosed)
+	public void getSearchSetsAsArrayList(ArrayList<GridCell> _conOpen, ArrayList<GridCell> _conClosed)
 	{
-		//ArrayList<CellInfo> conOpenSet = new ArrayList<CellInfo>();
-		//ArrayList<CellInfo> conClosedSet = new ArrayList<CellInfo>();
+		//ArrayList<DasCellInfo> conOpenSet = new ArrayList<CellInfo>();
+		//ArrayList<DasCellInfo> conClosedSet = new ArrayList<CellInfo>();
 		
 		for (int x = 0; x < width; x++)
 		{
 			for (int y = 0; y < height; y++)
 			{
-				CellInfo currCell = cells[x][y];
+				DasCellInfo currCell = cells[x][y];
 				if (currCell != null)
 				{
 					if (currCell.getCellMembership() == CellSetMembership.OPEN)
