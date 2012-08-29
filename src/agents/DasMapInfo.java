@@ -21,18 +21,14 @@ import pplanning.simviewer.model.GridCoord;
  * Nodes that are in the open set cannot be altered. Later this will probably
  * need to be changed, but for standard A* this is fine.
  *
- * To fix this a linked list will be used instead of a priority queue. Whenever
- * the f cost of a node in the open list is changed, a flag will change to show
- * that the list is out of order. The list will be sorted when
- * closeCheapestOpenCell is called. Insertions to the open list will be in order.
- *
  * I have used assertions instead of exceptions for speed (since we can disable
  * them on run).
  */
 public class DasMapInfo {
 	private DasCellInfo[][] cells;
 	private PriorityQueue<DasCellInfo> openQueue;
-	
+	private PriorityQueue<DasCellInfo> prunedQueue;
+
 	// Added this data for debugging - probably not useful in our actual algorithm,
 	// is just to aid analysis.
 	private int width;
@@ -56,7 +52,7 @@ public class DasMapInfo {
 		     cell.getParent() != null;
 		     cell = cell.getParent()) {
 			GridCell gc = cell.getCell();
-			//Trace.print("Prepending " + gc);
+			Trace.print("Prepending " + gc);
 			plan.prependStep(gc);
 		}
 
@@ -67,7 +63,7 @@ public class DasMapInfo {
 	}
 
 	/**
-	 * Add cell to open set. This will fail if cell has already been added
+	 * Add cell to open set. This will fail if cell has already been added.
 	 * @param cell the cell
 	 * @param gCost the cost to get to the cell
 	 * @param hCost the heuristic estimate to get to the goal
@@ -129,9 +125,8 @@ public class DasMapInfo {
 	 * This function just points out that we need a structure for closed list.
 	 * It is only used for debugging of the output of closed list.
 	 */
-	public int closedCount()
-	{
-		return(nClosedCount);
+	public int closedCount() {
+		return nClosedCount ;
 	}
 
 	/**
@@ -252,35 +247,27 @@ public class DasMapInfo {
 		if (cells == null) Trace.print("cells is null");
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
-	
-	/*
-	 * Return a container for visualising the Open and Closed Sets
-	 * Very expensive function!
-	 * @param Open and Closed Sets
-	 * @return none
-	 */
-	public void getSearchSetsAsArrayList(ArrayList<GridCell> _conOpen, ArrayList<GridCell> _conClosed)
-	{
-		//ArrayList<DasCellInfo> conOpenSet = new ArrayList<CellInfo>();
-		//ArrayList<DasCellInfo> conClosedSet = new ArrayList<CellInfo>();
-		
-		for (int x = 0; x < width; x++)
-		{
-			for (int y = 0; y < height; y++)
-			{
-				DasCellInfo currCell = cells[x][y];
-				if (currCell != null)
-				{
-					if (currCell.getCellMembership() == CellSetMembership.OPEN)
-					{
-						_conOpen.add(currCell.getCell());
-					}
-					else if (currCell.getCellMembership() == CellSetMembership.CLOSED)
-					{
-						_conClosed.add(currCell.getCell());
-					}
+
+	/** Return an ArrayList of all the GridCells currently in the closed set. */
+	public ArrayList<GridCell> getClosedArrayList() {
+		ArrayList<GridCell> closed = new ArrayList<GridCell>(nClosedCount);
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				DasCellInfo cell = cells[x][y];
+				if (cell != null && cell.getCellMembership() == CellSetMembership.CLOSED) {
+					closed.add(cells[x][y].getCell());
 				}
 			}
 		}
+		return closed;
+	}
+
+	/** Return an ArrayList of all GridCells currently in the open set. */
+	public ArrayList<GridCell> getOpenArrayList() {
+		ArrayList<GridCell> open = new ArrayList<GridCell>(openQueue.size());
+		for (DasCellInfo dci : openQueue) {
+			open.add(dci.getCell());
+		}
+		return open;
 	}
 }

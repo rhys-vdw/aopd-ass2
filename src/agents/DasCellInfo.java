@@ -8,7 +8,24 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		private float gCost;
 		private float hCost;
 		private float fCost;
+		private int dCheapestRaw;
 		private CellSetMembership cellSetMembership;
+
+		// Estimated number of expansions required to reach goal state from this
+		// node. (d cheapest)
+		// The raw estimate (not incorporating mean step error), given by the
+		// distance heuristic.
+		// TODO: Should this be a float? I think it makes sense for a d estimate
+		// to always be an int...
+
+
+		/**
+		 * Set the estimated number of expansions from this node to the goal state.
+		 * @param dCheapestRaw the new d value
+		 */
+		public void setDCheapestRaw (int dCheapestRaw) {
+			this.dCheapestRaw = dCheapestRaw;
+		}
 
 		/** Read only. */
 		public GridCell getCell() {

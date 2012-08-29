@@ -21,7 +21,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 {
 	private ComputedPlan plan;
 
-	DasMapInfo mapinfo;
+	DasMapInfo mapInfo;
 
 	// number of steps taken in current plan
 	private int stepNo = 0;
@@ -125,21 +125,21 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
 			GridCell goal, long deadline) {
 
-		mapinfo = new DasMapInfo(map);
+		mapInfo = new DasMapInfo(map);
 
 		// initialize open set with start node
-		mapinfo.add(start, 0f, map.hCost(start, goal));
+		mapInfo.add(start, 0f, map.hCost(start, goal));
 
 		// repeat while states are left in open set
-		while (mapinfo.isOpenEmpty() == false) {
-			GridCell current = mapinfo.closeCheapestOpen();
+		while (mapInfo.isOpenEmpty() == false) {
+			GridCell current = mapInfo.closeCheapestOpen();
 
 			//Trace.print(current);
 
 			// if goal has been reached, return path
 			if (current == goal) {
 				Trace.print("found goal!");
-				return mapinfo.computePlan(goal);
+				return mapInfo.computePlan(goal);
 			}
 
 			// iterate through neighboring nodes
@@ -147,15 +147,15 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 				// consider node if it can be entered and is not in closed list
 				if (map.isBlocked(neighbor) == false &&
-						mapinfo.isClosed((GridCell) neighbor) == false) {
+						mapInfo.isClosed((GridCell) neighbor) == false) {
 
 					// get g cost of neighbor
-					float gCost = mapinfo.getGCost(current) + map.cost(current, neighbor);
+					float gCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
 
-					if (mapinfo.isOpen((GridCell) neighbor) == false) {
+					if (mapInfo.isOpen((GridCell) neighbor) == false) {
 						// node not previously encountered, add it to the open set
-						mapinfo.add((GridCell) neighbor, gCost, map.hCost(neighbor, goal), current);
-					} else if (gCost < mapinfo.getGCost((GridCell) neighbor)) {
+						mapInfo.add((GridCell) neighbor, gCost, map.hCost(neighbor, goal), current);
+					} else if (gCost < mapInfo.getGCost((GridCell) neighbor)) {
 						// more direct route to node found, update it
 						// NOTE: this can never happen with an admissible heuristic!
 						assert false;
@@ -171,48 +171,19 @@ public class DeadlineAwareSearch implements PlanningAgent
 		return null;
 	}
 
-	// Do we want to show extra info? (e.g., close and open nodes, current path)
 	@Override
 	public Boolean showInfo() {
-		return true;
+		return mapInfo != null;
 	}
 
 	@Override
 	public ArrayList<GridCell> expandedNodes() {
-
-		ArrayList<GridCell> open = new ArrayList<GridCell>();
-		ArrayList<GridCell> closed = new ArrayList<GridCell>();
-
-		if (mapinfo != null)
-		{
-			//Trace.print("Open Set has" + mapinfo.openCount() + " entries");
-			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
-			// to being called at unexpanded nodes too!!
-			mapinfo.getSearchSetsAsArrayList(open, closed);
-		}
-
-
-
-		return(closed);
+		return mapInfo.getClosedArrayList();
 	}
 
 	@Override
 	public ArrayList<GridCell> unexpandedNodes() {
-		ArrayList<GridCell> open = new ArrayList<GridCell>();
-		ArrayList<GridCell> closed = new ArrayList<GridCell>();
-
-		if (mapinfo != null)
-		{
-			//Trace.print("Closed Set has" + mapinfo.closedCount() + " entries");
-			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
-			// to being called at expanded nodes too!!
-			mapinfo.getSearchSetsAsArrayList(open, closed);
-
-
-		}
-
-		return(open);
-
+		return mapInfo.getOpenArrayList();
 	}
 
 
