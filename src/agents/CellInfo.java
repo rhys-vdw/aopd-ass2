@@ -57,8 +57,13 @@ class CellInfo implements Comparable<CellInfo> {
 		 * @other the CellInfo to be compared
 		 */
 		public int compareTo(CellInfo other) {
+			// compare f cost of either cell
 			if (this.fCost < other.fCost) return -1;
-			if (this.fCost > other.fCost) return 1;
+			if (this.fCost > other.fCost) return  1;
+			// in the event of a tie, return the cell with the lowest h cost
+			if (this.hCost < other.hCost) return -1;
+			if (this.hCort > other.hCost) return  1;
+			// both values are the same
 			return 0;
 		}
 
