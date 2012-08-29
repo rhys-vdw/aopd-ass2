@@ -147,7 +147,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 				// consider node if it can be entered and is not in closed list
 				if (map.isBlocked(neighbor) == false &&
-						mapInfo.isClosed((GridCell) neighbor) == false) {
+				    mapInfo.isClosed((GridCell) neighbor) == false) {
 
 					// get g cost of neighbor
 					float gCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
@@ -164,11 +164,33 @@ public class DeadlineAwareSearch implements PlanningAgent
 							 mapInfo.setParent(neighbor, current);
 							 */
 					}
-						}
+				}
 			}
 		}
 		// no goal found
 		return null;
+	}
+
+	/**
+	 * Estimate the number of expansions required to move from one state to
+	 * another in a gridworld where only four directional movement is permitted. 
+	 * @param from the starting state
+	 * @param to the goal state
+	 */
+	private int dCostManhattan(GridCell from, GridCell to) {
+		return Math.abs(to.getCoord().getX() - from.getCoord().getX()) +
+		       Math.abs(to.getCoord().getY() - from.getCoord().getY());
+	}
+
+	/**
+	 * Estimate the number of expansions required to move from one state to
+	 * another in a gridworld where diagonal movement is permitted. 
+	 * @param from the starting state
+	 * @param to the goal state
+	 */
+	private int dCostEuclidean(GridCell from, GridCell to) {
+		return Math.max(Math.abs(to.getCoord().getX() - from.getCoord().getX()),
+		                Math.abs(to.getCoord().getY() - from.getCoord().getY()));
 	}
 
 	@Override

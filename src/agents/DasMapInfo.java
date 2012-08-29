@@ -159,6 +159,7 @@ public class DasMapInfo {
 		assert cellInfo.getCellMembership() == CellSetMembership.CLOSED;
 
 		cellInfo.setCellMembership(CellSetMembership.PRUNED);
+		prunedQueue.offer(cellInfo);
 	}
 
 	public GridCell getParent(GridCell cell) {
@@ -228,7 +229,7 @@ public class DasMapInfo {
 	 */
 	public boolean isOpen(GridCell cell) {
 		DasCellInfo cellInfo = getCellInfo(cell);
-		return (cellInfo == null) ? false : cellInfo.getCellMembership() == CellSetMembership.OPEN;
+		return cellInfo != null && cellInfo.getCellMembership() == CellSetMembership.OPEN;
 	}
 
 	/**
@@ -238,7 +239,7 @@ public class DasMapInfo {
 	 */
 	public boolean isClosed(GridCell cell) {
 		DasCellInfo cellInfo = getCellInfo(cell);
-		return (cellInfo == null) ? false : cellInfo.getCellMembership() == CellSetMembership.CLOSED;
+		return cellInfo == null && cellInfo.getCellMembership() == CellSetMembership.CLOSED;
 	}
 
 	/* get cell info associated with cell. */

@@ -11,16 +11,12 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		private int dCheapestRaw;
 		private CellSetMembership cellSetMembership;
 
-		// Estimated number of expansions required to reach goal state from this
-		// node. (d cheapest)
-		// The raw estimate (not incorporating mean step error), given by the
-		// distance heuristic.
-		// TODO: Should this be a float? I think it makes sense for a d estimate
-		// to always be an int...
-
-
 		/**
 		 * Set the estimated number of expansions from this node to the goal state.
+		 * This is the raw estimate, not including mean step error.
+		 *
+		 * TODO: Should this be a float? I think it makes sense for a d estimate.
+		 *
 		 * @param dCheapestRaw the new d value
 		 */
 		public void setDCheapestRaw (int dCheapestRaw) {
