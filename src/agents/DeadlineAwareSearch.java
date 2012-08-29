@@ -57,6 +57,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			if (bReplan) 
 			{
 				long timeCurrent = System.nanoTime();
+				// TODO: Should we provide a buffer, i.e. 1% of the time, for provision of the plan to the recipient
 				long timeDeadline = timeCurrent + timeLeft * MS_TO_NS_CONV_FACT;
 				Trace.print("current time (ns): " + timeCurrent);
 				Trace.print("deadline: " + timeDeadline);
@@ -86,6 +87,41 @@ public class DeadlineAwareSearch implements PlanningAgent
 		}
 	}
 
+	/*
+	 * Algorithm description
+	 * 1) 	Initialise Open with starting state
+	 * 2) 	Initialise Pruned with empty structure
+	 * 3) 	Initialise Incumbent plan with NULL
+	 * 4) 	while (current time < deadline)
+	 * 		{
+	 * 			if Open is not empty
+	 * 			{
+	 * 				max_reachable_depth = calculate_d_bound()
+	 * 				state s = open.pop()
+	 *  			if goal(s) && s > incumbent
+	 *  			{
+	 *  				incumbent = s
+	 *   			}
+	 *   			else if cheapest_solution_depth < max_reachable_depth
+	 *   			{
+	 *   				s' = for each child of s
+	 *   				{
+	 *   					open.push(s') 
+	 *   				}
+	 *   			}
+	 *   			else
+	 *   			{
+	 *   				pruned.push(s)
+	 *   			}
+	 *   		}
+	 *   		else
+	 *   		{
+	 *   			recover_pruned_states(open, pruned)
+	 *   		}
+	 *   	}
+	 *   
+	 *   	return incumbent	
+	 */
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
 			GridCell goal, long deadline) {
 
