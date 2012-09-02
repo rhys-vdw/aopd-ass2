@@ -200,7 +200,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			else
 			{
 				// Open list is empty, so we need to repopulate it.
-				mapInfo.recoverPrunedStates(exp);
+				mapInfo.recoverPrunedStates(0.0f);
 			}
 		}
 		
