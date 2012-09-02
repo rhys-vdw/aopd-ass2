@@ -288,4 +288,12 @@ public class DasMapInfo {
 		}
 		return open;
 	}
+	
+	
+	/** Move cells from pruned list back into open list.
+	 */
+	public void recoverPrunedStates()
+	{
+		
+	}
 }

@@ -139,7 +139,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			if (!mapInfo.isOpenEmpty())
 			{
 				
-				nMaxReachableDepth = CalculateMaxReachableDepth();
+				nMaxReachableDepth = calculateMaxReachableDepth();
 				GridCell current = mapInfo.closeCheapestOpen();
 				
 				// If the current state is a goal state, and the cost to get there was cheaper
@@ -159,7 +159,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					}
 						
 				}
-				else if (EstimateGoalDepth(current) < nMaxReachableDepth)
+				else if (estimateGoalDepth(current) < nMaxReachableDepth)
 				{
 					for (State neighbor : map.getSuccessors(current)) 
 					{
@@ -168,52 +168,31 @@ public class DeadlineAwareSearch implements PlanningAgent
 						    mapInfo.isClosed((GridCell) neighbor) == false &&
 						    mapInfo.isPruned((GridCell) neighbor) == false) 
 						{
+							float gCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
 							
+							if (mapInfo.isOpen((GridCell) neighbor) == false)
+							{
+								mapInfo.add((GridCell) neighbor, gCost, map.hCost(neighbor, goal), current);
+							}
+							// Do we need the following case handling? Is the above enough to add s' to open? Step 12 of algorithm
+							/* else if (gCost < mapInfo.getGCost((GridCell) neighbor)) */
 						}
 					}
 				}
-				
+				else
+				{
+					mapInfo.pruneCell(current);
+				}
 			}
-		// repeat while states are left in open set
-		//while (mapInfo.isOpenEmpty() == false) {
-		//	GridCell current = mapInfo.closeCheapestOpen();
-
-			//Trace.print(current);
-
-			// if goal has been reached, return path
-//			if (current == goal) {
-//				Trace.print("found goal!");
-//				return mapInfo.computePlan(goal);
-//			}
-//
-//			// iterate through neighboring nodes
-//			for (State neighbor : map.getSuccessors(current)) {
-//
-//				// consider node if it can be entered and is not in closed list
-//				if (map.isBlocked(neighbor) == false &&
-//				    mapInfo.isClosed((GridCell) neighbor) == false) {
-//
-//					// get g cost of neighbor
-//					float gCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
-//
-//					if (mapInfo.isOpen((GridCell) neighbor) == false) {
-//						// node not previously encountered, add it to the open set
-//						mapInfo.add((GridCell) neighbor, gCost, map.hCost(neighbor, goal), current);
-//					} else if (gCost < mapInfo.getGCost((GridCell) neighbor)) {
-//						// more direct route to node found, update it
-//						// NOTE: this can never happen with an admissible heuristic!
-//						assert false;
-//						/*
-//							 mapInfo.setCosts(neighbor, gCost, map.hCost(neighbor, goal));
-//							 mapInfo.setParent(neighbor, current);
-//							 */
-//					}
-//				}
-//			}
-//		}
-		// no goal found
+			else
+			{
+				// Open list is empty, so we need to repopulate it.
+				mapInfo.recoverPrunedStates();
+			}
 		}
-		return(planIncumbent);
+		
+		return(mapInfo.GetIncumbentPlan());
+			
 	}
 	
 
@@ -263,16 +242,23 @@ public class DeadlineAwareSearch implements PlanningAgent
 		return plan;
 	}
 	
-	public int CalculateMaxReachableDepth()
+	/**
+	 * Calculate dMax
+	 * @return
+	 */
+	public int calculateMaxReachableDepth()
 	{
 		int nMaxDepth = Integer.MAX_VALUE;
-		
-		
-		
+	
 		return(nMaxDepth);
 	}
 	
-	public int EstimateGoalDepth(GridCell _cell)
+	/**
+	 * Calculate the estimated depth of goal under this cell
+	 * @param _cell
+	 * @return
+	 */
+	public int estimateGoalDepth(GridCell _cell)
 	{
 		int nEstimatedGoalDepth = Integer.MAX_VALUE;
 		
