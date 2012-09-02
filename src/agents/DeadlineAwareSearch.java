@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Collection;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Queue;
+import java.util.LinkedHashMap;
 
 import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
 import au.rmit.ract.planning.pathplanning.entity.State;
@@ -30,6 +32,19 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private GridCell lastGoal = null;
 
 	final private long MS_TO_NS_CONV_FACT = 1000000;
+	
+	// This value needs tuning!
+	final private int EXPANSION_DELAY_WINDOW_LENGTH = 20;
+	
+	private int nExpansionsCount = 0; 
+	
+	// Delta e value
+	// GS: Only really want a circular queue.. is this really the way to do this in java?!?!
+	// The value of 10 needs to be tuned
+	private SlidingWindow<Integer> conExpansionDelays = new SlidingWindow<Integer>(EXPANSION_DELAY_WINDOW_LENGTH);
+	
+	// r value
+	private SlidingWindow<Double> conExpansionIntervals = new SlidingWindow<Double>(EXPANSION_DELAY_WINDOW_LENGTH);
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
@@ -249,6 +264,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 	public int calculateMaxReachableDepth()
 	{
 		int nMaxDepth = Integer.MAX_VALUE;
+		
+		
 	
 		return(nMaxDepth);
 	}

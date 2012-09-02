@@ -10,6 +10,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		private float fCost;
 		private int dCheapestRaw;
 		private CellSetMembership cellSetMembership;
+		private int nExpansionNumber; // GS: should this be final?
 
 		/**
 		 * Set the estimated number of expansions from this node to the goal state.
