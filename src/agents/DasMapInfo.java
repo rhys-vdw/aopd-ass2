@@ -35,6 +35,8 @@ public class DasMapInfo {
 	private int height;
 	
 	private int nClosedCount = 0;
+	
+	private ComputedPlan planIncumbent = null;
 
 	public DasMapInfo(GridDomain map) {
 		this.width = map.getWidth();
@@ -43,23 +45,31 @@ public class DasMapInfo {
 		this.openQueue = new PriorityQueue<DasCellInfo>();
 	}
 
-	public ComputedPlan computePlan(GridCell goal) {
-		ComputedPlan plan = new ComputedPlan();
+	public void computePlan(GridCell goal) 
+	{
+		ComputedPlan planNewIncumbent = new ComputedPlan();
 
-		Trace.print("Generating plan...");
+		Trace.print("Generating new incumbent plan...");
 
 		for (DasCellInfo cell = getCellInfo(goal);
 		     cell.getParent() != null;
-		     cell = cell.getParent()) {
+		     cell = cell.getParent()) 
+		{
 			GridCell gc = cell.getCell();
 			Trace.print("Prepending " + gc);
-			plan.prependStep(gc);
+			planNewIncumbent.prependStep(gc);
 		}
 
 		Trace.print("...Done.");
 
-		plan.setCost(getGCost(goal));
-		return plan;
+		planNewIncumbent.setCost(getGCost(goal));
+		planIncumbent = planNewIncumbent;
+	}
+	
+	public ComputedPlan GetIncumbentPlan()
+	{
+		assert planIncumbent != null;
+		return(planIncumbent);
 	}
 
 	/**
@@ -157,6 +167,8 @@ public class DasMapInfo {
 
 		assert cellInfo != null;
 		assert cellInfo.getCellMembership() == CellSetMembership.CLOSED;
+		// TODO: this is slightly confusing - we have quite a lot of coupling between
+		// setting to CLOSED and pruning
 
 		cellInfo.setCellMembership(CellSetMembership.PRUNED);
 		prunedQueue.offer(cellInfo);
@@ -239,7 +251,12 @@ public class DasMapInfo {
 	 */
 	public boolean isClosed(GridCell cell) {
 		DasCellInfo cellInfo = getCellInfo(cell);
-		return cellInfo == null && cellInfo.getCellMembership() == CellSetMembership.CLOSED;
+		return cellInfo != null && cellInfo.getCellMembership() == CellSetMembership.CLOSED;
+	}
+	
+	public boolean isPruned(GridCell cell) {
+		DasCellInfo cellInfo = getCellInfo(cell);
+		return cellInfo != null && cellInfo.getCellMembership() == CellSetMembership.PRUNED;
 	}
 
 	/* get cell info associated with cell. */
