@@ -174,6 +174,40 @@ public class DasMapInfo {
 		prunedQueue.offer(cellInfo);
 	}
 
+	/**
+	 * Move cheapest pruned cell to the open set and return it.
+	 * @return the cell formerly the cheapest from the open set
+	 */
+	void openCheapestPruned() {
+		DasCellInfo cellInfo = prunedQueue.poll();
+
+		assert(cellInfo != null);
+
+		openQueue.offer(cellInfo);
+	}
+
+	/**
+	 * Return a selection of pruned states to the open set. The number of states
+	 * moved is the number that is estimated can be explored with the given
+	 * number of expansions.
+	 * @param expansions the number of expansions to limit the number of nodes
+	 *                   recovered
+	 */
+	public void recoverPrunedStates(float expansionCount) {
+		// the sum of d^cheapest for each cell reopened
+		float dSum = 0f;
+
+		while (dSum < expansionCount && prunedQueue.isEmpty() == false) {
+			DasCellInfo cellInfo = prunedQueue.poll();
+
+			dSum += cellInfo.getDCheapestWithError();
+
+			// add to open set
+			cellInfo.setCellMembership(CellSetMembership.OPEN);
+			openQueue.offer(cellInfo);
+		}
+	}
+
 	public GridCell getParent(GridCell cell) {
 		DasCellInfo cellInfo = getCellInfo(cell);
 		assert cellInfo != null;
@@ -253,17 +287,15 @@ public class DasMapInfo {
 		DasCellInfo cellInfo = getCellInfo(cell);
 		return cellInfo != null && cellInfo.getCellMembership() == CellSetMembership.CLOSED;
 	}
-	
+
+	/**
+	 * Check if cell is in pruned set.
+	 * @param cell the cell to check
+	 * @return true if cell is in pruned set, otherwise false
+	 */
 	public boolean isPruned(GridCell cell) {
 		DasCellInfo cellInfo = getCellInfo(cell);
 		return cellInfo != null && cellInfo.getCellMembership() == CellSetMembership.PRUNED;
-	}
-
-	/* get cell info associated with cell. */
-	private DasCellInfo getCellInfo(GridCell cell) {
-		GridCoord gc = cell.getCoord();
-		if (cells == null) Trace.print("cells is null");
-		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 
 	/** Return an ArrayList of all the GridCells currently in the closed set. */
@@ -271,9 +303,9 @@ public class DasMapInfo {
 		ArrayList<GridCell> closed = new ArrayList<GridCell>(nClosedCount);
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				DasCellInfo cell = cells[x][y];
-				if (cell != null && cell.getCellMembership() == CellSetMembership.CLOSED) {
-					closed.add(cells[x][y].getCell());
+				DasCellInfo cellInfo = cells[x][y];
+				if (cellInfo != null && cellInfo.getCellMembership() == CellSetMembership.CLOSED) {
+					closed.add(cellInfo.getCell());
 				}
 			}
 		}
@@ -283,17 +315,16 @@ public class DasMapInfo {
 	/** Return an ArrayList of all GridCells currently in the open set. */
 	public ArrayList<GridCell> getOpenArrayList() {
 		ArrayList<GridCell> open = new ArrayList<GridCell>(openQueue.size());
-		for (DasCellInfo dci : openQueue) {
-			open.add(dci.getCell());
+		for (DasCellInfo cellInfo : openQueue) {
+			open.add(cellInfo.getCell());
 		}
 		return open;
 	}
-	
-	
-	/** Move cells from pruned list back into open list.
-	 */
-	public void recoverPrunedStates()
-	{
-		
+
+	/* get cell info associated with cell. */
+	private DasCellInfo getCellInfo(GridCell cell) {
+		GridCoord gc = cell.getCoord();
+		if (cells == null) Trace.print("cells is null");
+		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 }

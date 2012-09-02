@@ -187,20 +187,17 @@ public class DeadlineAwareSearch implements PlanningAgent
 			else
 			{
 				// Open list is empty, so we need to repopulate it.
-				mapInfo.recoverPrunedStates();
+				//mapInfo.recoverPrunedStates(exp);
 			}
 		}
 		
 		return(mapInfo.GetIncumbentPlan());
-			
 	}
-	
-
-
 
 	/**
 	 * Estimate the number of expansions required to move from one state to
 	 * another in a gridworld where only four directional movement is permitted. 
+	 *
 	 * @param from the starting state
 	 * @param to the goal state
 	 */
@@ -212,13 +209,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 	/**
 	 * Estimate the number of expansions required to move from one state to
 	 * another in a gridworld where diagonal movement is permitted. 
+	 *
 	 * @param from the starting state
 	 * @param to the goal state
 	 */
 	private int dCostEuclidean(GridCell from, GridCell to) {
 		return Math.max(Math.abs(to.getCoord().getX() - from.getCoord().getX()),
 		                Math.abs(to.getCoord().getY() - from.getCoord().getY()));
-		// GS: Why max here? Wouldn't it be c = sqrt(a^2 + b^2) ?
 	}
 
 	@Override
@@ -241,7 +238,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	public ComputedPlan getPath() {
 		return plan;
 	}
-	
+
 	/**
 	 * Calculate dMax
 	 * @return
@@ -249,10 +246,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 	public int calculateMaxReachableDepth()
 	{
 		int nMaxDepth = Integer.MAX_VALUE;
-	
+
 		return(nMaxDepth);
 	}
-	
+
 	/**
 	 * Calculate the estimated depth of goal under this cell
 	 * @param _cell
@@ -264,6 +261,4 @@ public class DeadlineAwareSearch implements PlanningAgent
 		
 		return(nEstimatedGoalDepth);
 	}
-	
-
 }

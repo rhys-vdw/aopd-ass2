@@ -15,12 +15,21 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		 * Set the estimated number of expansions from this node to the goal state.
 		 * This is the raw estimate, not including mean step error.
 		 *
-		 * TODO: Should this be a float? I think it makes sense for a d estimate.
+		 * TODO: Should this be a float? I think int makes sense for a d estimate.
 		 *
 		 * @param dCheapestRaw the new d value
 		 */
-		public void setDCheapestRaw (int dCheapestRaw) {
+		public void setDCheapestRaw(int dCheapestRaw) {
 			this.dCheapestRaw = dCheapestRaw;
+		}
+
+		public int getDCheapestRaw() {
+			return this.dCheapestRaw;
+		}
+
+		public float getDCheapestWithError() {
+			// TODO: return d^cheapest(cell)
+			return 0;
 		}
 
 		/** Read only. */
