@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Collection;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.Queue;
-import java.util.LinkedHashMap;
 
 import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
 import au.rmit.ract.planning.pathplanning.entity.State;
@@ -202,7 +200,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			else
 			{
 				// Open list is empty, so we need to repopulate it.
-				mapInfo.recoverPrunedStates();
+				mapInfo.recoverPrunedStates(exp);
 			}
 		}
 		
@@ -233,7 +231,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private int dCostEuclidean(GridCell from, GridCell to) {
 		return Math.max(Math.abs(to.getCoord().getX() - from.getCoord().getX()),
 		                Math.abs(to.getCoord().getY() - from.getCoord().getY()));
-		// GS: Why max here? Wouldn't it be c = sqrt(a^2 + b^2) ?
 	}
 
 	@Override
