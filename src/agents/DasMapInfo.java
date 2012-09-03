@@ -39,6 +39,7 @@ public class DasMapInfo {
 	private ComputedPlan planIncumbent = null;
 	
 	// Track the number of expansions performed -  e_curr value
+	// TODO: investigate refactoring this to long to avoid potential truncactions in operations 
 	private int nExpansionsCount = 0; 
 	
 	// This value needs tuning!
@@ -60,6 +61,12 @@ public class DasMapInfo {
 		this.height = map.getHeight();
 		this.cells = new DasCellInfo[width][height];
 		this.openQueue = new PriorityQueue<DasCellInfo>();
+		
+		// This shows design problems:
+		// Need to have an initial element to prevent divide by zero when it is first used.
+		// TODO: More evidence of a need to refactor the slidingwindow class!!
+		this.conExpansionDelays.add(1);
+		this.conExpansionIntervals.add(1l);
 	}
 
 	public void computePlan(GridCell goal) 
@@ -388,6 +395,11 @@ public class DasMapInfo {
 		return(fAvgExpansionInterval);
 	}
 	
+	/**
+	 * TODO: This could be a possible performance hole!!!!
+	 * TODO: This should also be refactored into the SlidingWindow class
+	 * @return
+	 */
 	public double calculateAvgExpansionDelay()
 	{
 		double fAvgExpansionDelay = 0.0f;

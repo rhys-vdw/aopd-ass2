@@ -141,7 +141,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			if (!mapInfo.isOpenEmpty())
 			{
 				
-				nMaxReachableDepth = calculateMaxReachableDepth();
+				nMaxReachableDepth = calculateMaxReachableDepth(timeDeadline);
 				GridCell current = mapInfo.closeCheapestOpen();
 				
 				// If the current state is a goal state, and the cost to get there was cheaper
@@ -247,13 +247,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 	 * Calculate dMax
 	 * @return
 	 */
-	public int calculateMaxReachableDepth()
+	public int calculateMaxReachableDepth(long timeDeadline)
 	{
 		int nMaxDepth = Integer.MAX_VALUE;
 		
 		double fAvgExpansionDelay = mapInfo.calculateAvgExpansionDelay();
 		
-		nMaxDepth = (int) (calculateExpansionsRemaining() / fAvgExpansionDelay);
+		nMaxDepth = (int) (calculateExpansionsRemaining(timeDeadline) / fAvgExpansionDelay);
 	
 		return(nMaxDepth);
 	}
@@ -264,13 +264,16 @@ public class DeadlineAwareSearch implements PlanningAgent
 	 * r = sliding window average of the delta times between expansions
 	 * @return
 	 */
-	public int calculateExpansionsRemaining()
+	public int calculateExpansionsRemaining(long timeDeadline)
 	{
 		int nExpansionsRemaining = 0;
 		
 		long timeCurrent = System.nanoTime();
+		long timeRemaining = timeDeadline - timeCurrent;
 		
-		nExpansionsRemaining = (int) (timeCurrent * mapInfo.calculateAvgExpansionInterval());
+		double nAvgExpansionInterval = mapInfo.calculateAvgExpansionInterval();
+		
+		nExpansionsRemaining = (int) (timeRemaining * nAvgExpansionInterval);
 		
 		return(nExpansionsRemaining);
 	}
