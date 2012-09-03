@@ -74,6 +74,11 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		public void setCellMembership(CellSetMembership cellMembership) {
 			this.cellSetMembership = cellMembership;
 		}
+		
+		public int getExpansionNumber()
+		{
+			return(this.nExpansionNumber);
+		}
 
 		/**
 		 * Compare the f cost of this cell to another.
@@ -103,8 +108,8 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		 * @parent         the parent node of this cell
 		 */
 		public DasCellInfo(GridCell cell, float gCost, float hCost,
-				CellSetMembership cellMembership, DasCellInfo parent) {
-			this(cell, gCost, hCost, cellMembership);
+				CellSetMembership cellMembership, DasCellInfo parent, int nExpansion) {
+			this(cell, gCost, hCost, cellMembership, nExpansion);
 			this.parent = parent;
 		}
 
@@ -115,10 +120,11 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		 * @hCost          the heuristic estimate of the remaining cost to the goal
 		 * @cellMembership the set that this node should start in
 		 */
-		public DasCellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership) {
+		public DasCellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership, int nExpansion) {
 			this.cell = cell;
 			this.gCost = gCost;
 			updateFCost();
 			this.cellSetMembership = cellMembership;
+			this.nExpansionNumber = nExpansion;
 		}
 	}

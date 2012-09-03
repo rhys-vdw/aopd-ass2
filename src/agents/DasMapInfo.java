@@ -37,7 +37,24 @@ public class DasMapInfo {
 	private int nClosedCount = 0;
 	
 	private ComputedPlan planIncumbent = null;
-
+	
+	// Track the number of expansions performed -  e_curr value
+	private int nExpansionsCount = 0; 
+	
+	// This value needs tuning!
+	final private int EXPANSION_DELAY_WINDOW_LENGTH = 20;
+	
+	// Time of the most recent expansion
+	private long timeMostRecentExpansion = 0;
+	
+	// Delta e value
+	// GS: Only really want a circular queue.. is this really the way to do this in java?!?!
+	// The value of 10 needs to be tuned
+	private SlidingWindow<Integer> conExpansionDelays = new SlidingWindow<Integer>(EXPANSION_DELAY_WINDOW_LENGTH);
+	
+	// r value
+	private SlidingWindow<Long> conExpansionIntervals = new SlidingWindow<Long>(EXPANSION_DELAY_WINDOW_LENGTH);
+	
 	public DasMapInfo(GridDomain map) {
 		this.width = map.getWidth();
 		this.height = map.getHeight();
@@ -84,7 +101,7 @@ public class DasMapInfo {
 		assert getCellInfo(cell) == null;
 
 		// add new node to array and open queue
-		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost, CellSetMembership.OPEN);
+		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost, CellSetMembership.OPEN, nExpansionsCount);
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.offer(cellInfo);
 	}
@@ -141,9 +158,11 @@ public class DasMapInfo {
 
 	/**
 	 * Move cheapest open cell to the closed set and return it.
+	 * Effectively, this, combined with the "add" functionality is the verb: Expansion
 	 * @return the cell formerly the cheapest from the open set
 	 */
-	public GridCell closeCheapestOpen() {
+	public GridCell closeCheapestOpen() 
+	{
 		DasCellInfo cellInfo = openQueue.poll();
 
 		assert(cellInfo != null);
@@ -153,7 +172,26 @@ public class DasMapInfo {
 		// We will have better closed list management, but for now, just tally the
 		// number of times we close an entry - this will help with analysis.
 		++nClosedCount;
-
+		
+		// TODO: Not sure if it should be incremented before or after!
+		// Incremented e_curr value
+		++nExpansionsCount;
+		
+		// Record the number of expansions performed before processing the node
+		// after each expansion.
+		// i.e. we are recording the current level of vacillation.
+		int nCurrentExpansionDelay = this.nExpansionsCount - cellInfo.getExpansionNumber();
+		
+		long timeCurrent = System.nanoTime();
+		long timeExpansionsDelta = timeCurrent - this.timeMostRecentExpansion;
+		
+		// Store this time, for the next time we perform an expansion.
+		this.timeMostRecentExpansion = timeCurrent;
+		// Add the expansion delay to the circular queue, so that
+		// we can compute a rolling average.
+		conExpansionDelays.add(nCurrentExpansionDelay);
+		conExpansionIntervals.add(timeExpansionsDelta);
+		
 		return cellInfo.getCell();
 	}
 
