@@ -366,9 +366,24 @@ public class DasMapInfo {
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 	
+	/**
+	 * TODO: This could be a possible performance hole!!!!
+	 * TODO: This should also be refactored into the SlidingWindow class
+	 * @return
+	 */
 	public double calculateAvgExpansionInterval()
 	{
 		double fAvgExpansionInterval = 0.0f;
+		long sumDeltas = 0;
+		int nEntries = 0;
+		
+		for (long timeDelta : conExpansionIntervals)
+		{
+			sumDeltas += timeDelta;
+		}
+		nEntries = conExpansionIntervals.size();
+
+		fAvgExpansionInterval = sumDeltas / nEntries;
 		
 		return(fAvgExpansionInterval);
 	}
@@ -377,7 +392,16 @@ public class DasMapInfo {
 	{
 		double fAvgExpansionDelay = 0.0f;
 		
+		int sumDelays = 0;
+		int nEntries = 0;
 		
+		for (int expDelay : conExpansionDelays)
+		{
+			sumDelays += expDelay;
+		}
+		nEntries = conExpansionDelays.size();
+
+		fAvgExpansionDelay = sumDelays / nEntries;		
 		
 		return(fAvgExpansionDelay);
 	}
