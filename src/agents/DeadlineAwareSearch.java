@@ -251,7 +251,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 	{
 		int nMaxDepth = Integer.MAX_VALUE;
 		
-		calculateExpansionsRemaining();
+		double fAvgExpansionDelay = mapInfo.calculateAvgExpansionDelay();
+		
+		nMaxDepth = (int) (calculateExpansionsRemaining() / fAvgExpansionDelay);
 	
 		return(nMaxDepth);
 	}
@@ -266,7 +268,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 	{
 		int nExpansionsRemaining = 0;
 		
+		long timeCurrent = System.nanoTime();
 		
+		nExpansionsRemaining = (int) (timeCurrent * mapInfo.calculateAvgExpansionInterval());
 		
 		return(nExpansionsRemaining);
 	}

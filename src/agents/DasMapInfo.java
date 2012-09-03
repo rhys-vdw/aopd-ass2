@@ -365,4 +365,20 @@ public class DasMapInfo {
 		if (cells == null) Trace.print("cells is null");
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
+	
+	public double calculateAvgExpansionInterval()
+	{
+		double fAvgExpansionInterval = 0.0f;
+		
+		return(fAvgExpansionInterval);
+	}
+	
+	public double calculateAvgExpansionDelay()
+	{
+		double fAvgExpansionDelay = 0.0f;
+		
+		
+		
+		return(fAvgExpansionDelay);
+	}
 }
