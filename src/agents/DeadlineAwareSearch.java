@@ -96,7 +96,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	 * 3) 	Initialise Incumbent plan with NULL
 	 * 4) 	while (current time < deadline)
 	 * 		{
-	 * 5)			if Open is not empty
+	 * 5)		if Open is not empty
 	 * 			{
 	 * 6)			max_reachable_depth = calculate_d_bound()
 	 * 7)			state s = open.pop()

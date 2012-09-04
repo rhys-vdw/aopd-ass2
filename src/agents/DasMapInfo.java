@@ -51,22 +51,17 @@ public class DasMapInfo {
 	// Delta e value
 	// GS: Only really want a circular queue.. is this really the way to do this in java?!?!
 	// The value of 10 needs to be tuned
-	private SlidingWindow<Integer> conExpansionDelays = new SlidingWindow<Integer>(EXPANSION_DELAY_WINDOW_LENGTH);
+	private SlidingWindow conExpansionDelays = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH);
 	
 	// r value
-	private SlidingWindow<Long> conExpansionIntervals = new SlidingWindow<Long>(EXPANSION_DELAY_WINDOW_LENGTH);
+	private SlidingWindow conExpansionIntervals = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH);
 	
 	public DasMapInfo(GridDomain map) {
 		this.width = map.getWidth();
 		this.height = map.getHeight();
 		this.cells = new DasCellInfo[width][height];
 		this.openQueue = new PriorityQueue<DasCellInfo>();
-		
-		// This shows design problems:
-		// Need to have an initial element to prevent divide by zero when it is first used.
-		// TODO: More evidence of a need to refactor the slidingwindow class!!
-		this.conExpansionDelays.add(1);
-		this.conExpansionIntervals.add(1l);
+	
 	}
 
 	public void computePlan(GridCell goal) 
@@ -187,7 +182,7 @@ public class DasMapInfo {
 		// Record the number of expansions performed before processing the node
 		// after each expansion.
 		// i.e. we are recording the current level of vacillation.
-		int nCurrentExpansionDelay = this.nExpansionsCount - cellInfo.getExpansionNumber();
+		long nCurrentExpansionDelay = this.nExpansionsCount - cellInfo.getExpansionNumber();
 		
 		long timeCurrent = System.nanoTime();
 		long timeExpansionsDelta = timeCurrent - this.timeMostRecentExpansion;
@@ -196,8 +191,8 @@ public class DasMapInfo {
 		this.timeMostRecentExpansion = timeCurrent;
 		// Add the expansion delay to the circular queue, so that
 		// we can compute a rolling average.
-		conExpansionDelays.add(nCurrentExpansionDelay);
-		conExpansionIntervals.add(timeExpansionsDelta);
+		conExpansionDelays.Push(nCurrentExpansionDelay);
+		conExpansionIntervals.Push(timeExpansionsDelta);
 		
 		return cellInfo.getCell();
 	}
@@ -373,48 +368,17 @@ public class DasMapInfo {
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 	
-	/**
-	 * TODO: This could be a possible performance hole!!!!
-	 * TODO: This should also be refactored into the SlidingWindow class
-	 * @return
-	 */
 	public double calculateAvgExpansionInterval()
 	{
 		double fAvgExpansionInterval = 0.0f;
-		long sumDeltas = 0;
-		int nEntries = 0;
-		
-		for (long timeDelta : conExpansionIntervals)
-		{
-			sumDeltas += timeDelta;
-		}
-		nEntries = conExpansionIntervals.size();
-
-		fAvgExpansionInterval = sumDeltas / nEntries;
-		
+		fAvgExpansionInterval = conExpansionIntervals.getAvg();
 		return(fAvgExpansionInterval);
 	}
 	
-	/**
-	 * TODO: This could be a possible performance hole!!!!
-	 * TODO: This should also be refactored into the SlidingWindow class
-	 * @return
-	 */
 	public double calculateAvgExpansionDelay()
 	{
 		double fAvgExpansionDelay = 0.0f;
-		
-		int sumDelays = 0;
-		int nEntries = 0;
-		
-		for (int expDelay : conExpansionDelays)
-		{
-			sumDelays += expDelay;
-		}
-		nEntries = conExpansionDelays.size();
-
-		fAvgExpansionDelay = sumDelays / nEntries;		
-		
+		fAvgExpansionDelay = conExpansionDelays.getAvg();
 		return(fAvgExpansionDelay);
 	}
 }
