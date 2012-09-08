@@ -16,43 +16,61 @@ import java.util.Arrays;
  * @param <T>
  */
 
+
+
+
 public class SlidingWindow
 {
 	
-	private int m_sz;
+	private int m_size;
 
-	private Long[] m_conData;
+	private long[] m_conData;
 	
 	private long m_sum;
 	
+	private int m_oldest;
+	
+	private int m_count;
+	
 	SlidingWindow(int _size) 
 	{
-		m_sz = _size;
-		m_conData = new Long[_size];
-		
-		// Give an initial population - probably should be done by application!
-		// Populate with 0's to start with
-		Arrays.fill(m_conData, 0l);
+		m_size = _size;
+		m_conData = new long[_size];
+		m_oldest = 0;
+		m_count = 0;
 	}
 	
 	void Push(long _newEntry)
 	{
-		// Maintain the sum, for easy computation of the average.
-		// Reduce the sum of all values by the last value in the array
-		m_sum -= m_conData[m_sz-1];
+		if (m_count < m_size)
+		{
+			m_count++;
+		}
+		else
+		{
+			long removedEntry = m_conData[m_oldest];
+			m_sum -= removedEntry;
+			System.out.print("removing " + removedEntry);
+		}
+		// Replace the previous oldest entry with the new entry, and update the oldest pointer to the next oldest
+		m_conData[m_oldest] = _newEntry;
+		if (m_oldest < m_size-1)
+		{
+			m_oldest++;
+		}
+		else
+		{
+			m_oldest = 0;
+		}
+
 		// Add the new value to the sum
 		m_sum += _newEntry;
-		
-		for (int n = m_conData.length -1; n > 0; n--)
-		{
-			m_conData[n] = m_conData[n-1];
-		}
-		m_conData[0] = new Long(_newEntry);
+
 	}
 	
 	public void PrintAll()
 	{
-		for (Long n : m_conData)
+		for (long n : m_conData)
 		{
 			System.out.print(n + " ");
 		}
@@ -61,7 +79,7 @@ public class SlidingWindow
 	
 	public double getAvg()
 	{
-		return(m_sum/m_sz);
+		return((float)m_sum/m_count);
 	}
 	
 	/**
