@@ -131,10 +131,12 @@ public class DeadlineAwareSearch implements PlanningAgent
 		mapInfo = new DasMapInfo(map);
 		
 		float fHCost = map.hCost(start, goal);
-		int nDCost = (int) fHCost;
+		
+		//TODO: Again, this is assuming manhattan world - see #Issue 11
+		int nDCost = dCostManhattan((GridCell)start, goal);
 
 		// initialize open set with start node
-		mapInfo.add(start, 0f, fHCost, nDCost);
+		mapInfo.add(start, 0f, fHCost, nDCost, 0);
 
 		while (System.nanoTime() < timeDeadline)
 		{
@@ -173,12 +175,15 @@ public class DeadlineAwareSearch implements PlanningAgent
 						{
 							float fNeighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
 							float fNeighborHCost = map.hCost(neighbor, goal);
-							int nNeighbourDCost = (int) fNeighborHCost;
+							
+							// TODO: this is currently assuming manhattan grid world. See Issue #11
+							int nNeighbourDCost = (int) dCostManhattan((GridCell)neighbor, goal);
 							
 							if (mapInfo.isOpen((GridCell) neighbor) == false)
 							{
 								// Add the neighbor to the open set!
-								mapInfo.add((GridCell) neighbor, fNeighborGCost, fNeighborHCost, nNeighbourDCost, current);
+								mapInfo.add((GridCell) neighbor, fNeighborGCost, fNeighborHCost, 
+										nNeighbourDCost, current);
 							}
 							// Do we need the following case handling? Is the above enough to add s' to open? Step 12 of algorithm
 							/* else if (gCost < mapInfo.getGCost((GridCell) neighbor)) */
@@ -284,14 +289,19 @@ public class DeadlineAwareSearch implements PlanningAgent
 	
 	/**
 	 * Calculate the estimated depth of goal under this cell
+	 * For the given cell, we want to get it's dCheapest
+	 * We can use this dCheapest, and that of it's parent, as well as the mean single step error
+	 * to compute a dCheapestWithError.
 	 * @param _cell
 	 * @return
 	 */
-	public int estimateGoalDepth(GridCell _cell)
+	public float estimateGoalDepth(GridCell _cell)
 	{
-		int nEstimatedGoalDepth = Integer.MAX_VALUE;
+		float fEstimatedGoalDepth = Integer.MAX_VALUE;
 		
-		return(nEstimatedGoalDepth);
+		fEstimatedGoalDepth = mapInfo.getDCheapestWithError(_cell);
+		
+		return(fEstimatedGoalDepth);
 	}
 	
 

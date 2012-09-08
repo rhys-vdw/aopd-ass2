@@ -97,13 +97,14 @@ public class DasMapInfo {
 	 * @param hCost the heuristic estimate to get to the goal
 	 * @param parent the previous cell in a path
 	 */
-	public void add(GridCell cell, float gCost, float hCost, int dCheapest) {
+	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw, int error) 
+	{
 		// should only be called when no cell already exists in array
 		assert getCellInfo(cell) == null;
 
 		// add new node to array and open queue
 		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost, CellSetMembership.OPEN, nExpansionsCount,
-				dCheapest);
+				dCheapestRaw);
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.offer(cellInfo);
 	}
@@ -114,8 +115,15 @@ public class DasMapInfo {
 	 * @param gCost the cost to get to the cell
 	 * @param hCost the heuristic estimate to get to the goal
 	 */
-	public void add(GridCell cell, float gCost, float hCost, int dCheapest, GridCell parent) {
-		add(cell, gCost, hCost, dCheapest);
+	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw, 
+			GridCell parent) 
+	{
+		// TODO: need to add some traces to check the intuition here.
+		// i.e. show that error goes up as the direction is away from the goal.
+		int nError = 0;
+		nError = dCheapestRaw - cells[parent.getCoord().getX()][parent.getCoord().getY()]
+				.getDCheapestRaw() + 1;
+		add(cell, gCost, hCost, dCheapestRaw, nError);
 		setParent(cell, parent);
 	}
 
@@ -378,5 +386,14 @@ public class DasMapInfo {
 		double fAvgExpansionDelay = 0.0f;
 		fAvgExpansionDelay = conExpansionDelays.getAvg();
 		return(fAvgExpansionDelay);
+	}
+	
+	public float getDCheapestWithError(GridCell cell)
+	{
+		float fDCheapestWithError = 0.0f;
+		
+		fDCheapestWithError = cells[cell.getCoord().getX()][cell.getCoord().getY()].getDCheapestWithError();
+		
+		return(fDCheapestWithError);
 	}
 }

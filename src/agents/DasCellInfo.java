@@ -12,6 +12,47 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		private CellSetMembership cellSetMembership;
 		private int nExpansionNumber; // TODO: should this be final?
 
+		// The below are required for the d_cheapest calculation
+		private int dError = 0;
+		//private float dAverageError = 0.0f;
+		private int nCumulativeErrorOfPartialSolution = 0;
+		private int nPartialSolutionDepth = 0; // Node depth so far
+
+		public int getDepth()
+		{
+			return(this.nPartialSolutionDepth);
+		}
+		
+//		public float getAverageError()
+//		{
+//			return(this.dAverageError);
+//		}
+		
+		public int getCumulativeError()
+		{
+			return(nCumulativeErrorOfPartialSolution);
+		}
+		
+		public int getError()
+		{
+			// TODO: possibly not needed
+			return(this.dError);
+		}
+		
+		public float getAverageError()
+		{
+			float avgError;
+			if (this.nPartialSolutionDepth != 0)
+			{
+				avgError = this.nCumulativeErrorOfPartialSolution / this.nPartialSolutionDepth;
+			}
+			else
+			{
+				avgError = 0;
+			}
+			return(avgError);
+		}
+		
 		/**
 		 * Set the estimated number of expansions from this node to the goal state.
 		 * This is the raw estimate, not including mean step error.
@@ -29,8 +70,22 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		}
 
 		public float getDCheapestWithError() {
+			// This is now being calculated at the mapinfo level, as the map info keeps track of 
+			// the structures required.
 			// TODO: return d^cheapest(cell)
-			return 0;
+			float dCheapestWithError = 0.0f;
+			float avgError = this.getAverageError();
+			
+			if (avgError < 1.0f)
+			{
+				dCheapestWithError = this.dCheapestRaw / (1-avgError);
+			}
+			else
+			{
+				dCheapestWithError = (float)Float.POSITIVE_INFINITY;
+			}
+			
+			return(dCheapestWithError);
 		}
 
 		/** Read only. */
@@ -109,9 +164,12 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		 */
 		public DasCellInfo(GridCell cell, float gCost, float hCost,
 				CellSetMembership cellMembership, DasCellInfo parent, int nExpansion,
-				int dCheapest) {
+				int dCheapest, int error) {
 			this(cell, gCost, hCost, cellMembership, nExpansion, dCheapest);
 			this.parent = parent;
+			this.dError = error;
+			this.nPartialSolutionDepth = parent.getDepth() + 1;
+			this.nCumulativeErrorOfPartialSolution = parent.getCumulativeError() + error;
 		}
 
 		/**
