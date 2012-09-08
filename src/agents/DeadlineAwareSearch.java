@@ -145,6 +145,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 				
 				nMaxReachableDepth = calculateMaxReachableDepth(timeDeadline);
+				Trace.print("just calced d_max: " + nMaxReachableDepth);
 				GridCell current = mapInfo.closeCheapestOpen();
 				
 				// If the current state is a goal state, and the cost to get there was cheaper
@@ -166,6 +167,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 				else if (estimateGoalDepth(current) < nMaxReachableDepth)
 				{
+					Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
 					for (State neighbor : map.getSuccessors(current)) 
 					{
 						// consider node if it can be entered and is not in closed or pruned list
@@ -192,6 +194,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 				else
 				{
+					Trace.print("(unreachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
 					mapInfo.pruneCell(current);
 				}
 			}
@@ -263,7 +266,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 		double fAvgExpansionDelay = mapInfo.calculateAvgExpansionDelay();
 		
 		nMaxDepth = (int) (calculateExpansionsRemaining(timeDeadline) / fAvgExpansionDelay);
-	
+
+		Trace.print(nMaxDepth + " maximum reachable depth");
 		return(nMaxDepth);
 	}
 	
@@ -281,8 +285,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 		long timeRemaining = timeDeadline - timeCurrent;
 		
 		double nAvgExpansionRate = 1/mapInfo.calculateAvgExpansionInterval();
-
+		Trace.print(nAvgExpansionRate  + " avg expansion rate");
 		nExpansionsRemaining = (int) (timeRemaining * nAvgExpansionRate);
+		Trace.print(nExpansionsRemaining + " expansions remaining (estimated)");
 		
 		return(nExpansionsRemaining);
 	}
