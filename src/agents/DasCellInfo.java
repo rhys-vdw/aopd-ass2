@@ -44,7 +44,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 			float avgError;
 			if (this.nPartialSolutionDepth != 0)
 			{
-				avgError = this.nCumulativeErrorOfPartialSolution / this.nPartialSolutionDepth;
+				avgError = (float)this.nCumulativeErrorOfPartialSolution / this.nPartialSolutionDepth;
 			}
 			else
 			{

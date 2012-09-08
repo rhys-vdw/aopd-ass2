@@ -283,8 +283,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 		
 		long timeCurrent = System.nanoTime();
 		long timeRemaining = timeDeadline - timeCurrent;
+		double avgExpansionInterval = mapInfo.calculateAvgExpansionInterval();
+		double nAvgExpansionRate = 1/avgExpansionInterval;
 		
-		double nAvgExpansionRate = 1/mapInfo.calculateAvgExpansionInterval();
 		Trace.print(nAvgExpansionRate  + " avg expansion rate");
 		nExpansionsRemaining = (int) (timeRemaining * nAvgExpansionRate);
 		Trace.print(nExpansionsRemaining + " expansions remaining (estimated)");

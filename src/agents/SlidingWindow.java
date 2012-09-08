@@ -50,7 +50,7 @@ public class SlidingWindow
 		{
 			long removedEntry = m_conData[m_oldest];
 			m_sum -= removedEntry;
-			System.out.print("removing " + removedEntry);
+			//System.out.print("removing " + removedEntry);
 		}
 		// Replace the previous oldest entry with the new entry, and update the oldest pointer to the next oldest
 		m_conData[m_oldest] = _newEntry;
@@ -79,7 +79,15 @@ public class SlidingWindow
 	
 	public double getAvg()
 	{
-		return((float)m_sum/m_count);
+		if (m_count == 0)
+		{
+			return(0);
+		}
+		else
+		{
+			return((float)m_sum/m_count);
+		}
+			
 	}
 	
 	/**
