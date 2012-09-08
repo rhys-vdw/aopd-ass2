@@ -31,8 +31,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	final private long MS_TO_NS_CONV_FACT = 1000000;
 	
-
-
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
 			int stepLeft, long stepTime, long timeLeft) {
@@ -131,9 +129,12 @@ public class DeadlineAwareSearch implements PlanningAgent
 		int nMaxReachableDepth = Integer.MAX_VALUE;
 		int nEstimatedDepth = Integer.MAX_VALUE;
 		mapInfo = new DasMapInfo(map);
+		
+		float fHCost = map.hCost(start, goal);
+		int nDCost = (int) fHCost;
 
 		// initialize open set with start node
-		mapInfo.add(start, 0f, map.hCost(start, goal));
+		mapInfo.add(start, 0f, fHCost, nDCost);
 
 		while (System.nanoTime() < timeDeadline)
 		{
@@ -170,11 +171,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 						    mapInfo.isClosed((GridCell) neighbor) == false &&
 						    mapInfo.isPruned((GridCell) neighbor) == false) 
 						{
-							float gCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
+							float fNeighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
+							float fNeighborHCost = map.hCost(neighbor, goal);
+							int nNeighbourDCost = (int) fNeighborHCost;
 							
 							if (mapInfo.isOpen((GridCell) neighbor) == false)
 							{
-								mapInfo.add((GridCell) neighbor, gCost, map.hCost(neighbor, goal), current);
+								// Add the neighbor to the open set!
+								mapInfo.add((GridCell) neighbor, fNeighborGCost, fNeighborHCost, nNeighbourDCost, current);
 							}
 							// Do we need the following case handling? Is the above enough to add s' to open? Step 12 of algorithm
 							/* else if (gCost < mapInfo.getGCost((GridCell) neighbor)) */
@@ -271,9 +275,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 		long timeCurrent = System.nanoTime();
 		long timeRemaining = timeDeadline - timeCurrent;
 		
-		double nAvgExpansionInterval = mapInfo.calculateAvgExpansionInterval();
-		
-		nExpansionsRemaining = (int) (timeRemaining * nAvgExpansionInterval);
+		double nAvgExpansionRate = 1/mapInfo.calculateAvgExpansionInterval();
+
+		nExpansionsRemaining = (int) (timeRemaining * nAvgExpansionRate);
 		
 		return(nExpansionsRemaining);
 	}

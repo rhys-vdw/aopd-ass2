@@ -10,7 +10,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		private float fCost;
 		private int dCheapestRaw;
 		private CellSetMembership cellSetMembership;
-		private int nExpansionNumber; // GS: should this be final?
+		private int nExpansionNumber; // TODO: should this be final?
 
 		/**
 		 * Set the estimated number of expansions from this node to the goal state.
@@ -108,8 +108,9 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		 * @parent         the parent node of this cell
 		 */
 		public DasCellInfo(GridCell cell, float gCost, float hCost,
-				CellSetMembership cellMembership, DasCellInfo parent, int nExpansion) {
-			this(cell, gCost, hCost, cellMembership, nExpansion);
+				CellSetMembership cellMembership, DasCellInfo parent, int nExpansion,
+				int dCheapest) {
+			this(cell, gCost, hCost, cellMembership, nExpansion, dCheapest);
 			this.parent = parent;
 		}
 
@@ -120,11 +121,13 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		 * @hCost          the heuristic estimate of the remaining cost to the goal
 		 * @cellMembership the set that this node should start in
 		 */
-		public DasCellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership, int nExpansion) {
+		public DasCellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership, 
+				int nExpansion, int dCheapest) {
 			this.cell = cell;
 			this.gCost = gCost;
 			updateFCost();
 			this.cellSetMembership = cellMembership;
 			this.nExpansionNumber = nExpansion;
+			this.dCheapestRaw = dCheapest;
 		}
 	}

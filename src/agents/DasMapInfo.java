@@ -1,7 +1,6 @@
 package agents;
 
 import java.util.PriorityQueue;
-// TODO:
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -98,12 +97,13 @@ public class DasMapInfo {
 	 * @param hCost the heuristic estimate to get to the goal
 	 * @param parent the previous cell in a path
 	 */
-	public void add(GridCell cell, float gCost, float hCost) {
+	public void add(GridCell cell, float gCost, float hCost, int dCheapest) {
 		// should only be called when no cell already exists in array
 		assert getCellInfo(cell) == null;
 
 		// add new node to array and open queue
-		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost, CellSetMembership.OPEN, nExpansionsCount);
+		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost, CellSetMembership.OPEN, nExpansionsCount,
+				dCheapest);
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.offer(cellInfo);
 	}
@@ -114,8 +114,8 @@ public class DasMapInfo {
 	 * @param gCost the cost to get to the cell
 	 * @param hCost the heuristic estimate to get to the goal
 	 */
-	public void add(GridCell cell, float gCost, float hCost, GridCell parent) {
-		add(cell, gCost, hCost);
+	public void add(GridCell cell, float gCost, float hCost, int dCheapest, GridCell parent) {
+		add(cell, gCost, hCost, dCheapest);
 		setParent(cell, parent);
 	}
 
@@ -207,8 +207,6 @@ public class DasMapInfo {
 
 		assert cellInfo != null;
 		assert cellInfo.getCellMembership() == CellSetMembership.CLOSED;
-		// TODO: this is slightly confusing - we have quite a lot of coupling between
-		// setting to CLOSED and pruning
 
 		cellInfo.setCellMembership(CellSetMembership.PRUNED);
 		prunedQueue.offer(cellInfo);
