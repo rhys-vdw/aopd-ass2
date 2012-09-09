@@ -45,8 +45,8 @@ public class DasMapInfo {
 	final private int EXPANSION_DELAY_WINDOW_LENGTH = 20;
 	
 	// r_default. Used before conExpansionIntervals has settled.
-	final private int INITIAL_EXPANSION_RATE = 5;
-	final private int INITIAL_EXPANSION_DELAY = 20;
+	final private int SETTLING_EXPANSION_COUNT = 200;
+	final private int SETTLING_EXPANSION_AVG_INTERVAL = 1000;
 	
 	
 	// Time of the most recent expansion
@@ -56,17 +56,18 @@ public class DasMapInfo {
 	// GS: Only really want a circular queue.. is this really the way to do this in java?!?!
 	// The value of 10 needs to be tuned
 	private SlidingWindow conExpansionDelays = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH,
-			INITIAL_EXPANSION_RATE, INITIAL_EXPANSION_DELAY);
+			20, 1);
 	
 	// r value
 	private SlidingWindow conExpansionIntervals = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH, 
-			INITIAL_EXPANSION_RATE, INITIAL_EXPANSION_DELAY);
+			SETTLING_EXPANSION_COUNT, SETTLING_EXPANSION_AVG_INTERVAL);
 	
 	public DasMapInfo(GridDomain map) {
 		this.width = map.getWidth();
 		this.height = map.getHeight();
 		this.cells = new DasCellInfo[width][height];
 		this.openQueue = new PriorityQueue<DasCellInfo>();
+		this.prunedQueue = new PriorityQueue<DasCellInfo>();
 	
 	}
 
@@ -154,7 +155,7 @@ public class DasMapInfo {
 	 * @return true if there are no cells in the open set
 	 */
 	public boolean isOpenEmpty() {
-		return openQueue.isEmpty();
+		return (openQueue.size() == 0);
 	}
 
 	/**
@@ -243,6 +244,7 @@ public class DasMapInfo {
 
 		assert(cellInfo != null);
 
+		cellInfo.setCellMembership(CellSetMembership.OPEN);
 		openQueue.offer(cellInfo);
 	}
 
@@ -257,7 +259,7 @@ public class DasMapInfo {
 		// the sum of d^cheapest for each cell reopened
 		float dSum = 0f;
 
-		while (dSum < expansionCount && prunedQueue.isEmpty() == false) {
+		while (dSum < expansionCount && prunedQueue.size() > 0) {
 			DasCellInfo cellInfo = prunedQueue.poll();
 
 			dSum += cellInfo.getDCheapestWithError();
@@ -392,6 +394,7 @@ public class DasMapInfo {
 	{
 		double fAvgExpansionInterval = 0.0f;
 		fAvgExpansionInterval = conExpansionIntervals.getAvg();
+		//System.out.println(fAvgExpansionInterval);
 		return(fAvgExpansionInterval);
 	}
 	

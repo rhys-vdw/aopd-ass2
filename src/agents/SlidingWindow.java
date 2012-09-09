@@ -64,7 +64,7 @@ public class SlidingWindow
 		{
 			long removedEntry = m_conData[m_oldest];
 			m_sum -= removedEntry;
-			System.out.print("removing " + removedEntry);
+			//System.out.print("removing " + removedEntry);
 		}
 		// Replace the previous oldest entry with the new entry, and update the oldest pointer to the next oldest
 		m_conData[m_oldest] = _newEntry;
@@ -79,7 +79,7 @@ public class SlidingWindow
 
 		// Add the new value to the sum
 		m_sum += _newEntry;
-		System.out.print("adding " + _newEntry + " sum = " + m_sum);
+		//System.out.print("adding " + _newEntry + " sum = " + m_sum);
 
 
 	}
@@ -103,7 +103,7 @@ public class SlidingWindow
 		else
 		{
 			fAverage = (float)(m_sum/m_count);
-			System.out.print("sliding window computed avg: " + m_sum + " / " + m_count + " = " + fAverage);
+			//System.out.print("sliding window computed avg: " + m_sum + " / " + m_count + " = " + fAverage);
 		}
 			
 		return(fAverage);
@@ -127,31 +127,3 @@ public class SlidingWindow
 		}
 	}
 }
-
-// Old implementation
-//public class SlidingWindow<T> extends LinkedList<T>
-//{
-//
-//	int m_sz;
-//	
-//	SlidingWindow(int _sz)
-//	{
-//		super();
-//		m_sz = _sz;	
-//	}
-//	
-//	@Override
-//	public boolean add(T _obj)
-//	{
-//		boolean bRetVal = false;
-//		super.add(_obj);
-//		while (size() > m_sz)
-//		{
-//			super.remove();
-//		}
-//		
-//		return(true);
-//	}
-//	
-//	
-//}

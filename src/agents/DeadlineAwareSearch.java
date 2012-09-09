@@ -1,12 +1,6 @@
 package agents;
 
 import java.util.ArrayList;
-import java.util.PriorityQueue;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Collection;
-import java.util.Set;
-import java.util.HashSet;
 
 import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
 import au.rmit.ract.planning.pathplanning.entity.State;
@@ -36,7 +30,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			int stepLeft, long stepTime, long timeLeft) {
 
 		try {
-			Trace.Enable(true);
+			Trace.Enable(false);
 			GridCell nextStep = null;
 
 			// recalculate plan if:
@@ -58,7 +52,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 				long timeCurrent = System.nanoTime();
 				// TODO: Should we provide a buffer, i.e. 1% of the time, for provision of the plan to the recipient
-				long timeDeadline = timeCurrent + timeLeft * MS_TO_NS_CONV_FACT;
+				long timeDeadline = (long) ((float)(timeCurrent + (timeLeft * MS_TO_NS_CONV_FACT/0.97)));
 				Trace.print("current time (ns): " + timeCurrent);
 				Trace.print("deadline: " + timeDeadline);
 				plan = generatePlan(map, start, goal, timeDeadline);
@@ -66,14 +60,21 @@ public class DeadlineAwareSearch implements PlanningAgent
 				lastGoal = goal;
 			}
 
-			// take next step in plan
-			if (stepNo < plan.getLength())
+			if (plan == null)
 			{
-				nextStep = (GridCell) plan.getStep(stepNo++);
-
-				if (nextStep == null) 
+				Trace.print("No plan found within deadline");
+			}
+			else
+			{
+				// take next step in plan
+				if (stepNo < plan.getLength())
 				{
-					Trace.print("next step is null!");
+					nextStep = (GridCell) plan.getStep(stepNo++);
+	
+					if (nextStep == null) 
+					{
+						Trace.print("next step is null!");
+					}
 				}
 			}
 
@@ -125,18 +126,16 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
 			GridCell goal, long timeDeadline) {
 
-		ComputedPlan planIncumbent = null;
 		int nMaxReachableDepth = Integer.MAX_VALUE;
-		int nEstimatedDepth = Integer.MAX_VALUE;
 		mapInfo = new DasMapInfo(map);
 		
-		float fHCost = map.hCost(start, goal);
+		float fHCostStartState = map.hCost(start, goal);
 		
 		//TODO: Again, this is assuming manhattan world - see #Issue 11
 		int nDCost = dCostManhattan((GridCell)start, goal);
 
 		// initialize open set with start node
-		mapInfo.add(start, 0f, fHCost, nDCost, 0);
+		mapInfo.add(start, 0f, fHCostStartState, nDCost, 0);
 
 		while (System.nanoTime() < timeDeadline)
 		{
@@ -152,16 +151,16 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// than that of the incumbent solution
 				if ( current == goal)
 				{
-					Trace.print("found path to goal!");
+					System.out.println("found path to goal!");
 					if ( (mapInfo.GetIncumbentPlan() == null) || 
 						 (mapInfo.getGCost(goal) < mapInfo.GetIncumbentPlan().getCost()) )
 					{
-						Trace.print("new path to goal is an improvement!");
+						System.out.println("new path to goal is an improvement!");
 						mapInfo.computePlan(goal);
 					}
 					else
 					{
-						Trace.print("new path to goal is worse than incumbent!");
+						System.out.println("new path to goal is worse than incumbent!");
 					}
 						
 				}
@@ -236,12 +235,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	@Override
 	public Boolean showInfo() {
+		//return(false);
 		return mapInfo != null;
 	}
 
 	@Override
 	public ArrayList<GridCell> expandedNodes() {
-		return mapInfo.getClosedArrayList();
+		return (new ArrayList<GridCell>());
+		//return mapInfo.getClosedArrayList();
 	}
 
 	@Override
