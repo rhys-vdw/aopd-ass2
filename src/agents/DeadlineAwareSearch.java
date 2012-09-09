@@ -30,7 +30,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			int stepLeft, long stepTime, long timeLeft) {
 
 		try {
-			Trace.Enable(false);
+			Trace.Enable(true);
 			GridCell nextStep = null;
 
 			// recalculate plan if:
@@ -143,6 +143,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 			if (!mapInfo.isOpenEmpty())
 			{
 				
+				// TODO: Per last section of the pruning section of the DAS paper,
+				// dMax should not be calculated while initially settling, or settling after
+				// a repopulation of the open set from the pruned set.
 				nMaxReachableDepth = calculateMaxReachableDepth(timeDeadline);
 				Trace.print("just calced d_max: " + nMaxReachableDepth);
 				GridCell current = mapInfo.closeCheapestOpen();

@@ -268,6 +268,8 @@ public class DasMapInfo {
 			cellInfo.setCellMembership(CellSetMembership.OPEN);
 			openQueue.offer(cellInfo);
 		}
+		
+		// TODO: need to reset metrics here. See issue #5
 	}
 
 	public GridCell getParent(GridCell cell) {
