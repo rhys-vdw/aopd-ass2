@@ -101,9 +101,9 @@ public class SlidingWindow
 
 	}
 	
-	public long getAvg()
+	public float getAvg()
 	{
-		long nAverage = 0;
+		float nAverage = 0;
 		if (!m_isSettled)
 		{
 			nAverage = m_initialAverage;

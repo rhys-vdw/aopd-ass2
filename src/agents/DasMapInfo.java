@@ -255,9 +255,9 @@ public class DasMapInfo {
 	 * @param expansions the number of expansions to limit the number of nodes
 	 *                   recovered
 	 */
-	public void recoverPrunedStates(float expansionCount) {
+	public void recoverPrunedStates(int expansionCount) {
 		// the sum of d^cheapest for each cell reopened
-		float dSum = 0f;
+		int dSum = 0;
 
 		while (dSum < expansionCount && prunedQueue.size() > 0) {
 			DasCellInfo cellInfo = prunedQueue.poll();
@@ -394,9 +394,9 @@ public class DasMapInfo {
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 	
-	public long calculateAvgExpansionInterval()
+	public float calculateAvgExpansionInterval()
 	{
-		long avgExpansionInterval = 0;
+		float avgExpansionInterval = 0;
 		avgExpansionInterval = conExpansionIntervals.getAvg();
 		//System.out.println(fAvgExpansionInterval);
 		return(avgExpansionInterval);
@@ -404,7 +404,7 @@ public class DasMapInfo {
 	
 	public double calculateAvgExpansionDelay()
 	{
-		long avgExpansionDelay = 0;
+		float avgExpansionDelay = 0;
 		avgExpansionDelay = conExpansionDelays.getAvg();
 		return(avgExpansionDelay);
 	}

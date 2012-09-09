@@ -52,7 +52,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 				long timeCurrent = System.nanoTime();
 				// TODO: Should we provide a buffer, i.e. 1% of the time, for provision of the plan to the recipient
-				long timeDeadline = (long) ((float)(timeCurrent + (timeLeft * MS_TO_NS_CONV_FACT/0.97)));
+				long timeDeadline = (long) ((float)(timeCurrent + (timeLeft * MS_TO_NS_CONV_FACT/0.80)));
 				Trace.print("current time (ns): " + timeCurrent);
 				Trace.print("deadline: " + timeDeadline);
 				plan = generatePlan(map, start, goal, timeDeadline);
@@ -207,6 +207,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 				// Open list is empty, so we need to repopulate it.
 				int exp = calculateExpansionsRemaining(timeDeadline);
+				//System.out.print(exp);
 				mapInfo.recoverPrunedStates(exp);
 			}
 		}
@@ -290,7 +291,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		
 		long timeCurrent = System.nanoTime();
 		long timeRemaining = timeDeadline - timeCurrent;
-		long avgExpansionInterval = mapInfo.calculateAvgExpansionInterval();
+		float avgExpansionInterval = mapInfo.calculateAvgExpansionInterval();
 		float nAvgExpansionRate = 1/avgExpansionInterval;
 		
 		Trace.print(nAvgExpansionRate  + " avg expansion rate");
