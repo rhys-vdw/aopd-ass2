@@ -44,16 +44,23 @@ public class DasMapInfo {
 	// This value needs tuning!
 	final private int EXPANSION_DELAY_WINDOW_LENGTH = 20;
 	
+	// r_default. Used before conExpansionIntervals has settled.
+	final private int INITIAL_EXPANSION_RATE = 5;
+	final private int INITIAL_EXPANSION_DELAY = 20;
+	
+	
 	// Time of the most recent expansion
 	private long timeMostRecentExpansion = 0;
 	
 	// Delta e value
 	// GS: Only really want a circular queue.. is this really the way to do this in java?!?!
 	// The value of 10 needs to be tuned
-	private SlidingWindow conExpansionDelays = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH);
+	private SlidingWindow conExpansionDelays = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH,
+			INITIAL_EXPANSION_RATE, INITIAL_EXPANSION_DELAY);
 	
 	// r value
-	private SlidingWindow conExpansionIntervals = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH);
+	private SlidingWindow conExpansionIntervals = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH, 
+			INITIAL_EXPANSION_RATE, INITIAL_EXPANSION_DELAY);
 	
 	public DasMapInfo(GridDomain map) {
 		this.width = map.getWidth();
@@ -187,12 +194,14 @@ public class DasMapInfo {
 		// Incremented e_curr value
 		++nExpansionsCount;
 		
+
 		// Record the number of expansions performed before processing the node
 		// after each expansion.
 		// i.e. we are recording the current level of vacillation.
 		long nCurrentExpansionDelay = this.nExpansionsCount - cellInfo.getExpansionNumber();
 		
 		long timeCurrent = System.nanoTime();
+		
 		long timeExpansionsDelta = timeCurrent - this.timeMostRecentExpansion;
 		
 		// Store this time, for the next time we perform an expansion.
@@ -200,7 +209,12 @@ public class DasMapInfo {
 		// Add the expansion delay to the circular queue, so that
 		// we can compute a rolling average.
 		conExpansionDelays.Push(nCurrentExpansionDelay);
-		conExpansionIntervals.Push(timeExpansionsDelta);
+			// Don't perform certain functionality for the start node.
+		if (cellInfo.getParent() != null)
+		{
+
+			conExpansionIntervals.Push(timeExpansionsDelta);
+		}
 		
 		return cellInfo.getCell();
 	}

@@ -70,9 +70,6 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		}
 
 		public float getDCheapestWithError() {
-			// This is now being calculated at the mapinfo level, as the map info keeps track of 
-			// the structures required.
-			// TODO: return d^cheapest(cell)
 			float dCheapestWithError = 0.0f;
 			float avgError = this.getAverageError();
 			

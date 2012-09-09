@@ -32,16 +32,30 @@ public class SlidingWindow
 	
 	private int m_count;
 	
-	SlidingWindow(int _size) 
+	// Total number of entries that have been stored in this window.
+	private long m_countTotal;
+	
+	// Total number of entries that need to have passed through this window, before we 
+	// start to use the values contained within
+	private int m_initialisationThreshold;
+	
+	// Default average used before the entries have settled. Used in conjunction with m_initialisationThreshold
+	private float m_initialAverage;
+	
+	SlidingWindow(int _size, int _initialisationThreshold, float _initialAverage) 
 	{
 		m_size = _size;
 		m_conData = new long[_size];
 		m_oldest = 0;
 		m_count = 0;
+		m_initialisationThreshold = _initialisationThreshold;
+		m_initialAverage = _initialAverage;
+		m_countTotal = 0;
 	}
 	
 	void Push(long _newEntry)
 	{
+		++m_countTotal;
 		if (m_count < m_size)
 		{
 			m_count++;
@@ -50,7 +64,7 @@ public class SlidingWindow
 		{
 			long removedEntry = m_conData[m_oldest];
 			m_sum -= removedEntry;
-			//System.out.print("removing " + removedEntry);
+			System.out.print("removing " + removedEntry);
 		}
 		// Replace the previous oldest entry with the new entry, and update the oldest pointer to the next oldest
 		m_conData[m_oldest] = _newEntry;
@@ -65,6 +79,8 @@ public class SlidingWindow
 
 		// Add the new value to the sum
 		m_sum += _newEntry;
+		System.out.print("adding " + _newEntry + " sum = " + m_sum);
+
 
 	}
 	
@@ -77,17 +93,20 @@ public class SlidingWindow
 
 	}
 	
-	public double getAvg()
+	public float getAvg()
 	{
-		if (m_count == 0)
+		float fAverage = 0.0f;
+		if (m_countTotal < m_initialisationThreshold)
 		{
-			return(0);
+			fAverage = m_initialAverage;
 		}
 		else
 		{
-			return((float)m_sum/m_count);
+			fAverage = (float)(m_sum/m_count);
+			System.out.print("sliding window computed avg: " + m_sum + " / " + m_count + " = " + fAverage);
 		}
 			
+		return(fAverage);
 	}
 	
 	/**
@@ -96,7 +115,7 @@ public class SlidingWindow
 	 */
 	public static void main(String[] args) 
 	{
-		SlidingWindow sw = new SlidingWindow(10);
+		SlidingWindow sw = new SlidingWindow(10,20,105);
 		
 		for (long n = 0; n < 1000; n++)
 		{
