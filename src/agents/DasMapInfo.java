@@ -82,7 +82,7 @@ public class DasMapInfo {
 		     cell = cell.getParent()) 
 		{
 			GridCell gc = cell.getCell();
-			Trace.print("Prepending " + gc);
+			System.out.println("Prepending " + gc);
 			planNewIncumbent.prependStep(gc);
 		}
 
@@ -269,7 +269,9 @@ public class DasMapInfo {
 			openQueue.offer(cellInfo);
 		}
 		
-		// TODO: need to reset metrics here. See issue #5
+		Trace.print("Resetting windows");
+		conExpansionIntervals.reset();
+		conExpansionDelays.reset();
 	}
 
 	public GridCell getParent(GridCell cell) {
@@ -392,19 +394,19 @@ public class DasMapInfo {
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 	
-	public double calculateAvgExpansionInterval()
+	public long calculateAvgExpansionInterval()
 	{
-		double fAvgExpansionInterval = 0.0f;
-		fAvgExpansionInterval = conExpansionIntervals.getAvg();
+		long avgExpansionInterval = 0;
+		avgExpansionInterval = conExpansionIntervals.getAvg();
 		//System.out.println(fAvgExpansionInterval);
-		return(fAvgExpansionInterval);
+		return(avgExpansionInterval);
 	}
 	
 	public double calculateAvgExpansionDelay()
 	{
-		double fAvgExpansionDelay = 0.0f;
-		fAvgExpansionDelay = conExpansionDelays.getAvg();
-		return(fAvgExpansionDelay);
+		long avgExpansionDelay = 0;
+		avgExpansionDelay = conExpansionDelays.getAvg();
+		return(avgExpansionDelay);
 	}
 	
 	public float getDCheapestWithError(GridCell cell)

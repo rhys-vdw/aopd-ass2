@@ -30,7 +30,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			int stepLeft, long stepTime, long timeLeft) {
 
 		try {
-			Trace.Enable(true);
+			Trace.Enable(false);
 			GridCell nextStep = null;
 
 			// recalculate plan if:
@@ -126,6 +126,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
 			GridCell goal, long timeDeadline) {
 
+		System.out.println("Generating a new plan");
 		int nMaxReachableDepth = Integer.MAX_VALUE;
 		mapInfo = new DasMapInfo(map);
 		
@@ -160,6 +161,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 					{
 						System.out.println("new path to goal is an improvement!");
 						mapInfo.computePlan(goal);
+						// The below hack is to test finding the first goal!
+						//return(mapInfo.GetIncumbentPlan());
 					}
 					else
 					{
@@ -203,10 +206,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 			else
 			{
 				// Open list is empty, so we need to repopulate it.
-				mapInfo.recoverPrunedStates(0.0f);
+				int exp = calculateExpansionsRemaining(timeDeadline);
+				mapInfo.recoverPrunedStates(exp);
 			}
 		}
-		
 		return(mapInfo.GetIncumbentPlan());
 			
 	}
@@ -287,8 +290,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 		
 		long timeCurrent = System.nanoTime();
 		long timeRemaining = timeDeadline - timeCurrent;
-		double avgExpansionInterval = mapInfo.calculateAvgExpansionInterval();
-		double nAvgExpansionRate = 1/avgExpansionInterval;
+		long avgExpansionInterval = mapInfo.calculateAvgExpansionInterval();
+		float nAvgExpansionRate = 1/avgExpansionInterval;
 		
 		Trace.print(nAvgExpansionRate  + " avg expansion rate");
 		nExpansionsRemaining = (int) (timeRemaining * nAvgExpansionRate);

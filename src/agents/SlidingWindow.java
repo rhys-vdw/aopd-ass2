@@ -40,9 +40,11 @@ public class SlidingWindow
 	private int m_initialisationThreshold;
 	
 	// Default average used before the entries have settled. Used in conjunction with m_initialisationThreshold
-	private float m_initialAverage;
+	private long m_initialAverage;
 	
-	SlidingWindow(int _size, int _initialisationThreshold, float _initialAverage) 
+	private boolean m_isSettled;
+	
+	SlidingWindow(int _size, int _initialisationThreshold, long _initialAverage) 
 	{
 		m_size = _size;
 		m_conData = new long[_size];
@@ -51,11 +53,17 @@ public class SlidingWindow
 		m_initialisationThreshold = _initialisationThreshold;
 		m_initialAverage = _initialAverage;
 		m_countTotal = 0;
+		m_isSettled = false;
 	}
 	
 	void Push(long _newEntry)
 	{
 		++m_countTotal;
+		if (m_countTotal > m_initialisationThreshold)
+		{
+			m_isSettled = true;
+		}
+		
 		if (m_count < m_size)
 		{
 			m_count++;
@@ -93,20 +101,29 @@ public class SlidingWindow
 
 	}
 	
-	public float getAvg()
+	public long getAvg()
 	{
-		float fAverage = 0.0f;
-		if (m_countTotal < m_initialisationThreshold)
+		long nAverage = 0;
+		if (!m_isSettled)
 		{
-			fAverage = m_initialAverage;
+			nAverage = m_initialAverage;
 		}
 		else
 		{
-			fAverage = (float)(m_sum/m_count);
+			nAverage = (m_sum/m_count);
 			//System.out.print("sliding window computed avg: " + m_sum + " / " + m_count + " = " + fAverage);
 		}
 			
-		return(fAverage);
+		return(nAverage);
+	}
+	
+	public void reset()
+	{
+		m_isSettled = false;
+		m_countTotal = 0;
+		m_count = 0;
+		m_oldest = 0;
+		m_sum = 0;
 	}
 	
 	/**
