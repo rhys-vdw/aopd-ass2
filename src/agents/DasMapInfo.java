@@ -41,22 +41,24 @@ public class DasMapInfo {
 	// TODO: investigate refactoring this to long to avoid potential truncactions in operations 
 	private int nExpansionsCount = 0; 
 	
-	// This value needs tuning!
-	final private int EXPANSION_DELAY_WINDOW_LENGTH = 20;
+	// These values needs tuning!
+	// This is the size of the sliding window, in entries.
+	final private int EXPANSION_DELAY_WINDOW_LENGTH = 30;
 	
 	// r_default. Used before conExpansionIntervals has settled.
-	final private int SETTLING_EXPANSION_COUNT = 200;
-	final private int SETTLING_EXPANSION_AVG_INTERVAL = 1000;
+	// This is the number of expansions to perform before the sliding window is deemed 'settled'
+	final private int SETTLING_EXPANSION_COUNT = 30;
+	
+	// Time in ns to use as the expected interval between expansions, before settling.
+	final private long SETTLING_EXPANSION_AVG_INTERVAL = 30;
 	
 	
 	// Time of the most recent expansion
 	private long timeMostRecentExpansion = 0;
 	
 	// Delta e value
-	// GS: Only really want a circular queue.. is this really the way to do this in java?!?!
-	// The value of 10 needs to be tuned
 	private SlidingWindow conExpansionDelays = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH,
-			20, 1);
+			SETTLING_EXPANSION_COUNT, SETTLING_EXPANSION_AVG_INTERVAL);
 	
 	// r value
 	private SlidingWindow conExpansionIntervals = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH, 
@@ -183,7 +185,7 @@ public class DasMapInfo {
 	{
 		DasCellInfo cellInfo = openQueue.poll();
 
-		assert(cellInfo != null);
+		//assert(cellInfo != null);
 
 		cellInfo.setCellMembership(CellSetMembership.CLOSED);
 		
@@ -390,7 +392,8 @@ public class DasMapInfo {
 	/* get cell info associated with cell. */
 	private DasCellInfo getCellInfo(GridCell cell) {
 		GridCoord gc = cell.getCoord();
-		if (cells == null) Trace.print("cells is null");
+		//if (cells == null) 
+			//Trace.print("cells is null");
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 	

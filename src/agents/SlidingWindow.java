@@ -117,6 +117,7 @@ public class SlidingWindow
 		return(nAverage);
 	}
 	
+	// Used to trigger a "settling" state
 	public void reset()
 	{
 		m_isSettled = false;

@@ -52,7 +52,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 				long timeCurrent = System.nanoTime();
 				// TODO: Should we provide a buffer, i.e. 1% of the time, for provision of the plan to the recipient
-				long timeDeadline = (long) ((float)(timeCurrent + (timeLeft * MS_TO_NS_CONV_FACT/0.80)));
+				long timeDeadline = (long) ((float)(timeCurrent + (timeLeft * MS_TO_NS_CONV_FACT)));
 				Trace.print("current time (ns): " + timeCurrent);
 				Trace.print("deadline: " + timeDeadline);
 				plan = generatePlan(map, start, goal, timeDeadline);
@@ -126,7 +126,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
 			GridCell goal, long timeDeadline) {
 
-		System.out.println("Generating a new plan");
+		//System.out.println("Generating a new plan");
 		int nMaxReachableDepth = Integer.MAX_VALUE;
 		mapInfo = new DasMapInfo(map);
 		
@@ -148,7 +148,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// dMax should not be calculated while initially settling, or settling after
 				// a repopulation of the open set from the pruned set.
 				nMaxReachableDepth = calculateMaxReachableDepth(timeDeadline);
-				Trace.print("just calced d_max: " + nMaxReachableDepth);
+				//Trace.print("just calced d_max: " + nMaxReachableDepth);
 				GridCell current = mapInfo.closeCheapestOpen();
 				
 				// If the current state is a goal state, and the cost to get there was cheaper
@@ -159,20 +159,20 @@ public class DeadlineAwareSearch implements PlanningAgent
 					if ( (mapInfo.GetIncumbentPlan() == null) || 
 						 (mapInfo.getGCost(goal) < mapInfo.GetIncumbentPlan().getCost()) )
 					{
-						System.out.println("new path to goal is an improvement!");
+						//System.out.println("new path to goal is an improvement!");
 						mapInfo.computePlan(goal);
 						// The below hack is to test finding the first goal!
 						//return(mapInfo.GetIncumbentPlan());
 					}
 					else
 					{
-						System.out.println("new path to goal is worse than incumbent!");
+						//System.out.println("new path to goal is worse than incumbent!");
 					}
 						
 				}
 				else if (estimateGoalDepth(current) < nMaxReachableDepth)
 				{
-					Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
+					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
 					for (State neighbor : map.getSuccessors(current)) 
 					{
 						// consider node if it can be entered and is not in closed or pruned list
@@ -180,14 +180,16 @@ public class DeadlineAwareSearch implements PlanningAgent
 						    mapInfo.isClosed((GridCell) neighbor) == false &&
 						    mapInfo.isPruned((GridCell) neighbor) == false) 
 						{
-							float fNeighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
-							float fNeighborHCost = map.hCost(neighbor, goal);
-							
-							// TODO: this is currently assuming manhattan grid world. See Issue #11
-							int nNeighbourDCost = (int) dCostManhattan((GridCell)neighbor, goal);
 							
 							if (mapInfo.isOpen((GridCell) neighbor) == false)
 							{
+								float fNeighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
+								float fNeighborHCost = map.hCost(neighbor, goal);
+								
+								//System.out.println("g: " + fNeighborGCost + " h" + fNeighborHCost);
+								// TODO: this is currently assuming manhattan grid world. See Issue #11
+								int nNeighbourDCost = (int) dCostManhattan((GridCell)neighbor, goal);
+								//System.out.println("d" + nNeighbourDCost);
 								// Add the neighbor to the open set!
 								mapInfo.add((GridCell) neighbor, fNeighborGCost, fNeighborHCost, 
 										nNeighbourDCost, current);
@@ -199,7 +201,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 				else
 				{
-					Trace.print("(unreachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
+					//Trace.print("(unreachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
 					mapInfo.pruneCell(current);
 				}
 			}
@@ -248,8 +250,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	@Override
 	public ArrayList<GridCell> expandedNodes() {
-		return (new ArrayList<GridCell>());
-		//return mapInfo.getClosedArrayList();
+		//return (new ArrayList<GridCell>());
+		return mapInfo.getClosedArrayList();
 	}
 
 	@Override

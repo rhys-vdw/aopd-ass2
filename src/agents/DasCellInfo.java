@@ -138,13 +138,33 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		 */
 		public int compareTo(DasCellInfo other) {
 			// compare f cost of either cell
-			if (this.fCost < other.fCost) return -1;
-			if (this.fCost > other.fCost) return  1;
-			// in the event of a tie, return the cell with the lowest h cost
-			if (this.hCost < other.hCost) return -1;
-			if (this.hCost > other.hCost) return  1;
-			// both values are the same
-			return 0;
+			int nReturnValue;
+			// Check if the values are "the same" 
+			if (Math.abs(this.fCost - other.fCost) < 0.001)
+			{
+				if (Math.abs(this.hCost - other.hCost) < 0.001)
+				{
+					// Both f and h are the same, in which case, return 0
+					nReturnValue = 0;
+				}
+				else if (this.hCost < other.hCost)
+				{
+					nReturnValue = -1;
+				}
+				else
+				{
+					nReturnValue = 1;
+				}
+			}
+			else if (this.fCost < other.fCost)
+			{
+				nReturnValue = -1;
+			}
+			else
+			{
+				nReturnValue = 1;
+			}
+			return(nReturnValue);
 		}
 
 		void updateFCost() {
