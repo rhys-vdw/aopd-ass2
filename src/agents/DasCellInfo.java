@@ -138,11 +138,12 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		 */
 		public int compareTo(DasCellInfo other) {
 			// compare f cost of either cell
+			final float EPSILON = 0.001f;
 			int nReturnValue;
 			// Check if the values are "the same" 
-			if (Math.abs(this.fCost - other.fCost) < 0.001)
+			if (Math.abs(this.fCost - other.fCost) < EPSILON)
 			{
-				if (Math.abs(this.hCost - other.hCost) < 0.001)
+				if (Math.abs(this.hCost - other.hCost) < EPSILON)
 				{
 					// Both f and h are the same, in which case, return 0
 					nReturnValue = 0;
