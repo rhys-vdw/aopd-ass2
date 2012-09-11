@@ -57,7 +57,7 @@ public class SlidingWindow
 		++m_countTotal;
 		if (!m_isSettled && m_countTotal > m_initialisationThreshold)
 		{
-			System.out.println("Settled");
+			//System.out.println("Settled");
 			m_isSettled = true;
 		}
 		
@@ -120,7 +120,7 @@ public class SlidingWindow
 	// Used to trigger a "settling" state
 	public void reset()
 	{
-		System.out.println("Resetting");
+		//System.out.println("Resetting");
 		m_isSettled = false;
 		m_countTotal = 0;
 		m_count = 0;

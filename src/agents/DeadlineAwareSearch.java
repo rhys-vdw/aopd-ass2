@@ -52,6 +52,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 				long timeCurrent = System.nanoTime();
 				// TODO: Should we provide a buffer, i.e. 1% of the time, for provision of the plan to the recipient
+				// This buffer should be based on the length of the solution.
 				long timeDeadline = (long) ((float)(timeCurrent + (timeLeft * MS_TO_NS_CONV_FACT)));
 				Trace.print("current time (ns): " + timeCurrent);
 				Trace.print("deadline: " + timeDeadline);
