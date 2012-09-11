@@ -39,19 +39,15 @@ public class SlidingWindow
 	// start to use the values contained within
 	private int m_initialisationThreshold;
 	
-	// Default average used before the entries have settled. Used in conjunction with m_initialisationThreshold
-	private long m_initialAverage;
-	
 	private boolean m_isSettled;
 	
-	SlidingWindow(int _size, int _initialisationThreshold, long _initialAverage) 
+	SlidingWindow(int _size, int _initialisationThreshold) 
 	{
 		m_size = _size;
 		m_conData = new long[_size];
 		m_oldest = 0;
 		m_count = 0;
 		m_initialisationThreshold = _initialisationThreshold;
-		m_initialAverage = _initialAverage;
 		m_countTotal = 0;
 		m_isSettled = false;
 	}
@@ -59,8 +55,9 @@ public class SlidingWindow
 	void Push(long _newEntry)
 	{
 		++m_countTotal;
-		if (m_countTotal > m_initialisationThreshold)
+		if (!m_isSettled && m_countTotal > m_initialisationThreshold)
 		{
+			System.out.println("Settled");
 			m_isSettled = true;
 		}
 		
@@ -101,25 +98,29 @@ public class SlidingWindow
 
 	}
 	
+	public boolean getSettled()
+	{
+		return(m_isSettled);
+	}
+	
 	public float getAvg()
 	{
-		float nAverage = 0;
-		if (!m_isSettled)
-		{
-			nAverage = m_initialAverage;
-		}
-		else
-		{
-			nAverage = (m_sum/m_count);
-			//System.out.print("sliding window computed avg: " + m_sum + " / " + m_count + " = " + fAverage);
-		}
+		// Should only be called when settled!
+		// TODO: probably a better interface than this, but as long as it is remembered to 
+		// check first!
+		assert(m_isSettled);
+		
+		float fAverage = 0;
+		fAverage = (m_sum/m_count);
+		//	System.out.print("sliding window computed avg: " + m_sum + " / " + m_count + " = " + fAverage);
 			
-		return(nAverage);
+		return(fAverage);
 	}
 	
 	// Used to trigger a "settling" state
 	public void reset()
 	{
+		System.out.println("Resetting");
 		m_isSettled = false;
 		m_countTotal = 0;
 		m_count = 0;
@@ -133,7 +134,7 @@ public class SlidingWindow
 	 */
 	public static void main(String[] args) 
 	{
-		SlidingWindow sw = new SlidingWindow(10,20,105);
+		SlidingWindow sw = new SlidingWindow(10,20);
 		
 		for (long n = 0; n < 1000; n++)
 		{

@@ -147,7 +147,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// TODO: Per last section of the pruning section of the DAS paper,
 				// dMax should not be calculated while initially settling, or settling after
 				// a repopulation of the open set from the pruned set.
-				nMaxReachableDepth = calculateMaxReachableDepth(timeDeadline);
+				if (mapInfo.getSettled())
+				{
+					nMaxReachableDepth = calculateMaxReachableDepth(timeDeadline);
+				}
+				
 				//Trace.print("just calced d_max: " + nMaxReachableDepth);
 				GridCell current = mapInfo.closeCheapestOpen();
 				
@@ -159,18 +163,19 @@ public class DeadlineAwareSearch implements PlanningAgent
 					if ( (mapInfo.GetIncumbentPlan() == null) || 
 						 (mapInfo.getGCost(goal) < mapInfo.GetIncumbentPlan().getCost()) )
 					{
-						//System.out.println("new path to goal is an improvement!");
+						System.out.println("new path to goal is an improvement!");
 						mapInfo.computePlan(goal);
 						// The below hack is to test finding the first goal!
 						//return(mapInfo.GetIncumbentPlan());
 					}
 					else
 					{
-						//System.out.println("new path to goal is worse than incumbent!");
+						System.out.println("new path to goal is worse than incumbent!");
 					}
 						
 				}
-				else if (estimateGoalDepth(current) < nMaxReachableDepth)
+				else if (!mapInfo.getSettled() || 
+						(estimateGoalDepth(current) < nMaxReachableDepth) )
 				{
 					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
 					for (State neighbor : map.getSuccessors(current)) 
@@ -202,7 +207,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 				else
 				{
 					//Trace.print("(unreachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
-					mapInfo.pruneCell(current);
+					if (mapInfo.getSettled())
+					{
+						mapInfo.pruneCell(current);
+					}
 				}
 			}
 			else

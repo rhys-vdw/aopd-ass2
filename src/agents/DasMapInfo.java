@@ -43,13 +43,14 @@ public class DasMapInfo {
 	
 	// These values needs tuning!
 	// This is the size of the sliding window, in entries.
-	final private int EXPANSION_DELAY_WINDOW_LENGTH = 30;
+	final private int EXPANSION_DELAY_WINDOW_LENGTH = 15;
 	
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
-	final private int SETTLING_EXPANSION_COUNT = 30;
+	final private int SETTLING_EXPANSION_COUNT = 200;
 	
 	// Time in ns to use as the expected interval between expansions, before settling.
+	// Shouldn't be used with the new refactoring.
 	final private long SETTLING_EXPANSION_AVG_INTERVAL = 30;
 	
 	
@@ -58,11 +59,11 @@ public class DasMapInfo {
 	
 	// Delta e value
 	private SlidingWindow conExpansionDelays = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH,
-			SETTLING_EXPANSION_COUNT, SETTLING_EXPANSION_AVG_INTERVAL);
+			SETTLING_EXPANSION_COUNT);
 	
 	// r value
 	private SlidingWindow conExpansionIntervals = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH, 
-			SETTLING_EXPANSION_COUNT, SETTLING_EXPANSION_AVG_INTERVAL);
+			SETTLING_EXPANSION_COUNT);
 	
 	public DasMapInfo(GridDomain map) {
 		this.width = map.getWidth();
@@ -151,6 +152,13 @@ public class DasMapInfo {
 
 
 	} */
+	
+	public boolean getSettled()
+	{
+		// TODO: need to change sliding window class so that it has both windows as one.
+		boolean isSettled = (conExpansionDelays.getSettled() && conExpansionIntervals.getSettled());
+		return(isSettled);
+	}
 
 	/**
 	 * Returns true if there are no cells in the open set.
