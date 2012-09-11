@@ -97,7 +97,7 @@ public class DasMapInfo {
 	
 	public ComputedPlan GetIncumbentPlan()
 	{
-		assert planIncumbent != null;
+		//assert planIncumbent != null;
 		return(planIncumbent);
 	}
 

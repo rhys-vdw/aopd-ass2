@@ -42,10 +42,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 			// NOTE: I think Sebastian explicitly said that the goal wont move and the
 			// map wont change, so we could probably drop the last two conditions
 			boolean bReplan =
-				plan == null ||
-				map.getChangedEdges().size() > 0 ||
-				!lastGoal.equals(goal) ||
-				!plan.contains(start);
+				plan == null; 
+				//map.getChangedEdges().size() > 0 ||
+				//!lastGoal.equals(goal) ||
+				//!plan.contains(start);
 
 
 			if (bReplan) 
@@ -67,16 +67,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 			}
 			else
 			{
-				// take next step in plan
-				if (stepNo < plan.getLength())
+				if (stepNo < plan.getLength()) 
 				{
-					nextStep = (GridCell) plan.getStep(stepNo++);
-	
-					if (nextStep == null) 
-					{
-						Trace.print("next step is null!");
-					}
-				}
+					stepNo++;
+					nextStep = (GridCell) plan.getStep(stepNo);
+				} 
 			}
 
 			return nextStep;
@@ -127,7 +122,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
 			GridCell goal, long timeDeadline) {
 
-		//System.out.println("Generating a new plan");
+		System.out.println("Generating a new plan");
 		int nMaxReachableDepth = Integer.MAX_VALUE;
 		mapInfo = new DasMapInfo(map);
 		
@@ -165,6 +160,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 						 (mapInfo.getGCost(goal) < mapInfo.GetIncumbentPlan().getCost()) )
 					{
 						System.out.println("new path to goal is an improvement!");
+						//TODO: this is a potentially expensive operation!
 						mapInfo.computePlan(goal);
 						// The below hack is to test finding the first goal!
 						//return(mapInfo.GetIncumbentPlan());
@@ -217,9 +213,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 			else
 			{
 				// Open list is empty, so we need to repopulate it.
-				int exp = calculateExpansionsRemaining(timeDeadline);
+				//if (mapInfo.getSettled())
+				{
+					int exp = calculateExpansionsRemaining(timeDeadline);
+					mapInfo.recoverPrunedStates(exp);
+				}
 				//System.out.print(exp);
-				mapInfo.recoverPrunedStates(exp);
+
 			}
 		}
 		return(mapInfo.GetIncumbentPlan());

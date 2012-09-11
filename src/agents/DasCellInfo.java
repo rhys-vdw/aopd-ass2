@@ -17,6 +17,8 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		//private float dAverageError = 0.0f;
 		private int nCumulativeErrorOfPartialSolution = 0;
 		private int nPartialSolutionDepth = 0; // Node depth so far
+		
+		private final float EPSILON = 0.001f; // used for floating point comparisons
 
 		public int getDepth()
 		{
@@ -73,7 +75,8 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 			float dCheapestWithError = 0.0f;
 			float avgError = this.getAverageError();
 			
-			if (avgError < 1.0f)
+			
+			if (avgError < 1-EPSILON)
 			{
 				dCheapestWithError = this.dCheapestRaw / (1-avgError);
 			}
@@ -138,7 +141,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		 */
 		public int compareTo(DasCellInfo other) {
 			// compare f cost of either cell
-			final float EPSILON = 0.001f;
+
 			int nReturnValue;
 			// Check if the values are "the same" 
 			if (Math.abs(this.fCost - other.fCost) < EPSILON)
