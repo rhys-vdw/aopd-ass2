@@ -27,6 +27,7 @@ class CellInfo implements Comparable<CellInfo> {
 		}
 		public void setGCost(float gCost) {
 			this.gCost = gCost;
+			updateFCost();
 		}
 
 		public float getHCost() {
@@ -35,11 +36,12 @@ class CellInfo implements Comparable<CellInfo> {
 
 		public void setHCost(float hCost) {
 			this.hCost = hCost;
+			updateFCost();
 		}
 
 		/** Read only. */
 		public float getFCost() {
-			return (this.gCost + this.hCost);
+			return this.fCost;
 		}
 
 		public CellSetMembership getCellMembership() {
@@ -55,35 +57,41 @@ class CellInfo implements Comparable<CellInfo> {
 		 * @other the CellInfo to be compared
 		 */
 		public int compareTo(CellInfo other) {
+			// compare f cost of either cell
 			if (this.fCost < other.fCost) return -1;
-			if (this.fCost > other.fCost) return 1;
+			if (this.fCost > other.fCost) return  1;
 			return 0;
+		}
+
+		void updateFCost() {
+			this.fCost = gCost + hCost;
 		}
 
 		/**
 		 * Create a new CellInfo for specified cell with specified g and h costs.
-		 * @cell   the cell
-		 * @gCost  the cost of the path from start to cell
-		 * @hCost  the heuristic estimate of the remaining cost to the goal
-		 * @cellCategory    the set that this node should start in
-		 * @parent the parent node of this cell
+		 * @cell           the cell
+		 * @gCost          the cost of the path from start to cell
+		 * @hCost          the heuristic estimate of the remaining cost to the goal
+		 * @cellMembership the set that this node should start in
+		 * @parent         the parent node of this cell
 		 */
-		public CellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership, CellInfo parent) {
+		public CellInfo(GridCell cell, float gCost, float hCost,
+				CellSetMembership cellMembership, CellInfo parent) {
 			this(cell, gCost, hCost, cellMembership);
 			this.parent = parent;
 		}
 
 		/**
 		 * Create a new CellInfo for specified cell with specified g and h costs.
-		 * @cell  the cell
-		 * @gCost the cost of the path from start to cell
-		 * @hCost the heuristic estimate of the remaining cost to the goal
-		 * @cellCategory   the set that this node should start in
+		 * @cell           the cell
+		 * @gCost          the cost of the path from start to cell
+		 * @hCost          the heuristic estimate of the remaining cost to the goal
+		 * @cellMembership the set that this node should start in
 		 */
 		public CellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership) {
 			this.cell = cell;
 			this.gCost = gCost;
-			this.fCost = gCost + hCost;
+			updateFCost();
 			this.cellSetMembership = cellMembership;
 		}
 	}

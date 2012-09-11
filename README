@@ -1,5 +1,5 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Aparate Path Planner Simulator
+APPARATE Path Planner Simulator
 
 Sebastian Sardina
 Andy Heng Xie
@@ -7,7 +7,16 @@ Nitin Yadav
 
 Date: 
 
+- August 2012 - release v2.7 
+	- Added random start/goal
+	- Can now read costs of cells (trees, water, terrain) from map files
+	- Fixed bug with getNextStep() in ComputedPlan
 - August 2012 - release v2.6 (SS)
+	- Add more info in the status bar (cost, etc)
+	- Fixed calculation of time remaining
+	- Improved way of calculating how much time agent took in each cycle
+	- Cleaned up call to path planners
+	- Cleaned up and deleted many classes
 - August 2012 - release v2.5 (Nitin Yadav & SS)
 - January 2012 - release v2 (Andy Xie & SS)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -16,7 +25,7 @@ Date:
 # Command Line Run
 -------------------
 
-java -cp bin/:lib/JPathPlan-vX.Y.jar:lib/Apparate-vX.Y.jar pplanning.simviewer.controller.Launcher <conf-file>
+java -cp bin/:lib/JPathPlan-v1.0.jar:lib/Apparate-v2.5.jar pplanning.simviewer.controller.Launcher <conf-file>
 
 
 where
@@ -42,8 +51,8 @@ totaltime=10000	% total time allowed in milliseconds (0 =  no limit)
 pulsertime=200	% pause time between pulses (only under pulser)
 steps=200	% how many total steps allowed (0 = no limit)
 steptime=400	% time allowed in each step (default: no limit)
-startpos=200,110	% start position
-destpos=300,270		% goal position
+startpos=200,110	% start position (missing or =random --> random pick)
+destpos=300,270		% goal position (missing or =random --> random pick)
 quiet=false	% no GUI, print out stats (arrived?, #steps, #distance, #time)
 killonlimit=true % kill the agent if limit time exceeded?
 managegc=true	% Performs garbage collection before each step
@@ -86,6 +95,40 @@ into ECLIPSE so that it can be then selected in your project. You can do it in:
 	Windows / Preferences / Java / Installed JREs
 For example, you may register JRE /opt/java/64/jdk1.6.0_34/jre
 Then you can go to your particular project and set to use that JRE version.
+
+
+--------------------------------
+# Maps extension to include cost
+--------------------------------
+
+Apparate works with the Moving-AI gridworld domains; see http://movingai.com/benchmarks/
+
+The format of those files can be found here: 
+
+http://movingai.com/benchmarks/formats.html
+
+As one could see, the domains do not include cost of cells and it relies on different type of navigations (by foot, sailing, flying, etc).
+In contrast, Apparate is based soley on cost. To accommodate that, one can modify the first part of the map to include costs for each cell type.
+The cost specification has to come after "map" keyword and in the following order:
+
+ground <cost>
+tree <cost>
+swamp <cost>
+water <cost>
+
+where <cost> is a float or +inf (for infinite cost). Infinite cost cells are then assumed to be non-traversable.  
+
+type octile
+height 512
+width 512
+map
+ground 1
+tree +inf
+swamp 10
+water 20
+
+Observe the order is important: ground, tree, swamp, water just after the "map" keyword. If an entity is skipped, 
+a default cost is applied.
 
 ------------------
 # GUI Quick Start
@@ -223,7 +266,8 @@ Then you can go to your particular project and set to use that JRE version.
 # Bug
 -----------
 
-	- GUI occassionally locks up if the planner work is too intense
+	- GUI occassionally locks up if the planner work is too intense (e.g., the map is modified while the agent is moving)
+	- It is recommended to stop the execution (F5), do all changes to the map, and then resume execution (F5)
 	
 	
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
