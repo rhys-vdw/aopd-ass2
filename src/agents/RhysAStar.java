@@ -80,7 +80,6 @@ public class RhysAStar implements PlanningAgent {
 
 		// repeat while states are left in open set
 		while (mapinfo.isOpenEmpty() == false) {
-			System.out.println("open has members!");
 			GridCell current = mapinfo.closeCheapestOpen();
 
 			Trace.print(current);
