@@ -143,7 +143,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 				//Trace.print("just calced d_max: " + nMaxReachableDepth);
 				GridCell current = mapInfo.closeCheapestOpen();
-
+				//System.out.println(current.getCoord() +" " +  mapInfo.getFCost(current));
 				// If the current state is a goal state, and the cost to get there was cheaper
 				// than that of the incumbent solution
 				if ( current == goal)
@@ -196,7 +196,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				else
 				{
 					//Trace.print("(unreachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
-					if (mapInfo.getSettled())
+					//if (mapInfo.getSettled())
 					{
 						mapInfo.pruneCell(current);
 					}
@@ -212,12 +212,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 				else
 				{
+					System.out.println("Pruned and open are empty");
 					break;
 				}
 				//System.out.print(exp);
 
 			}
 		}
+		//System.out.println("Returning solution with " + mapInfo.GetIncumbentPlan().getLength() + " nodes");
 		return(mapInfo.GetIncumbentPlan());
 
 	}

@@ -210,6 +210,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 			int nExpansion, int dCheapest) {
 		this.cell = cell;
 		this.gCost = gCost;
+		this.hCost = hCost;
 		updateFCost();
 		this.cellSetMembership = cellMembership;
 		this.nExpansionNumber = nExpansion;

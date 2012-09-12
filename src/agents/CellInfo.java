@@ -91,6 +91,7 @@ class CellInfo implements Comparable<CellInfo> {
 		public CellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership) {
 			this.cell = cell;
 			this.gCost = gCost;
+			this.hCost = hCost;
 			updateFCost();
 			this.cellSetMembership = cellMembership;
 		}
