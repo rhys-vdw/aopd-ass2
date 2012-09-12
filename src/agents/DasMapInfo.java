@@ -240,6 +240,11 @@ public class DasMapInfo {
 		prunedQueue.offer(cellInfo);
 	}
 
+	public boolean isPrunedEmpty()
+	{
+		return(prunedQueue.isEmpty());
+	}
+
 	/**
 	 * Return a selection of pruned states to the open set. The number of states
 	 * moved is the number that is estimated can be explored with the given
