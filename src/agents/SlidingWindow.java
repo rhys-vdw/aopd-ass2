@@ -13,7 +13,6 @@ import java.util.Arrays;
  * beginning.
  * 
  * Would have preferred to define the class using generics, but you cant instantiate a generic array in java!
- * @param <T>
  */
 
 
@@ -100,7 +99,7 @@ public class SlidingWindow
 	
 	public boolean getSettled()
 	{
-		return(m_isSettled);
+		return m_isSettled;
 	}
 	
 	public float getAvg()

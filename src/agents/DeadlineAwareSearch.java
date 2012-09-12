@@ -26,6 +26,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 	// along the plan afterwards.)
 	final private float SEARCH_TIME_FRACTION = 0.97f;
 
+	// Should the open and closed sets be regenerated?
+	boolean shouldUpdateOpen = false;
+	boolean shouldUpdateClosed = false;
+
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
 			int stepLeft, long stepTime, long timeLeft) {
@@ -36,6 +40,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 			// If there is no plan, generate one.
 			if (plan == null)
 			{
+				// a new plan has been generated, update open and closed debug sets.
+				shouldUpdateOpen = true;
+				shouldUpdateClosed = true;
 
 				// TODO: base search buffer on the length of the solution.
 				long timeCurrent = System.nanoTime();
@@ -58,10 +65,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 				stepNo = 0;
 			}
 
-			// Check if path has been exhausted (this should only happen if the
-			// path did not end at the goal state).
+			// Check if path has been exhausted.
 			if (stepNo >= plan.getLength()) {
-				System.err.println("End of path reached, no more steps");
 				return start;
 			}
 
@@ -306,7 +311,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	@Override
 	public ArrayList<GridCell> expandedNodes() {
-		if (closedNodes == null) {
+		if (shouldUpdateClosed) {
+			shouldUpdateClosed = false;
 			closedNodes = mapInfo.getClosedArrayList();
 		}
 		return closedNodes;
@@ -314,7 +320,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	@Override
 	public ArrayList<GridCell> unexpandedNodes() {
-		if (openNodes == null) {
+		if (shouldUpdateOpen) {
+			shouldUpdateOpen = false;
 			openNodes = mapInfo.getOpenArrayList();
 		}
 		return openNodes;
