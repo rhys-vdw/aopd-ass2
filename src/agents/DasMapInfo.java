@@ -4,12 +4,14 @@ import java.util.PriorityQueue;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
-
-import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
+import java.lang.IllegalStateException;
+import java.lang.IllegalArgumentException;
 
 import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
 import pplanning.simviewer.model.GridCoord;
+
+import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
 
 /**
  * A class to store metadata about the current map.
@@ -97,7 +99,6 @@ public class DasMapInfo {
 
 	public ComputedPlan GetIncumbentPlan()
 	{
-		//assert planIncumbent != null;
 		return(planIncumbent);
 	}
 
@@ -111,7 +112,10 @@ public class DasMapInfo {
 	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw, int error)
 	{
 		// should only be called when no cell already exists in array
-		assert getCellInfo(cell) == null;
+		if (getCellInfo(cell) != null) {
+			throw new IllegalArgumentException("Cannot add cell " + cell +
+					", which has already been added");
+		}
 
 		// create new cell info
 		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost,
@@ -179,7 +183,10 @@ public class DasMapInfo {
 	{
 		DasCellInfo cellInfo = openQueue.poll();
 
-		//assert(cellInfo != null);
+		if (cellInfo == null) {
+			throw new IllegalStateException(
+					"Open set is empty - cannot close cheapest open cell");
+		}
 
 		cellInfo.setCellMembership(CellSetMembership.CLOSED);
 
@@ -222,26 +229,15 @@ public class DasMapInfo {
 	 * @param cell the cell to be pruned.
 	 */
 	public void pruneCell(GridCell cell) {
-		DasCellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
 
-		assert cellInfo != null;
-		assert cellInfo.getCellMembership() == CellSetMembership.CLOSED;
+		if (cellInfo.getCellMembership() != CellSetMembership.CLOSED) {
+			throw new IllegalStateException("Cannot prune cell " + cell +
+					" - not in closed set.");
+		}
 
 		cellInfo.setCellMembership(CellSetMembership.PRUNED);
 		prunedQueue.offer(cellInfo);
-	}
-
-	/**
-	 * Move cheapest pruned cell to the open set and return it.
-	 * @return the cell formerly the cheapest from the open set
-	 */
-	void openCheapestPruned() {
-		DasCellInfo cellInfo = prunedQueue.poll();
-
-		assert(cellInfo != null);
-
-		cellInfo.setCellMembership(CellSetMembership.OPEN);
-		openQueue.offer(cellInfo);
 	}
 
 	/**
@@ -271,60 +267,64 @@ public class DasMapInfo {
 	}
 
 	public GridCell getParent(GridCell cell) {
-		DasCellInfo cellInfo = getCellInfo(cell);
-		assert cellInfo != null;
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
 		return cellInfo.getParent().getCell();
 	}
 
 	public void setParent(GridCell cell, GridCell parent) {
-		DasCellInfo cellInfo = getCellInfo(cell);
-		DasCellInfo parentInfo = getCellInfo(parent);
-
-		assert cellInfo != null;
-		assert parentInfo != null;
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
+		DasCellInfo parentInfo = safeGetCellInfo(parent);
 
 		cellInfo.setParent(parentInfo);
 	}
 
 	public float getFCost(GridCell cell) {
-		DasCellInfo cellInfo = getCellInfo(cell);
-		assert cellInfo != null;
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
 		return cellInfo.getFCost();
 	}
 
 	public float getGCost(GridCell cell) {
-		DasCellInfo cellInfo = getCellInfo(cell);
-		assert cellInfo != null;
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
 		return cellInfo.getGCost();
 	}
 
 	public void setGCost(GridCell cell, float gCost) {
-		DasCellInfo cellInfo = getCellInfo(cell);
-		assert cellInfo != null;
-		assert cellInfo.getCellMembership() != CellSetMembership.OPEN;
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
+
+		// TODO: should we allow this? I think it might be necessary
+		if (cellInfo.getCellMembership() == CellSetMembership.OPEN) {
+			throw new IllegalArgumentException(
+					"Cell's g cost cannot be altered whilst in the open set.");
+		}
+
 		cellInfo.setGCost(gCost);
 	}
 
 	public float getHCost(GridCell cell) {
-		DasCellInfo cellInfo = getCellInfo(cell);
-		assert cellInfo != null;
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
 		return cellInfo.getHCost();
 	}
 
 	public void setHCost(GridCell cell, float hCost) {
-		DasCellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
 
-		assert cellInfo != null;
-		assert cellInfo.getCellMembership() != CellSetMembership.OPEN;
+		// TODO: should we allow this? I think it might be necessary
+		if (cellInfo.getCellMembership() == CellSetMembership.OPEN) {
+			throw new IllegalArgumentException(
+					"Cell's g cost cannot be altered whilst in the open set.");
+		}
 
 		cellInfo.setHCost(hCost);
 	}
 
 	public void setCosts(GridCell cell, float gCost, float hCost) {
-		DasCellInfo cellInfo = getCellInfo(cell);
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
 
-		assert cellInfo != null;
-		assert cellInfo.getCellMembership() != CellSetMembership.OPEN;
+		// TODO: should we allow this? I think it might be necessary
+		if (cellInfo.getCellMembership() == CellSetMembership.OPEN) {
+			throw new IllegalArgumentException(
+					"Cell's g cost cannot be altered whilst in the open set.");
+		}
 
 		cellInfo.setGCost(gCost);
 		cellInfo.setHCost(hCost);
@@ -396,6 +396,14 @@ public class DasMapInfo {
 	public float getDCheapestWithError(GridCell cell)
 	{
 		return getCellInfo(cell).getDCheapestWithError();
+	}
+
+	private DasCellInfo safeGetCellInfo(GridCell cell) {
+		DasCellInfo cellInfo = getCellInfo(cell);
+		if (cellInfo == null) {
+			throw new IllegalStateException("Cell " + cell + " has no been added.");
+		}
+		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 
 	/* get cell info associated with cell. */

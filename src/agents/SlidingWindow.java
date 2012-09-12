@@ -107,7 +107,6 @@ public class SlidingWindow
 		// Should only be called when settled!
 		// TODO: probably a better interface than this, but as long as it is remembered to 
 		// check first!
-		assert m_isSettled;
 		
 		return (m_count > 0) ? m_sum / m_count : 0;
 	}
