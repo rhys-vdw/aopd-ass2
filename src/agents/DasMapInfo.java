@@ -32,49 +32,49 @@ public class DasMapInfo {
 	// is just to aid analysis.
 	private int width;
 	private int height;
-	
+
 	private int nClosedCount = 0;
-	
+
 	private ComputedPlan planIncumbent = null;
-	
+
 	// Track the number of expansions performed -  e_curr value
-	// TODO: investigate refactoring this to long to avoid potential truncactions in operations 
-	private int nExpansionsCount = 0; 
-	
+	// TODO: investigate refactoring this to long to avoid potential truncactions in operations
+	private int nExpansionsCount = 0;
+
 	// These values needs tuning!
 	// This is the size of the sliding window, in entries.
 	final private int EXPANSION_DELAY_WINDOW_LENGTH = 15;
-	
+
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
 	final private int SETTLING_EXPANSION_COUNT = 200;
-	
+
 	// Time in ns to use as the expected interval between expansions, before settling.
 	// Shouldn't be used with the new refactoring.
 	final private long SETTLING_EXPANSION_AVG_INTERVAL = 30;
-	
-	
+
+
 	// Time of the most recent expansion
 	private long timeMostRecentExpansion = 0;
-	
+
 	// Delta e value
 	private SlidingWindow conExpansionDelays = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH,
 			SETTLING_EXPANSION_COUNT);
-	
+
 	// r value
-	private SlidingWindow conExpansionIntervals = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH, 
+	private SlidingWindow conExpansionIntervals = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH,
 			SETTLING_EXPANSION_COUNT);
-	
+
 	public DasMapInfo(GridDomain map) {
 		this.width = map.getWidth();
 		this.height = map.getHeight();
 		this.cells = new DasCellInfo[width][height];
 		this.openQueue = new PriorityQueue<DasCellInfo>();
 		this.prunedQueue = new PriorityQueue<DasCellInfo>();
-	
+
 	}
 
-	public void computePlan(GridCell goal) 
+	public void computePlan(GridCell goal)
 	{
 		ComputedPlan planNewIncumbent = new ComputedPlan();
 
@@ -82,10 +82,10 @@ public class DasMapInfo {
 
 		for (DasCellInfo cell = getCellInfo(goal);
 		     cell.getParent() != null;
-		     cell = cell.getParent()) 
+		     cell = cell.getParent())
 		{
 			GridCell gc = cell.getCell();
-			System.out.println("Prepending " + gc);
+			//System.out.println("Prepending " + gc);
 			planNewIncumbent.prependStep(gc);
 		}
 
@@ -94,7 +94,7 @@ public class DasMapInfo {
 		planNewIncumbent.setCost(getGCost(goal));
 		planIncumbent = planNewIncumbent;
 	}
-	
+
 	public ComputedPlan GetIncumbentPlan()
 	{
 		//assert planIncumbent != null;
@@ -108,14 +108,16 @@ public class DasMapInfo {
 	 * @param hCost the heuristic estimate to get to the goal
 	 * @param parent the previous cell in a path
 	 */
-	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw, int error) 
+	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw, int error)
 	{
 		// should only be called when no cell already exists in array
 		assert getCellInfo(cell) == null;
 
+		// create new cell info
+		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost,
+				CellSetMembership.OPEN, nExpansionsCount, dCheapestRaw);
+
 		// add new node to array and open queue
-		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost, CellSetMembership.OPEN, nExpansionsCount,
-				dCheapestRaw);
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.offer(cellInfo);
 	}
@@ -126,33 +128,17 @@ public class DasMapInfo {
 	 * @param gCost the cost to get to the cell
 	 * @param hCost the heuristic estimate to get to the goal
 	 */
-	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw, 
-			GridCell parent) 
+	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw,
+			GridCell parent)
 	{
 		// TODO: need to add some traces to check the intuition here.
 		// i.e. show that error goes up as the direction is away from the goal.
-		int nError = 0;
-		nError = dCheapestRaw - cells[parent.getCoord().getX()][parent.getCoord().getY()]
-				.getDCheapestRaw() + 1;
-		add(cell, gCost, hCost, dCheapestRaw, nError);
+		int dError = dCheapestRaw - getCellInfo(parent).getDCheapestRaw() + 1;
+
+		add(cell, gCost, hCost, dCheapestRaw, dError);
 		setParent(cell, parent);
 	}
 
-	/**
-	 * Move cell to open set.
-	 * @param cell the cell to move
-	 */
-	/*
-	public void setCellOpen(GridCell cell) {
-		DasCellInfo cellInfo = getCellInfo(cell);
-		// TODO: add to priority queue
-
-		// must have cell to 
-		assert (cellInfo != null);
-
-
-	} */
-	
 	public boolean getSettled()
 	{
 		// TODO: need to change sliding window class so that it has both windows as one.
@@ -175,7 +161,7 @@ public class DasMapInfo {
 	public int openCount() {
 		return openQueue.size();
 	}
-	
+
 	/*
 	 * This function just points out that we need a structure for closed list.
 	 * It is only used for debugging of the output of closed list.
@@ -189,32 +175,32 @@ public class DasMapInfo {
 	 * Effectively, this, combined with the "add" functionality is the verb: Expansion
 	 * @return the cell formerly the cheapest from the open set
 	 */
-	public GridCell closeCheapestOpen() 
+	public GridCell closeCheapestOpen()
 	{
 		DasCellInfo cellInfo = openQueue.poll();
 
 		//assert(cellInfo != null);
 
 		cellInfo.setCellMembership(CellSetMembership.CLOSED);
-		
+
 		// We will have better closed list management, but for now, just tally the
 		// number of times we close an entry - this will help with analysis.
 		++nClosedCount;
-		
+
 		// TODO: Not sure if it should be incremented before or after!
 		// Incremented e_curr value
 		++nExpansionsCount;
-		
+
 
 		// Record the number of expansions performed before processing the node
 		// after each expansion.
 		// i.e. we are recording the current level of vacillation.
 		long nCurrentExpansionDelay = this.nExpansionsCount - cellInfo.getExpansionNumber();
-		
+
 		long timeCurrent = System.nanoTime();
-		
+
 		long timeExpansionsDelta = timeCurrent - this.timeMostRecentExpansion;
-		
+
 		// Store this time, for the next time we perform an expansion.
 		this.timeMostRecentExpansion = timeCurrent;
 		// Add the expansion delay to the circular queue, so that
@@ -226,7 +212,7 @@ public class DasMapInfo {
 
 			conExpansionIntervals.Push(timeExpansionsDelta);
 		}
-		
+
 		return cellInfo.getCell();
 	}
 
@@ -258,6 +244,10 @@ public class DasMapInfo {
 		openQueue.offer(cellInfo);
 	}
 
+	public boolean isPrunedEmpty()
+	{
+		return(prunedQueue.isEmpty());
+	}
 	/**
 	 * Return a selection of pruned states to the open set. The number of states
 	 * moved is the number that is estimated can be explored with the given
@@ -278,7 +268,7 @@ public class DasMapInfo {
 			cellInfo.setCellMembership(CellSetMembership.OPEN);
 			openQueue.offer(cellInfo);
 		}
-		
+
 		Trace.print("Resetting windows");
 		conExpansionIntervals.reset();
 		conExpansionDelays.reset();
@@ -397,35 +387,23 @@ public class DasMapInfo {
 		return open;
 	}
 
-	/* get cell info associated with cell. */
-	private DasCellInfo getCellInfo(GridCell cell) {
-		GridCoord gc = cell.getCoord();
-		//if (cells == null) 
-			//Trace.print("cells is null");
-		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
-	}
-	
 	public float calculateAvgExpansionInterval()
 	{
-		float avgExpansionInterval = 0;
-		avgExpansionInterval = conExpansionIntervals.getAvg();
-		//System.out.println(fAvgExpansionInterval);
-		return(avgExpansionInterval);
+		return conExpansionIntervals.getAvg();
 	}
-	
+
 	public double calculateAvgExpansionDelay()
 	{
-		float avgExpansionDelay = 0;
-		avgExpansionDelay = conExpansionDelays.getAvg();
-		return(avgExpansionDelay);
+		return conExpansionDelays.getAvg();
 	}
-	
+
 	public float getDCheapestWithError(GridCell cell)
 	{
-		float fDCheapestWithError = 0.0f;
-		
-		fDCheapestWithError = cells[cell.getCoord().getX()][cell.getCoord().getY()].getDCheapestWithError();
-		
-		return(fDCheapestWithError);
+		return getCellInfo(cell).getDCheapestWithError();
+	}
+
+	/* get cell info associated with cell. */
+	private DasCellInfo getCellInfo(GridCell cell) {
+		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 }

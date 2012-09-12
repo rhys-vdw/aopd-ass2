@@ -13,7 +13,6 @@ import java.util.Arrays;
  * beginning.
  * 
  * Would have preferred to define the class using generics, but you cant instantiate a generic array in java!
- * @param <T>
  */
 
 
@@ -100,7 +99,7 @@ public class SlidingWindow
 	
 	public boolean getSettled()
 	{
-		return(m_isSettled);
+		return m_isSettled;
 	}
 	
 	public float getAvg()
@@ -108,13 +107,9 @@ public class SlidingWindow
 		// Should only be called when settled!
 		// TODO: probably a better interface than this, but as long as it is remembered to 
 		// check first!
-		assert(m_isSettled);
+		assert m_isSettled;
 		
-		float fAverage = 0;
-		fAverage = (m_sum/m_count);
-		//	System.out.print("sliding window computed avg: " + m_sum + " / " + m_count + " = " + fAverage);
-			
-		return(fAverage);
+		return (m_count > 0) ? m_sum / m_count : 0;
 	}
 	
 	// Used to trigger a "settling" state

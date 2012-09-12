@@ -18,12 +18,12 @@ import pplanning.simviewer.model.GridDomain;
 public class RhysAStar implements PlanningAgent {
 	// plan to execute
 	private ComputedPlan plan;
-	
+
 	MapInfo mapinfo;
-	
-    private int stepNo = 0;
-    
-    private GridCell lastGoal = null;
+
+	private int stepNo = 0;
+
+	private GridCell lastGoal = null;
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
@@ -32,34 +32,38 @@ public class RhysAStar implements PlanningAgent {
 		try {
 			Trace.Enable(false);
 			GridCell nextStep = null;
-			
-			boolean bReplan = 
-					plan == null ||			// no last path stored, have yet notr planned before?
-					map.getChangedEdges().size() > 0 ||	// map has had changes 
-					!lastGoal.equals(goal) || // Goal has changed (equals not implemented?)
-					!plan.contains(start); // sNode is not in the path (sNode out of track)
-			
+
+			boolean bReplan =
+				plan == null ||			// no last path stored, have yet notr planned before?
+				map.getChangedEdges().size() > 0 ||	// map has had changes
+				!lastGoal.equals(goal) || // Goal has changed (equals not implemented?)
+				!plan.contains(start); // sNode is not in the path (sNode out of track)
+
 			if (bReplan) {
 				plan = generatePlan(map, start, goal);
 				stepNo = 0;
 				lastGoal = goal;
 			}
 
+			if (plan == null) {
+				System.out.println("Could not find goal");
+				return start;
+			}
+
 			if (stepNo < plan.getLength())
 			{
-
 				nextStep = (GridCell) plan.getStep(stepNo++);
-				
-				if (nextStep == null) 
+
+				if (nextStep == null)
 				{
 					Trace.print("next step is null!");
 				}
 			}
-			
+
 			return nextStep;
 
-		} 
-		catch (Exception e) 
+		}
+		catch (Exception e)
 		{
 			e.printStackTrace();
 			return start;
@@ -91,7 +95,7 @@ public class RhysAStar implements PlanningAgent {
 
 				// consider node if it can be entered and is not in closed list
 				if (map.isBlocked(neighbor) == false &&
-				    mapinfo.isClosed((GridCell) neighbor) == false) {
+						mapinfo.isClosed((GridCell) neighbor) == false) {
 
 					// get g cost of neighbor
 					float gCost = mapinfo.getGCost(current) + map.cost(current, neighbor);
@@ -102,11 +106,9 @@ public class RhysAStar implements PlanningAgent {
 					} else if (gCost < mapinfo.getGCost((GridCell) neighbor)) {
 						// more direct route to node found, update it
 						// NOTE: this can never happen with an admissible heuristic!
-						assert false;
-						/*
-						mapInfo.setCosts(neighbor, gCost, map.hCost(neighbor, goal));
-						mapInfo.setParent(neighbor, current);
-						*/
+						System.out.println("failing now...");
+						//mapInfo.setGCost(neighbor, gCost);
+						//mapInfo.setParent(neighbor, current);
 					}
 				}
 			}
@@ -123,38 +125,36 @@ public class RhysAStar implements PlanningAgent {
 
 	@Override
 	public ArrayList<GridCell> expandedNodes() {
-		
+
 		ArrayList<GridCell> open = new ArrayList<GridCell>();
 		ArrayList<GridCell> closed = new ArrayList<GridCell>();
-		
+
 		if (mapinfo != null)
 		{
 			Trace.print("Open Set has" + mapinfo.openCount() + " entries");
-			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
+			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due
 			// to being called at unexpanded nodes too!!
 			mapinfo.GetSearchSetsAsArrayList(open, closed);
 		}
 
-
-		
 		return(closed);
 	}
 
 	@Override
-	public ArrayList<GridCell> unexpandedNodes() {	
+	public ArrayList<GridCell> unexpandedNodes() {
 		ArrayList<GridCell> open = new ArrayList<GridCell>();
 		ArrayList<GridCell> closed = new ArrayList<GridCell>();
-		
+
 		if (mapinfo != null)
 		{
 			Trace.print("Closed Set has" + mapinfo.closedCount() + " entries");
-			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due 
+			// Need to make this open/closed query into singleton style - it iterates through every tile twice, due
 			// to being called at expanded nodes too!!
 			mapinfo.GetSearchSetsAsArrayList(open, closed);
-			
+
 
 		}
-		
+
 		return(open);
 
 	}
