@@ -205,10 +205,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 			else
 			{
 				// Open list is empty, so we need to repopulate it.
-				//if (mapInfo.getSettled())
+				if (!mapInfo.isPrunedEmpty())
 				{
 					int exp = calculateExpansionsRemaining(timeDeadline);
 					mapInfo.recoverPrunedStates(exp);
+				}
+				else
+				{
+					break;
 				}
 				//System.out.print(exp);
 
