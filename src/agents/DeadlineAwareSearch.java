@@ -361,7 +361,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	public ArrayList<GridCell> unexpandedNodes() {
 		if (shouldUpdateOpen) {
 			shouldUpdateOpen = false;
-			prunedNodes = mapInfo.getOpenArrayList();
+			prunedNodes = mapInfo.getPrunedArrayList();
 		}
 		return prunedNodes;
 	}
