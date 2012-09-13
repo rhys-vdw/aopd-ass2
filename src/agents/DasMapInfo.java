@@ -102,45 +102,37 @@ public class DasMapInfo {
 		return(planIncumbent);
 	}
 
+	public void addStartCell(GridCell cell, float hCost, int dCheapestRaw) {
+		// Start cell has zero gCost, and no parent.
+		add(cell, 0f, hCost, dCheapestRaw, null);
+	}
+
 	/**
 	 * Add cell to open set. This will fail if cell has already been added.
-	 * @param cell the cell
-	 * @param gCost the cost to get to the cell
-	 * @param hCost the heuristic estimate to get to the goal
-	 * @param parent the previous cell in a path
+	 * @param cell         the cell
+	 * @param gCost        the cost to get to the cell
+	 * @param hCost        the heuristic estimate to get to the goal
+	 * @param dCheapestRaw the estimated goaldepth from the cell
+	 * @param parent       the previous cell in a path
 	 */
-	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw, int error)
+	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw, GridCell parent)
 	{
-		// should only be called when no cell already exists in array
+		// Should only be called when no info exists for node.
 		if (getCellInfo(cell) != null) {
 			throw new IllegalArgumentException("Cannot add cell " + cell +
-					", which has already been added");
+					", which has already been added as '" + getCellInfo(cell) + "'");
 		}
 
-		// create new cell info
+		// Find cell info associated with parent.
+		DasCellInfo parentInfo = (parent == null) ? null : getCellInfo(parent);
+
+		// Create new cell info.
 		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost,
-				CellSetMembership.OPEN, nExpansionsCount, dCheapestRaw);
+				CellSetMembership.OPEN, parentInfo, nExpansionsCount, dCheapestRaw);
 
 		// add new node to array and open queue
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.offer(cellInfo);
-	}
-
-	/**
-	 * Add cell to open set. This will fail if cell has already been added
-	 * @param cell the cell
-	 * @param gCost the cost to get to the cell
-	 * @param hCost the heuristic estimate to get to the goal
-	 */
-	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw,
-			GridCell parent)
-	{
-		// TODO: need to add some traces to check the intuition here.
-		// i.e. show that error goes up as the direction is away from the goal.
-		int dError = dCheapestRaw - getCellInfo(parent).getDCheapestRaw() + 1;
-
-		add(cell, gCost, hCost, dCheapestRaw, dError);
-		setParent(cell, parent);
 	}
 
 	public boolean getSettled()
@@ -195,6 +187,8 @@ public class DasMapInfo {
 		++nClosedCount;
 
 		// TODO: Not sure if it should be incremented before or after!
+		// Before is correct, start node is appended at zero expansions. However
+		// can we put this where the actual expansion occurs?
 		// Incremented e_curr value
 		++nExpansionsCount;
 

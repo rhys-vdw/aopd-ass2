@@ -126,7 +126,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		// initialize open set with start node
 		float hCost = map.hCost(start, goal);
 		int dCost = dCostManhattan((GridCell)start, goal);
-		mapInfo.add(start, 0f, hCost, dCost, 0);
+		mapInfo.addStartCell(start, hCost, dCost);
 
 		// Continue until time has run out
 		while (System.nanoTime() < timeDeadline)
@@ -162,7 +162,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 					{
 						System.out.println("new path to goal is worse than incumbent!");
 					}
-
 				}
 				else if (!mapInfo.getSettled() ||
 						(estimateGoalDepth(current) < nMaxReachableDepth) )
@@ -177,16 +176,16 @@ public class DeadlineAwareSearch implements PlanningAgent
 						{
 							if (mapInfo.isOpen((GridCell) neighbor) == false)
 							{
-								float fNeighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
-								float fNeighborHCost = map.hCost(neighbor, goal);
+								float neighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
+								float neighborHCost = map.hCost(neighbor, goal);
 
 								//System.out.println("g: " + fNeighborGCost + " h" + fNeighborHCost);
 								// TODO: this is currently assuming manhattan grid world. See Issue #11
-								int nNeighbourDCost = (int) dCostManhattan((GridCell)neighbor, goal);
+								int neighbordCheapestRaw = (int) dCostManhattan((GridCell)neighbor, goal);
 								//System.out.println("d" + nNeighbourDCost);
 								// Add the neighbor to the open set!
-								mapInfo.add((GridCell) neighbor, fNeighborGCost, fNeighborHCost,
-										nNeighbourDCost, current);
+								mapInfo.add((GridCell) neighbor, neighborGCost, neighborHCost,
+										neighbordCheapestRaw, current);
 							}
 							// Do we need the following case handling? Is the above enough to add s' to open? Step 12 of algorithm
 							/* else if (gCost < mapInfo.getGCost((GridCell) neighbor)) */
@@ -195,11 +194,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 				else
 				{
-					//Trace.print("(unreachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
-					//if (mapInfo.getSettled())
-					{
-						mapInfo.pruneCell(current);
-					}
+					mapInfo.pruneCell(current);
 				}
 			}
 			else

@@ -35,12 +35,6 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		return(nCumulativeErrorOfPartialSolution);
 	}
 
-	public int getError()
-	{
-		// TODO: possibly not needed
-		return(this.dError);
-	}
-
 	public float getAverageError()
 	{
 		float avgError;
@@ -102,7 +96,11 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 	public DasCellInfo getParent() {
 		return this.parent;
 	}
+
+	// TODO: Consider the implications to partialSolutionDepth when the parent is
+	// changed. Do we need to address this?
 	public void setParent(DasCellInfo parent) {
+		this.nPartialSolutionDepth = parent.getDepth() + 1;
 		this.parent = parent;
 	}
 
@@ -177,43 +175,62 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		return(nReturnValue);
 	}
 
+	/**
+	 * Update the total cost estimate of this path. Should be called every time
+	 * gCost of hCost is modified.
+	 */
 	void updateFCost() {
 		this.fCost = gCost + hCost;
 	}
 
 	/**
 	 * Create a new CellInfo for specified cell with specified g and h costs.
-	 * @cell           the cell
-	 * @gCost          the cost of the path from start to cell
-	 * @hCost          the heuristic estimate of the remaining cost to the goal
-	 * @cellMembership the set that this node should start in
-	 * @parent         the parent node of this cell
+	 * @cell            the cell
+	 * @gCost           the cost of the path from start to cell
+	 * @hCost           the heuristic estimate of the remaining cost to the goal
+	 * @cellMembership  the set that this node should start in
+	 * @parent          the parent node of this cell
+	 * @expansionNumber the number of expansions that have occurred before this
+	 *                  node was generated
+	 * @dCheapestRaw    estimate of expansions required from this node to the goal
 	 */
 	public DasCellInfo(GridCell cell, float gCost, float hCost,
-			CellSetMembership cellMembership, DasCellInfo parent, int nExpansion,
-			int dCheapest, int error) {
-		this(cell, gCost, hCost, cellMembership, nExpansion, dCheapest);
-		this.parent = parent;
-		this.dError = error;
-		this.nPartialSolutionDepth = parent.getDepth() + 1;
-		this.nCumulativeErrorOfPartialSolution = parent.getCumulativeError() + error;
-	}
-
-	/**
-	 * Create a new CellInfo for specified cell with specified g and h costs.
-	 * @cell           the cell
-	 * @gCost          the cost of the path from start to cell
-	 * @hCost          the heuristic estimate of the remaining cost to the goal
-	 * @cellMembership the set that this node should start in
-	 */
-	public DasCellInfo(GridCell cell, float gCost, float hCost, CellSetMembership cellMembership, 
-			int nExpansion, int dCheapest) {
+			CellSetMembership cellMembership, DasCellInfo parent,
+			int expansionNumber, int dCheapestRaw) {
+		// Set cell.
 		this.cell = cell;
+
+		// Set costs.
 		this.gCost = gCost;
 		this.hCost = hCost;
 		updateFCost();
+
+		// Set membership
 		this.cellSetMembership = cellMembership;
-		this.nExpansionNumber = nExpansion;
-		this.dCheapestRaw = dCheapest;
+
+		// Set d cheapest and error.
+		this.dCheapestRaw = dCheapestRaw;
+
+		// Set expansion number.
+		this.nExpansionNumber = expansionNumber;
+
+		// Set parent and partial solution cost and error.
+		this.parent = parent;
+		if (parent == null) {
+			// This is the start node; set to zero.
+			this.nPartialSolutionDepth = 0;
+			this.dError = 0;
+			this.nCumulativeErrorOfPartialSolution = 0;
+		} else {
+			// This is not the first node, base data on its parent.
+			this.nPartialSolutionDepth = parent.getDepth() + 1;
+			this.dError = dCheapestRaw - parent.dCheapestRaw + 1;
+			this.nCumulativeErrorOfPartialSolution = parent.getCumulativeError() + dError;
+		}
+	}
+
+	@Override 
+	public String toString() {
+		return cell + " in set " + cellSetMembership.toString();
 	}
 }
