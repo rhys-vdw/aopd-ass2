@@ -10,7 +10,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 	private float fCost;
 	private int dCheapestRaw;
 	private CellSetMembership cellSetMembership;
-	private final int nExpansionNumber; // TODO: should this be final?
+	private int nExpansionNumber; // TODO: should this be final?
 
 	// The below are required for the d_cheapest calculation
 	private int dError = 0;
@@ -40,12 +40,13 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		float avgError;
 		if (this.nPartialSolutionDepth != 0)
 		{
-			avgError = (float)this.nCumulativeErrorOfPartialSolution / this.nPartialSolutionDepth;
+			avgError = (float)this.nCumulativeErrorOfPartialSolution / (float)this.nPartialSolutionDepth;
 		}
 		else
 		{
-			avgError = 0;
+			avgError = 0.0f;
 		}
+		//System.out.println("avgError: " + avgError);
 		return(avgError);
 	}
 
@@ -75,7 +76,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		float dCheapestWithError = 0.0f;
 		float avgError = this.getAverageError();
 
-		System.out.println("avgError: " + avgError);
+		//System.out.println("avgError: " + avgError);
 
 		if (avgError < 1.0f-EPSILON)
 		{

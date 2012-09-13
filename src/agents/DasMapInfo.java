@@ -180,8 +180,10 @@ public class DasMapInfo {
 	public void recoverPrunedStates(int expansionCount) {
 		// the sum of d^cheapest for each cell reopened
 		int dSum = 0;
+		int count = 0;
 
 		while (dSum < expansionCount && prunedQueue.size() > 0) {
+			
 			DasCellInfo cellInfo = prunedQueue.poll();
 
 			dSum += cellInfo.getDCheapestWithError();
@@ -189,7 +191,10 @@ public class DasMapInfo {
 			// add to open set
 			cellInfo.setCellMembership(CellSetMembership.OPEN);
 			openQueue.offer(cellInfo);
+			count++;
 		}
+		
+		System.out.println("Recovering " + count + " nodes");
 	}
 
 	public GridCell getParent(GridCell cell) {

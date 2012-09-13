@@ -195,7 +195,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					// Expand current node. TODO: move this into its own method.
 					for (State neighbor : map.getSuccessors(current))
 					{
-						System.out.println("Generating Child " + count++);
+//						System.out.println("Generating Child " + count++);
 						// consider node if it can be entered and is not in closed or pruned list
 						if (map.isBlocked(neighbor) == false &&
 						    mapInfo.isClosed((GridCell) neighbor) == false &&
@@ -206,7 +206,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 								float neighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
 								float neighborHCost = map.hCost(neighbor, goal);
 
-								//System.out.println("g: " + fNeighborGCost + " h" + fNeighborHCost);
+								//System.out.println("g: " + neighborGCost + " h" + neighborHCost);
 								// TODO: this is currently assuming manhattan grid world. See Issue #11
 								int neighborDCheapestRaw = (int) dCostManhattan((GridCell)neighbor, goal);
 								//System.out.println("d" + nNeighbourDCost);
@@ -248,7 +248,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 					mapInfo.recoverPrunedStates(exp);
 					expansionDelayWindow.reset();
 					expansionIntervalWindow.reset();
-					expansionCount = 0;
 				}
 				else
 				{
@@ -296,7 +295,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		int dMax = (int) (calculateExpansionsRemaining(timeDeadline) / avgExpansionDelay);
 
-		System.out.println(dMax + " maximum reachable depth");
+//		System.out.println(dMax + " maximum reachable depth");
 		return dMax;
 	}
 
@@ -321,10 +320,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		int exp = (int) (timeRemaining * averageRate);
 
-		System.out.println("Calculating expansions remaining:" +
-				"\nexpansions remaining: " + exp +
-				"\ntime remaining: " + timeRemaining +
-				"\naverage expansion rate: " + averageRate);
+//		System.out.println("Calculating expansions remaining:" +
+//				"\nexpansions remaining: " + exp +
+//				"\ntime remaining: " + timeRemaining +
+//				"\naverage expansion rate: " + averageRate);
 
 		return exp;
 	}
