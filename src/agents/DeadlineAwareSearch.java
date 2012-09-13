@@ -10,10 +10,6 @@ import pplanning.interfaces.PlanningAgent;
 import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
 
-import java.lang.management.ThreadMXBean;
-import java.lang.management.ManagementFactory;
-
-
 public class DeadlineAwareSearch implements PlanningAgent
 {
 	private ComputedPlan plan;
@@ -51,7 +47,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			EXPANSION_DELAY_WINDOW_LENGTH);
 	
 	// For timing
-	final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
+	//final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
@@ -59,17 +55,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		try {
 			Trace.Enable(true);
-			assert threadMX.isCurrentThreadCpuTimeSupported();
-			threadMX.setThreadCpuTimeEnabled(true);
 
 			// If there is no plan, generate one.
 			if (plan == null)
 			{
-				assert threadMX.isCurrentThreadCpuTimeSupported();
-				threadMX.setThreadCpuTimeEnabled(true);
 				
 				// TODO: base search buffer on the length of the solution.
-				long timeCurrent = threadMX.getCurrentThreadCpuTime();
+				long timeCurrent = System.nanoTime();
 				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) * SEARCH_TIME_FRACTION);
 				long timeDeadline = timeCurrent + searchTime;
 
@@ -169,11 +161,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 		ComputedPlan incumbentPlan = null;
 
 		// Continue until time has run out
-		while (threadMX.getCurrentThreadCpuTime() < timeDeadline)
+		while (System.nanoTime() < timeDeadline)
 		{
 			System.out.println("expansionCount:" + expansionCount);
 			// TODO: is this a good inital value?
-			long prevExpansionTime = threadMX.getCurrentThreadCpuTime();
+			long prevExpansionTime = System.nanoTime();
 
 			if (!mapInfo.isOpenEmpty()) {
 				GridCell current = mapInfo.closeCheapestOpen();
@@ -234,7 +226,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					expansionDelayWindow.push(expansionDelay);
 
 					// Calculate expansion interval.
-					long currentTime = threadMX.getCurrentThreadCpuTime();
+					long currentTime = System.nanoTime();
 					long expansionInterval = currentTime - prevExpansionTime;
 					prevExpansionTime = currentTime;
 
@@ -323,7 +315,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	 */
 	public int calculateExpansionsRemaining(long timeDeadline)
 	{
-		long timeRemaining = timeDeadline - threadMX.getCurrentThreadCpuTime();
+		long timeRemaining = timeDeadline - System.nanoTime();
 		float averageInterval = expansionIntervalWindow.getAvg();
 		float averageRate = 1.0f / averageInterval;
 
