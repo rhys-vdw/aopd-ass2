@@ -142,6 +142,7 @@ public class DasMapInfo {
 		}
 
 		cellInfo.setCellMembership(CellSetMembership.CLOSED);
+		nClosedCount++;
 
 		return cellInfo.getCell();
 	}
@@ -161,6 +162,7 @@ public class DasMapInfo {
 
 		cellInfo.setCellMembership(CellSetMembership.PRUNED);
 		prunedQueue.offer(cellInfo);
+		nClosedCount--;
 	}
 
 	public boolean isPrunedEmpty()
@@ -328,6 +330,15 @@ public class DasMapInfo {
 		}
 		return open;
 	}
+	
+	/** Return an ArrayList of all GridCells currently in the pruned set. */
+	public ArrayList<GridCell> getPrunedArrayList() {
+		ArrayList<GridCell> pruned = new ArrayList<GridCell>(prunedQueue.size());
+		for (DasCellInfo cellInfo : prunedQueue) {
+			pruned.add(cellInfo.getCell());
+		}
+		return pruned;
+	}	
 
 	private DasCellInfo safeGetCellInfo(GridCell cell) {
 		DasCellInfo cellInfo = getCellInfo(cell);

@@ -10,6 +10,9 @@ import pplanning.interfaces.PlanningAgent;
 import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
 
+import java.lang.management.ThreadMXBean;
+import java.lang.management.ManagementFactory;
+
 
 public class DeadlineAwareSearch implements PlanningAgent
 {
@@ -39,10 +42,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 	// This is the size of the sliding window, in entries.
 	final private int EXPANSION_DELAY_WINDOW_LENGTH = 15;
 
-	// Time in ns to use as the expected interval between expansions, before settling.
-	// Shouldn't be used with the new refactoring.
-	final private long SETTLING_EXPANSION_AVG_INTERVAL = 30;
-
 	// Sliding window to calculate average single step error.
 	private SlidingWindow expansionDelayWindow = new SlidingWindow(
 			EXPANSION_DELAY_WINDOW_LENGTH);
@@ -50,6 +49,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 	// r value
 	private SlidingWindow expansionIntervalWindow = new SlidingWindow(
 			EXPANSION_DELAY_WINDOW_LENGTH);
+	
+	// For timing
+	final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
@@ -57,22 +59,29 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		try {
 			Trace.Enable(true);
+			assert threadMX.isCurrentThreadCpuTimeSupported();
+			threadMX.setThreadCpuTimeEnabled(true);
 
 			// If there is no plan, generate one.
 			if (plan == null)
 			{
-				// a new plan has been generated, update open and closed debug sets.
-				shouldUpdateOpen = true;
-				shouldUpdateClosed = true;
-
+				assert threadMX.isCurrentThreadCpuTimeSupported();
+				threadMX.setThreadCpuTimeEnabled(true);
+				
 				// TODO: base search buffer on the length of the solution.
-				long timeCurrent = System.nanoTime();
+				long timeCurrent = threadMX.getCurrentThreadCpuTime();
 				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) * SEARCH_TIME_FRACTION);
 				long timeDeadline = timeCurrent + searchTime;
 
 				Trace.print("current time (ns): " + timeCurrent);
 				Trace.print("deadline: " + timeDeadline);
 				Trace.Enable(false);
+				
+				// a new plan has been generated, update open and closed debug sets.
+				shouldUpdateOpen = true;
+				shouldUpdateClosed = true;
+
+
 				plan = generatePlan(map, start, goal, timeDeadline);
 
 				// If plan was not found, return start node.
@@ -140,6 +149,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
 			GridCell goal, long timeDeadline) {
 
+
+		
 		System.out.println("Generating a new plan");
 
 		// Map info exists outside of this function so that its open and closed
@@ -158,10 +169,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 		ComputedPlan incumbentPlan = null;
 
 		// Continue until time has run out
-		while (System.nanoTime() < timeDeadline)
+		while (threadMX.getCurrentThreadCpuTime() < timeDeadline)
 		{
+			System.out.println("expansionCount:" + expansionCount);
 			// TODO: is this a good inital value?
-			long prevExpansionTime = System.nanoTime();
+			long prevExpansionTime = threadMX.getCurrentThreadCpuTime();
 
 			if (!mapInfo.isOpenEmpty()) {
 				GridCell current = mapInfo.closeCheapestOpen();
@@ -187,10 +199,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 						(mapInfo.getDCheapestWithError(current) < calculateMaxReachableDepth(timeDeadline)))
 				{
 					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + dMax);
-
+					int count = 0;
 					// Expand current node. TODO: move this into its own method.
 					for (State neighbor : map.getSuccessors(current))
 					{
+						System.out.println("Generating Child " + count++);
 						// consider node if it can be entered and is not in closed or pruned list
 						if (map.isBlocked(neighbor) == false &&
 						    mapInfo.isClosed((GridCell) neighbor) == false &&
@@ -221,7 +234,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					expansionDelayWindow.push(expansionDelay);
 
 					// Calculate expansion interval.
-					long currentTime = System.nanoTime();
+					long currentTime = threadMX.getCurrentThreadCpuTime();
 					long expansionInterval = currentTime - prevExpansionTime;
 					prevExpansionTime = currentTime;
 
@@ -230,6 +243,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 				else
 				{
+					System.out.println("Pruning " + current.getCoord());
 					mapInfo.pruneCell(current);
 				}
 			}
@@ -242,6 +256,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					mapInfo.recoverPrunedStates(exp);
 					expansionDelayWindow.reset();
 					expansionIntervalWindow.reset();
+					expansionCount = 0;
 				}
 				else
 				{
@@ -289,7 +304,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		int dMax = (int) (calculateExpansionsRemaining(timeDeadline) / avgExpansionDelay);
 
-		Trace.print(dMax + " maximum reachable depth");
+		System.out.println(dMax + " maximum reachable depth");
 		return dMax;
 	}
 
@@ -308,14 +323,15 @@ public class DeadlineAwareSearch implements PlanningAgent
 	 */
 	public int calculateExpansionsRemaining(long timeDeadline)
 	{
-		long timeRemaining = timeDeadline - System.nanoTime();
+		long timeRemaining = timeDeadline - threadMX.getCurrentThreadCpuTime();
 		float averageInterval = expansionIntervalWindow.getAvg();
-		float averageRate = 1 / averageInterval;
+		float averageRate = 1.0f / averageInterval;
 
 		int exp = (int) (timeRemaining * averageRate);
 
-		Trace.print("Calculating expansions remaining:" +
+		System.out.println("Calculating expansions remaining:" +
 				"\nexpansions remaining: " + exp +
+				"\ntime remaining: " + timeRemaining +
 				"\naverage expansion rate: " + averageRate);
 
 		return exp;
@@ -324,7 +340,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	// -- Apparate Debug Output --
 
 	private ArrayList<GridCell> closedNodes;
-	private ArrayList<GridCell> openNodes;
+	private ArrayList<GridCell> prunedNodes;
 
 	@Override
 	public Boolean showInfo() {
@@ -345,9 +361,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 	public ArrayList<GridCell> unexpandedNodes() {
 		if (shouldUpdateOpen) {
 			shouldUpdateOpen = false;
-			openNodes = mapInfo.getOpenArrayList();
+			prunedNodes = mapInfo.getOpenArrayList();
 		}
-		return openNodes;
+		return prunedNodes;
 	}
 
 
