@@ -54,7 +54,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			int stepLeft, long stepTime, long timeLeft) {
 
 		try {
-			Trace.Enable(true);
+			Trace.Enable(false);
 
 			// If there is no plan, generate one.
 			if (plan == null)
@@ -143,7 +143,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 
 		
-		System.out.println("Generating a new plan");
+		//System.out.println("Generating a new plan");
 
 		// Map info exists outside of this function so that its open and closed
 		// sets for debug display.
@@ -163,7 +163,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		// Continue until time has run out
 		while (System.nanoTime() < timeDeadline)
 		{
-			System.out.println("expansionCount:" + expansionCount);
+			//System.out.println("expansionCount:" + expansionCount);
 			// TODO: is this a good inital value?
 			long prevExpansionTime = System.nanoTime();
 
@@ -235,7 +235,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 				else
 				{
-					System.out.println("Pruning " + current.getCoord());
+					//System.out.println("Pruning " + current.getCoord());
 					mapInfo.pruneCell(current);
 				}
 			}

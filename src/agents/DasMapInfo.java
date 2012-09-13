@@ -194,7 +194,7 @@ public class DasMapInfo {
 			count++;
 		}
 		
-		System.out.println("Recovering " + count + " nodes");
+		//System.out.println("Recovering " + count + " nodes");
 	}
 
 	public GridCell getParent(GridCell cell) {
