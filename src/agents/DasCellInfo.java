@@ -227,6 +227,10 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 			this.dError = dCheapestRaw - parent.dCheapestRaw + 1;
 			this.nCumulativeErrorOfPartialSolution = parent.getCumulativeError() + dError;
 		}
+
+		/*
+		System.out.println("d = " + dCheapestRaw + " d_error = " + dError + " d^ = " + getDCheapestWithError());
+		*/
 	}
 
 	@Override 

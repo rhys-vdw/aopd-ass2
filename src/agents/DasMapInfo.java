@@ -37,8 +37,6 @@ public class DasMapInfo {
 
 	private int nClosedCount = 0;
 
-	private ComputedPlan planIncumbent = null;
-
 	// Track the number of expansions performed -  e_curr value
 	// TODO: investigate refactoring this to long to avoid potential truncactions in operations
 	private int nExpansionsCount = 0;
@@ -76,30 +74,25 @@ public class DasMapInfo {
 
 	}
 
-	public void computePlan(GridCell goal)
+	public ComputedPlan computePlan(GridCell goal)
 	{
-		ComputedPlan planNewIncumbent = new ComputedPlan();
+		ComputedPlan plan = new ComputedPlan();
 
 		Trace.print("Generating new incumbent plan...");
 
-		for (DasCellInfo cell = getCellInfo(goal);
-		     cell.getParent() != null;
-		     cell = cell.getParent())
+		for (DasCellInfo cellInfo = getCellInfo(goal);
+		     cellInfo.getParent() != null;
+		     cellInfo = cellInfo.getParent())
 		{
-			GridCell gc = cell.getCell();
+			GridCell cell = cellInfo.getCell();
 			//System.out.println("Prepending " + gc);
-			planNewIncumbent.prependStep(gc);
+			plan.prependStep(cell);
 		}
 
 		Trace.print("...Done.");
 
-		planNewIncumbent.setCost(getGCost(goal));
-		planIncumbent = planNewIncumbent;
-	}
-
-	public ComputedPlan GetIncumbentPlan()
-	{
-		return(planIncumbent);
+		plan.setCost(getGCost(goal));
+		return plan;
 	}
 
 	public void addStartCell(GridCell cell, float hCost, int dCheapestRaw) {

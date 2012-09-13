@@ -121,12 +121,17 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		System.out.println("Generating a new plan");
 		int nMaxReachableDepth = Integer.MAX_VALUE;
+
+		// Map info exists outside of this function so that its open and closed
+		// sets for debug display.
 		mapInfo = new DasMapInfo(map);
 
-		// initialize open set with start node
+		// Initialize open set with start node.
 		float hCost = map.hCost(start, goal);
 		int dCost = dCostManhattan((GridCell)start, goal);
 		mapInfo.addStartCell(start, hCost, dCost);
+
+		ComputedPlan incumbentPlan = null;
 
 		// Continue until time has run out
 		while (System.nanoTime() < timeDeadline)
@@ -143,30 +148,32 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 				//Trace.print("just calced d_max: " + nMaxReachableDepth);
 				GridCell current = mapInfo.closeCheapestOpen();
+
+				// If this node has a higher g cost than the incumbent plan, discard it.
+				if (incumbentPlan != null
+						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
+					continue;
+				}
+
 				//System.out.println(current.getCoord() +" " +  mapInfo.getFCost(current));
 				// If the current state is a goal state, and the cost to get there was cheaper
 				// than that of the incumbent solution
-				if ( current == goal)
+				if (current == goal)
 				{
-					System.out.println("found path to goal!");
-					if ( (mapInfo.GetIncumbentPlan() == null) ||
-						 (mapInfo.getGCost(goal) < mapInfo.GetIncumbentPlan().getCost()) )
-					{
-						System.out.println("new path to goal is an improvement!");
-						//TODO: this is a potentially expensive operation!
-						mapInfo.computePlan(goal);
-						// The below hack is to test finding the first goal!
-						//return(mapInfo.GetIncumbentPlan());
-					}
-					else
-					{
-						System.out.println("new path to goal is worse than incumbent!");
-					}
+					System.out.println("Found cheaper path to goal!");
+					//TODO: this is a potentially expensive operation!
+					incumbentPlan = mapInfo.computePlan(goal);
+					// The below hack is to test finding the first goal!
+					//return incumbentPlan;
 				}
 				else if (!mapInfo.getSettled() ||
 						(estimateGoalDepth(current) < nMaxReachableDepth) )
 				{
 					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
+					/* for comparison
+					ArrayList<State> successors = map.getSuccessors(current);
+					for (int i = successors.size() - 1; i >= 0; i--)
+					*/
 					for (State neighbor : map.getSuccessors(current))
 					{
 						// consider node if it can be entered and is not in closed or pruned list
@@ -215,8 +222,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			}
 		}
 		//System.out.println("Returning solution with " + mapInfo.GetIncumbentPlan().getLength() + " nodes");
-		return(mapInfo.GetIncumbentPlan());
-
+		return incumbentPlan;
 	}
 
 	/**
