@@ -37,34 +37,6 @@ public class DasMapInfo {
 
 	private int nClosedCount = 0;
 
-	// Track the number of expansions performed -  e_curr value
-	// TODO: investigate refactoring this to long to avoid potential truncactions in operations
-	private int nExpansionsCount = 0;
-
-	// These values needs tuning!
-	// This is the size of the sliding window, in entries.
-	final private int EXPANSION_DELAY_WINDOW_LENGTH = 15;
-
-	// r_default. Used before conExpansionIntervals has settled.
-	// This is the number of expansions to perform before the sliding window is deemed 'settled'
-	final private int SETTLING_EXPANSION_COUNT = 200;
-
-	// Time in ns to use as the expected interval between expansions, before settling.
-	// Shouldn't be used with the new refactoring.
-	final private long SETTLING_EXPANSION_AVG_INTERVAL = 30;
-
-
-	// Time of the most recent expansion
-	private long timeMostRecentExpansion = 0;
-
-	// Delta e value
-	private SlidingWindow conExpansionDelays = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH,
-			SETTLING_EXPANSION_COUNT);
-
-	// r value
-	private SlidingWindow conExpansionIntervals = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH,
-			SETTLING_EXPANSION_COUNT);
-
 	public DasMapInfo(GridDomain map) {
 		this.width = map.getWidth();
 		this.height = map.getHeight();
@@ -97,18 +69,21 @@ public class DasMapInfo {
 
 	public void addStartCell(GridCell cell, float hCost, int dCheapestRaw) {
 		// Start cell has zero gCost, and no parent.
-		add(cell, 0f, hCost, dCheapestRaw, null);
+		add(cell, 0f, hCost, dCheapestRaw, 0, null);
 	}
 
 	/**
 	 * Add cell to open set. This will fail if cell has already been added.
-	 * @param cell         the cell
-	 * @param gCost        the cost to get to the cell
-	 * @param hCost        the heuristic estimate to get to the goal
-	 * @param dCheapestRaw the estimated goaldepth from the cell
-	 * @param parent       the previous cell in a path
+	 * @param cell           the cell
+	 * @param gCost          the cost to get to the cell
+	 * @param hCost          the heuristic estimate to get to the goal
+	 * @param dCheapestRaw   the estimated goaldepth from the cell
+	 * @param expansionCount the number of expansions performed before this cell
+	 *                       was generated
+	 * @param parent         the previous cell in a path
 	 */
-	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw, GridCell parent)
+	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw,
+			int expansionCount, GridCell parent)
 	{
 		// Should only be called when no info exists for node.
 		if (getCellInfo(cell) != null) {
@@ -121,18 +96,11 @@ public class DasMapInfo {
 
 		// Create new cell info.
 		DasCellInfo cellInfo = new DasCellInfo(cell, gCost, hCost,
-				CellSetMembership.OPEN, parentInfo, nExpansionsCount, dCheapestRaw);
+				CellSetMembership.OPEN, parentInfo, expansionCount, dCheapestRaw);
 
 		// add new node to array and open queue
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.offer(cellInfo);
-	}
-
-	public boolean getSettled()
-	{
-		// TODO: need to change sliding window class so that it has both windows as one.
-		boolean isSettled = (conExpansionDelays.getSettled() && conExpansionIntervals.getSettled());
-		return(isSettled);
 	}
 
 	/**
@@ -174,38 +142,6 @@ public class DasMapInfo {
 		}
 
 		cellInfo.setCellMembership(CellSetMembership.CLOSED);
-
-		// We will have better closed list management, but for now, just tally the
-		// number of times we close an entry - this will help with analysis.
-		++nClosedCount;
-
-		// TODO: Not sure if it should be incremented before or after!
-		// Before is correct, start node is appended at zero expansions. However
-		// can we put this where the actual expansion occurs?
-		// Incremented e_curr value
-		++nExpansionsCount;
-
-
-		// Record the number of expansions performed before processing the node
-		// after each expansion.
-		// i.e. we are recording the current level of vacillation.
-		long nCurrentExpansionDelay = this.nExpansionsCount - cellInfo.getExpansionNumber();
-
-		long timeCurrent = System.nanoTime();
-
-		long timeExpansionsDelta = timeCurrent - this.timeMostRecentExpansion;
-
-		// Store this time, for the next time we perform an expansion.
-		this.timeMostRecentExpansion = timeCurrent;
-		// Add the expansion delay to the circular queue, so that
-		// we can compute a rolling average.
-		conExpansionDelays.Push(nCurrentExpansionDelay);
-			// Don't perform certain functionality for the start node.
-		if (cellInfo.getParent() != null)
-		{
-
-			conExpansionIntervals.Push(timeExpansionsDelta);
-		}
 
 		return cellInfo.getCell();
 	}
@@ -252,10 +188,6 @@ public class DasMapInfo {
 			cellInfo.setCellMembership(CellSetMembership.OPEN);
 			openQueue.offer(cellInfo);
 		}
-
-		Trace.print("Resetting windows");
-		conExpansionIntervals.reset();
-		conExpansionDelays.reset();
 	}
 
 	public GridCell getParent(GridCell cell) {
@@ -322,6 +254,28 @@ public class DasMapInfo {
 		cellInfo.setHCost(hCost);
 	}
 
+	public float getDCheapestWithError(GridCell cell) {
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
+
+		return cellInfo.getDCheapestWithError();
+	}
+
+	public int getExpansionNumber(GridCell cell) {
+		DasCellInfo cellInfo = safeGetCellInfo(cell);
+
+		return cellInfo.getExpansionNumber();
+	}
+
+	/**
+	 * Get set that this cell is currently in.
+	 * @param cell the cell to check
+	 * @return the set that the cell is in, or null if it has not been added.
+	 */
+	public CellSetMembership getSetMembership(GridCell cell) {
+		DasCellInfo cellInfo = getCellInfo(cell);
+		return (cellInfo == null) ? null : cellInfo.getCellMembership();
+	}
+
 	/**
 	 * Check if cell is in open set.
 	 * @param cell the cell to check
@@ -373,21 +327,6 @@ public class DasMapInfo {
 			open.add(cellInfo.getCell());
 		}
 		return open;
-	}
-
-	public float calculateAvgExpansionInterval()
-	{
-		return conExpansionIntervals.getAvg();
-	}
-
-	public double calculateAvgExpansionDelay()
-	{
-		return conExpansionDelays.getAvg();
-	}
-
-	public float getDCheapestWithError(GridCell cell)
-	{
-		return getCellInfo(cell).getDCheapestWithError();
 	}
 
 	private DasCellInfo safeGetCellInfo(GridCell cell) {

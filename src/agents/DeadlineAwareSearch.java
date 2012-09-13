@@ -30,6 +30,27 @@ public class DeadlineAwareSearch implements PlanningAgent
 	boolean shouldUpdateOpen = false;
 	boolean shouldUpdateClosed = false;
 
+	// These values needs tuning!
+
+	// r_default. Used before conExpansionIntervals has settled.
+	// This is the number of expansions to perform before the sliding window is deemed 'settled'
+	final private int SETTLING_EXPANSION_COUNT = 200;
+
+	// This is the size of the sliding window, in entries.
+	final private int EXPANSION_DELAY_WINDOW_LENGTH = 15;
+
+	// Time in ns to use as the expected interval between expansions, before settling.
+	// Shouldn't be used with the new refactoring.
+	final private long SETTLING_EXPANSION_AVG_INTERVAL = 30;
+
+	// Sliding window to calculate average single step error.
+	private SlidingWindow expansionDelayWindow = new SlidingWindow(
+			EXPANSION_DELAY_WINDOW_LENGTH);
+
+	// r value
+	private SlidingWindow expansionIntervalWindow = new SlidingWindow(
+			EXPANSION_DELAY_WINDOW_LENGTH);
+
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
 			int stepLeft, long stepTime, long timeLeft) {
@@ -120,11 +141,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 			GridCell goal, long timeDeadline) {
 
 		System.out.println("Generating a new plan");
-		int nMaxReachableDepth = Integer.MAX_VALUE;
 
 		// Map info exists outside of this function so that its open and closed
 		// sets for debug display.
 		mapInfo = new DasMapInfo(map);
+
+		// Track the number of expansions performed -  e_curr value
+		// TODO: investigate refactoring this to long to avoid potential truncactions in operations
+		int expansionCount = 0;
 
 		// Initialize open set with start node.
 		float hCost = map.hCost(start, goal);
@@ -136,17 +160,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 		// Continue until time has run out
 		while (System.nanoTime() < timeDeadline)
 		{
-			if (!mapInfo.isOpenEmpty())
-			{
-				// TODO: Per last section of the pruning section of the DAS paper,
-				// dMax should not be calculated while initially settling, or settling after
-				// a repopulation of the open set from the pruned set.
-				if (mapInfo.getSettled())
-				{
-					nMaxReachableDepth = calculateMaxReachableDepth(timeDeadline);
-				}
+			// TODO: is this a good inital value?
+			long prevExpansionTime = System.nanoTime();
 
-				//Trace.print("just calced d_max: " + nMaxReachableDepth);
+			if (!mapInfo.isOpenEmpty()) {
 				GridCell current = mapInfo.closeCheapestOpen();
 
 				// If this node has a higher g cost than the incumbent plan, discard it.
@@ -166,14 +183,12 @@ public class DeadlineAwareSearch implements PlanningAgent
 					// The below hack is to test finding the first goal!
 					//return incumbentPlan;
 				}
-				else if (!mapInfo.getSettled() ||
-						(estimateGoalDepth(current) < nMaxReachableDepth) )
+				else if (expansionCount <= SETTLING_EXPANSION_COUNT ||
+						(mapInfo.getDCheapestWithError(current) < calculateMaxReachableDepth(timeDeadline)))
 				{
-					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + nMaxReachableDepth);
-					/* for comparison
-					ArrayList<State> successors = map.getSuccessors(current);
-					for (int i = successors.size() - 1; i >= 0; i--)
-					*/
+					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + dMax);
+
+					// Expand current node. TODO: move this into its own method.
 					for (State neighbor : map.getSuccessors(current))
 					{
 						// consider node if it can be entered and is not in closed or pruned list
@@ -188,16 +203,30 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 								//System.out.println("g: " + fNeighborGCost + " h" + fNeighborHCost);
 								// TODO: this is currently assuming manhattan grid world. See Issue #11
-								int neighbordCheapestRaw = (int) dCostManhattan((GridCell)neighbor, goal);
+								int neighborDCheapestRaw = (int) dCostManhattan((GridCell)neighbor, goal);
 								//System.out.println("d" + nNeighbourDCost);
 								// Add the neighbor to the open set!
 								mapInfo.add((GridCell) neighbor, neighborGCost, neighborHCost,
-										neighbordCheapestRaw, current);
+										neighborDCheapestRaw, expansionCount, current);
 							}
 							// Do we need the following case handling? Is the above enough to add s' to open? Step 12 of algorithm
 							/* else if (gCost < mapInfo.getGCost((GridCell) neighbor)) */
 						}
 					}
+					// Increment number of expansions.
+					expansionCount++;
+
+					// Insert expansion delay into sliding window.
+					int expansionDelay = expansionCount - mapInfo.getExpansionNumber(current);
+					expansionDelayWindow.push(expansionDelay);
+
+					// Calculate expansion interval.
+					long currentTime = System.nanoTime();
+					long expansionInterval = currentTime - prevExpansionTime;
+					prevExpansionTime = currentTime;
+
+					// Insert expansion interval into sliding window.
+					expansionIntervalWindow.push(expansionInterval);
 				}
 				else
 				{
@@ -211,6 +240,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 				{
 					int exp = calculateExpansionsRemaining(timeDeadline);
 					mapInfo.recoverPrunedStates(exp);
+					expansionDelayWindow.reset();
+					expansionIntervalWindow.reset();
 				}
 				else
 				{
@@ -248,19 +279,18 @@ public class DeadlineAwareSearch implements PlanningAgent
 	}
 
 	/**
-	 * Calculate dMax
-	 * @return
+	 * Estimate the number of expansions that can be performed before the deadline (dMax).
+	 * @param timeDeadline the time that a solution must be found by (ns)
+	 * @return estimated number of expansions or dMax
 	 */
 	public int calculateMaxReachableDepth(long timeDeadline)
 	{
-		int nMaxDepth = Integer.MAX_VALUE;
+		double avgExpansionDelay = expansionDelayWindow.getAvg();
 
-		double fAvgExpansionDelay = mapInfo.calculateAvgExpansionDelay();
+		int dMax = (int) (calculateExpansionsRemaining(timeDeadline) / avgExpansionDelay);
 
-		nMaxDepth = (int) (calculateExpansionsRemaining(timeDeadline) / fAvgExpansionDelay);
-
-		Trace.print(nMaxDepth + " maximum reachable depth");
-		return(nMaxDepth);
+		Trace.print(dMax + " maximum reachable depth");
+		return dMax;
 	}
 
 	/**
@@ -279,7 +309,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	public int calculateExpansionsRemaining(long timeDeadline)
 	{
 		long timeRemaining = timeDeadline - System.nanoTime();
-		float averageInterval = mapInfo.calculateAvgExpansionInterval();
+		float averageInterval = expansionIntervalWindow.getAvg();
 		float averageRate = 1 / averageInterval;
 
 		int exp = (int) (timeRemaining * averageRate);
@@ -289,20 +319,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 				"\naverage expansion rate: " + averageRate);
 
 		return exp;
-	}
-
-	/**
-	 * Calculate the estimated depth of goal under this cell
-	 * For the given cell, we want to get its dCheapest
-	 * We can use this dCheapest, and that of its parent, as well as the mean single step error
-	 * to compute a dCheapestWithError.
-	 *
-	 * @param cell the cell from which to estimate
-	 * @return estimated number of expansions from this cell to the goal
-	 */
-	public float estimateGoalDepth(GridCell cell)
-	{
-		return mapInfo.getDCheapestWithError(cell);
 	}
 
 	// -- Apparate Debug Output --
