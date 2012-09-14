@@ -14,7 +14,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 {
 	private ComputedPlan plan;
 
-	DasMapInfo mapInfo;
+	//DasMapInfo mapInfo;
+	FastDasMapInfo mapInfo;
 
 	// number of steps taken in current plan
 	private int stepNo = 0;
@@ -23,7 +24,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// Percentage of deadline to be used generating plan. (As opposed to moving
 	// along the plan afterwards.)
-	final private float SEARCH_TIME_FRACTION = 0.97f;
+	final private float SEARCH_TIME_FRACTION = 0.9f;
 
 	// Should the open and closed sets be regenerated?
 	boolean shouldUpdateOpen = false;
@@ -147,7 +148,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		// Map info exists outside of this function so that its open and closed
 		// sets for debug display.
-		mapInfo = new DasMapInfo(map);
+		//mapInfo = new DasMapInfo(map);
+		mapInfo = new FastDasMapInfo(map);
 
 		// Track the number of expansions performed -  e_curr value
 		// TODO: investigate refactoring this to long to avoid potential truncactions in operations

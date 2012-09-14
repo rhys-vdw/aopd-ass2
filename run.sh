@@ -9,7 +9,7 @@ fi
 
 echo "Running path planner on configuration file" "$fileName"
 echo ================================================
-cat "fileName"
+echo "$fileName"
 echo ================================================
 
 
