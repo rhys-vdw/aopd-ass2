@@ -1,0 +1,2611 @@
+Running path planner on configuration file config.properties
+================================================
+config.properties
+================================================
+
+current time (ns): 3843814
+deadline: 953843814
+time after greedy: 14198389
+time left: 939645425
+expansionDelay: 1
+
+ expansionTimeDelta 592398
+ expansionCountDelta 1
+ timePerExpansion: 592398
+
+For expansion: 1
+expansions remaining: 1583
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1583
+expansionDelay: 2
+
+ expansionTimeDelta 819935
+ expansionCountDelta 1
+ timePerExpansion: 819935
+
+For expansion: 2
+expansions remaining: 1143
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1143
+expansionDelay: 2
+
+ expansionTimeDelta 615856
+ expansionCountDelta 1
+ timePerExpansion: 615856
+
+For expansion: 3
+expansions remaining: 1521
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1521
+expansionDelay: 2
+
+ expansionTimeDelta 628671
+ expansionCountDelta 1
+ timePerExpansion: 628671
+
+For expansion: 4
+expansions remaining: 1489
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1489
+expansionDelay: 2
+
+ expansionTimeDelta 760159
+ expansionCountDelta 1
+ timePerExpansion: 760159
+
+For expansion: 5
+expansions remaining: 1230
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1230
+expansionDelay: 2
+
+ expansionTimeDelta 626619
+ expansionCountDelta 1
+ timePerExpansion: 626619
+
+For expansion: 6
+expansions remaining: 1491
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1491
+expansionDelay: 2
+
+ expansionTimeDelta 631689
+ expansionCountDelta 1
+ timePerExpansion: 631689
+
+For expansion: 7
+expansions remaining: 1478
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1478
+expansionDelay: 2
+
+ expansionTimeDelta 710757
+ expansionCountDelta 1
+ timePerExpansion: 710757
+
+For expansion: 8
+expansions remaining: 1313
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1313
+expansionDelay: 2
+
+ expansionTimeDelta 660528
+ expansionCountDelta 1
+ timePerExpansion: 660528
+
+For expansion: 9
+expansions remaining: 1412
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1412
+expansionDelay: 2
+
+ expansionTimeDelta 653240
+ expansionCountDelta 1
+ timePerExpansion: 653240
+
+For expansion: 10
+expansions remaining: 1426
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1426
+expansionDelay: 2
+
+ expansionTimeDelta 687575
+ expansionCountDelta 1
+ timePerExpansion: 687575
+
+For expansion: 11
+expansions remaining: 1354
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1354
+expansionDelay: 2
+
+ expansionTimeDelta 663577
+ expansionCountDelta 1
+ timePerExpansion: 663577
+
+For expansion: 12
+expansions remaining: 1402
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1402
+expansionDelay: 2
+
+ expansionTimeDelta 736602
+ expansionCountDelta 1
+ timePerExpansion: 736602
+
+For expansion: 13
+expansions remaining: 1262
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1262
+expansionDelay: 2
+
+ expansionTimeDelta 733448
+ expansionCountDelta 1
+ timePerExpansion: 733448
+
+For expansion: 14
+expansions remaining: 1267
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1267
+expansionDelay: 2
+
+ expansionTimeDelta 667146
+ expansionCountDelta 1
+ timePerExpansion: 667146
+
+For expansion: 15
+expansions remaining: 1391
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1391
+expansionDelay: 2
+
+ expansionTimeDelta 722371
+ expansionCountDelta 1
+ timePerExpansion: 722371
+
+For expansion: 16
+expansions remaining: 1284
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1284
+expansionDelay: 2
+
+ expansionTimeDelta 800632
+ expansionCountDelta 1
+ timePerExpansion: 800632
+
+For expansion: 17
+expansions remaining: 1157
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1157
+expansionDelay: 2
+
+ expansionTimeDelta 694413
+ expansionCountDelta 1
+ timePerExpansion: 694413
+
+For expansion: 18
+expansions remaining: 1334
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1334
+expansionDelay: 2
+
+ expansionTimeDelta 692010
+ expansionCountDelta 1
+ timePerExpansion: 692010
+
+For expansion: 19
+expansions remaining: 1337
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1337
+expansionDelay: 2
+
+ expansionTimeDelta 688736
+ expansionCountDelta 1
+ timePerExpansion: 688736
+
+For expansion: 20
+expansions remaining: 1343
+avgExpansionDelay: 1.0
+ maximum reachable depth
+1343
+expansionDelay: 2
+
+ expansionTimeDelta 716914
+ expansionCountDelta 1
+ timePerExpansion: 716914
+
+For expansion: 21
+expansions remaining: 1289
+avgExpansionDelay: 2.0
+ maximum reachable depth
+644
+expansionDelay: 2
+
+ expansionTimeDelta 714006
+ expansionCountDelta 1
+ timePerExpansion: 714006
+
+For expansion: 22
+expansions remaining: 1293
+avgExpansionDelay: 2.0
+ maximum reachable depth
+646
+expansionDelay: 2
+
+ expansionTimeDelta 691689
+ expansionCountDelta 1
+ timePerExpansion: 691689
+
+For expansion: 23
+expansions remaining: 1334
+avgExpansionDelay: 2.0
+ maximum reachable depth
+667
+expansionDelay: 2
+
+ expansionTimeDelta 683856
+ expansionCountDelta 1
+ timePerExpansion: 683856
+
+For expansion: 24
+expansions remaining: 1348
+avgExpansionDelay: 2.0
+ maximum reachable depth
+674
+expansionDelay: 2
+
+ expansionTimeDelta 740206
+ expansionCountDelta 1
+ timePerExpansion: 740206
+
+For expansion: 25
+expansions remaining: 1244
+avgExpansionDelay: 2.0
+ maximum reachable depth
+622
+expansionDelay: 2
+
+ expansionTimeDelta 777981
+ expansionCountDelta 1
+ timePerExpansion: 777981
+
+For expansion: 26
+expansions remaining: 1183
+avgExpansionDelay: 2.0
+ maximum reachable depth
+591
+expansionDelay: 2
+
+ expansionTimeDelta 731521
+ expansionCountDelta 1
+ timePerExpansion: 731521
+
+For expansion: 27
+expansions remaining: 1257
+avgExpansionDelay: 2.0
+ maximum reachable depth
+628
+expansionDelay: 2
+
+ expansionTimeDelta 689447
+ expansionCountDelta 1
+ timePerExpansion: 689447
+
+For expansion: 28
+expansions remaining: 1333
+avgExpansionDelay: 2.0
+ maximum reachable depth
+666
+expansionDelay: 2
+
+ expansionTimeDelta 690523
+ expansionCountDelta 1
+ timePerExpansion: 690523
+
+For expansion: 29
+expansions remaining: 1330
+avgExpansionDelay: 2.0
+ maximum reachable depth
+665
+expansionDelay: 2
+
+ expansionTimeDelta 698528
+ expansionCountDelta 1
+ timePerExpansion: 698528
+
+For expansion: 30
+expansions remaining: 1314
+avgExpansionDelay: 2.0
+ maximum reachable depth
+657
+expansionDelay: 2
+
+ expansionTimeDelta 783347
+ expansionCountDelta 1
+ timePerExpansion: 783347
+
+For expansion: 31
+expansions remaining: 1170
+avgExpansionDelay: 2.0
+ maximum reachable depth
+585
+expansionDelay: 2
+
+ expansionTimeDelta 714121
+ expansionCountDelta 1
+ timePerExpansion: 714121
+
+For expansion: 32
+expansions remaining: 1283
+avgExpansionDelay: 2.0
+ maximum reachable depth
+641
+expansionDelay: 2
+
+ expansionTimeDelta 747274
+ expansionCountDelta 1
+ timePerExpansion: 747274
+
+For expansion: 33
+expansions remaining: 1225
+avgExpansionDelay: 2.0
+ maximum reachable depth
+612
+expansionDelay: 2
+
+ expansionTimeDelta 705767
+ expansionCountDelta 1
+ timePerExpansion: 705767
+
+For expansion: 34
+expansions remaining: 1296
+avgExpansionDelay: 2.0
+ maximum reachable depth
+648
+expansionDelay: 2
+
+ expansionTimeDelta 705090
+ expansionCountDelta 1
+ timePerExpansion: 705090
+
+For expansion: 35
+expansions remaining: 1296
+avgExpansionDelay: 2.0
+ maximum reachable depth
+648
+expansionDelay: 2
+
+ expansionTimeDelta 707393
+ expansionCountDelta 1
+ timePerExpansion: 707393
+
+For expansion: 36
+expansions remaining: 1291
+avgExpansionDelay: 2.0
+ maximum reachable depth
+645
+expansionDelay: 2
+
+ expansionTimeDelta 705381
+ expansionCountDelta 1
+ timePerExpansion: 705381
+
+For expansion: 37
+expansions remaining: 1294
+avgExpansionDelay: 2.0
+ maximum reachable depth
+647
+expansionDelay: 2
+
+ expansionTimeDelta 719527
+ expansionCountDelta 1
+ timePerExpansion: 719527
+
+For expansion: 38
+expansions remaining: 1267
+avgExpansionDelay: 2.0
+ maximum reachable depth
+633
+expansionDelay: 2
+
+ expansionTimeDelta 735576
+ expansionCountDelta 1
+ timePerExpansion: 735576
+
+For expansion: 39
+expansions remaining: 1238
+avgExpansionDelay: 2.0
+ maximum reachable depth
+619
+expansionDelay: 2
+
+ expansionTimeDelta 772274
+ expansionCountDelta 1
+ timePerExpansion: 772274
+
+For expansion: 40
+expansions remaining: 1179
+avgExpansionDelay: 2.0
+ maximum reachable depth
+589
+expansionDelay: 2
+
+ expansionTimeDelta 708149
+ expansionCountDelta 1
+ timePerExpansion: 708149
+
+For expansion: 41
+expansions remaining: 1284
+avgExpansionDelay: 2.0
+ maximum reachable depth
+642
+expansionDelay: 2
+
+ expansionTimeDelta 729984
+ expansionCountDelta 1
+ timePerExpansion: 729984
+
+For expansion: 42
+expansions remaining: 1245
+avgExpansionDelay: 2.0
+ maximum reachable depth
+622
+expansionDelay: 2
+
+ expansionTimeDelta 707874
+ expansionCountDelta 1
+ timePerExpansion: 707874
+
+For expansion: 43
+expansions remaining: 1283
+avgExpansionDelay: 2.0
+ maximum reachable depth
+641
+expansionDelay: 2
+
+ expansionTimeDelta 729493
+ expansionCountDelta 1
+ timePerExpansion: 729493
+
+For expansion: 44
+expansions remaining: 1244
+avgExpansionDelay: 2.0
+ maximum reachable depth
+622
+expansionDelay: 2
+
+ expansionTimeDelta 871060
+ expansionCountDelta 1
+ timePerExpansion: 871060
+
+For expansion: 45
+expansions remaining: 1041
+avgExpansionDelay: 2.0
+ maximum reachable depth
+520
+expansionDelay: 2
+
+ expansionTimeDelta 720669
+ expansionCountDelta 1
+ timePerExpansion: 720669
+
+For expansion: 46
+expansions remaining: 1257
+avgExpansionDelay: 2.0
+ maximum reachable depth
+628
+expansionDelay: 2
+
+ expansionTimeDelta 714070
+ expansionCountDelta 1
+ timePerExpansion: 714070
+
+For expansion: 47
+expansions remaining: 1267
+avgExpansionDelay: 2.0
+ maximum reachable depth
+633
+expansionDelay: 2
+
+ expansionTimeDelta 705301
+ expansionCountDelta 1
+ timePerExpansion: 705301
+
+For expansion: 48
+expansions remaining: 1282
+avgExpansionDelay: 2.0
+ maximum reachable depth
+641
+expansionDelay: 2
+
+ expansionTimeDelta 764549
+ expansionCountDelta 1
+ timePerExpansion: 764549
+
+For expansion: 49
+expansions remaining: 1182
+avgExpansionDelay: 2.0
+ maximum reachable depth
+591
+expansionDelay: 2
+
+ expansionTimeDelta 711884
+ expansionCountDelta 1
+ timePerExpansion: 711884
+
+For expansion: 50
+expansions remaining: 1268
+avgExpansionDelay: 2.0
+ maximum reachable depth
+634
+expansionDelay: 2
+
+ expansionTimeDelta 778861
+ expansionCountDelta 1
+ timePerExpansion: 778861
+
+For expansion: 51
+expansions remaining: 1158
+avgExpansionDelay: 2.0
+ maximum reachable depth
+579
+expansionDelay: 2
+
+ expansionTimeDelta 727822
+ expansionCountDelta 1
+ timePerExpansion: 727822
+
+For expansion: 52
+expansions remaining: 1238
+avgExpansionDelay: 2.0
+ maximum reachable depth
+619
+expansionDelay: 2
+
+ expansionTimeDelta 709446
+ expansionCountDelta 1
+ timePerExpansion: 709446
+
+For expansion: 53
+expansions remaining: 1270
+avgExpansionDelay: 2.0
+ maximum reachable depth
+635
+expansionDelay: 2
+
+ expansionTimeDelta 706311
+ expansionCountDelta 1
+ timePerExpansion: 706311
+
+For expansion: 54
+expansions remaining: 1274
+avgExpansionDelay: 2.0
+ maximum reachable depth
+637
+expansionDelay: 2
+
+ expansionTimeDelta 768800
+ expansionCountDelta 1
+ timePerExpansion: 768800
+
+For expansion: 55
+expansions remaining: 1170
+avgExpansionDelay: 2.0
+ maximum reachable depth
+585
+expansionDelay: 2
+
+ expansionTimeDelta 707764
+ expansionCountDelta 1
+ timePerExpansion: 707764
+
+For expansion: 56
+expansions remaining: 1269
+avgExpansionDelay: 2.0
+ maximum reachable depth
+634
+expansionDelay: 2
+
+ expansionTimeDelta 710106
+ expansionCountDelta 1
+ timePerExpansion: 710106
+
+For expansion: 57
+expansions remaining: 1264
+avgExpansionDelay: 2.0
+ maximum reachable depth
+632
+expansionDelay: 2
+
+ expansionTimeDelta 706867
+ expansionCountDelta 1
+ timePerExpansion: 706867
+
+For expansion: 58
+expansions remaining: 1269
+avgExpansionDelay: 2.0
+ maximum reachable depth
+634
+expansionDelay: 2
+
+ expansionTimeDelta 710282
+ expansionCountDelta 1
+ timePerExpansion: 710282
+
+For expansion: 59
+expansions remaining: 1262
+avgExpansionDelay: 2.0
+ maximum reachable depth
+631
+expansionDelay: 2
+
+ expansionTimeDelta 768454
+ expansionCountDelta 1
+ timePerExpansion: 768454
+
+For expansion: 60
+expansions remaining: 1165
+avgExpansionDelay: 2.0
+ maximum reachable depth
+582
+expansionDelay: 2
+
+ expansionTimeDelta 719873
+ expansionCountDelta 1
+ timePerExpansion: 719873
+
+For expansion: 61
+expansions remaining: 1243
+avgExpansionDelay: 2.0
+ maximum reachable depth
+621
+expansionDelay: 2
+
+ expansionTimeDelta 797503
+ expansionCountDelta 1
+ timePerExpansion: 797503
+
+For expansion: 62
+expansions remaining: 1121
+avgExpansionDelay: 2.0
+ maximum reachable depth
+560
+expansionDelay: 2
+
+ expansionTimeDelta 716329
+ expansionCountDelta 1
+ timePerExpansion: 716329
+
+For expansion: 63
+expansions remaining: 1247
+avgExpansionDelay: 2.0
+ maximum reachable depth
+623
+expansionDelay: 2
+
+ expansionTimeDelta 760074
+ expansionCountDelta 1
+ timePerExpansion: 760074
+
+For expansion: 64
+expansions remaining: 1174
+avgExpansionDelay: 2.0
+ maximum reachable depth
+587
+expansionDelay: 2
+
+ expansionTimeDelta 842806
+ expansionCountDelta 1
+ timePerExpansion: 842806
+
+For expansion: 65
+expansions remaining: 1058
+avgExpansionDelay: 2.0
+ maximum reachable depth
+529
+expansionDelay: 2
+
+ expansionTimeDelta 785124
+ expansionCountDelta 1
+ timePerExpansion: 785124
+
+For expansion: 66
+expansions remaining: 1135
+avgExpansionDelay: 2.0
+ maximum reachable depth
+567
+expansionDelay: 2
+
+ expansionTimeDelta 766602
+ expansionCountDelta 1
+ timePerExpansion: 766602
+
+For expansion: 67
+expansions remaining: 1161
+avgExpansionDelay: 2.0
+ maximum reachable depth
+580
+expansionDelay: 2
+
+ expansionTimeDelta 681133
+ expansionCountDelta 1
+ timePerExpansion: 681133
+
+For expansion: 68
+expansions remaining: 1306
+avgExpansionDelay: 2.0
+ maximum reachable depth
+653
+expansionDelay: 2
+
+ expansionTimeDelta 686348
+ expansionCountDelta 1
+ timePerExpansion: 686348
+
+For expansion: 69
+expansions remaining: 1295
+avgExpansionDelay: 2.0
+ maximum reachable depth
+647
+expansionDelay: 2
+
+ expansionTimeDelta 783022
+ expansionCountDelta 1
+ timePerExpansion: 783022
+
+For expansion: 70
+expansions remaining: 1134
+avgExpansionDelay: 2.0
+ maximum reachable depth
+567
+expansionDelay: 2
+
+ expansionTimeDelta 718961
+ expansionCountDelta 1
+ timePerExpansion: 718961
+
+For expansion: 71
+expansions remaining: 1234
+avgExpansionDelay: 2.0
+ maximum reachable depth
+617
+expansionDelay: 2
+
+ expansionTimeDelta 687445
+ expansionCountDelta 1
+ timePerExpansion: 687445
+
+For expansion: 72
+expansions remaining: 1290
+avgExpansionDelay: 2.0
+ maximum reachable depth
+645
+expansionDelay: 2
+
+ expansionTimeDelta 671165
+ expansionCountDelta 1
+ timePerExpansion: 671165
+
+For expansion: 73
+expansions remaining: 1320
+avgExpansionDelay: 2.0
+ maximum reachable depth
+660
+expansionDelay: 2
+
+ expansionTimeDelta 669950
+ expansionCountDelta 1
+ timePerExpansion: 669950
+
+For expansion: 74
+expansions remaining: 1322
+avgExpansionDelay: 2.0
+ maximum reachable depth
+661
+expansionDelay: 2
+
+ expansionTimeDelta 708839
+ expansionCountDelta 1
+ timePerExpansion: 708839
+
+For expansion: 75
+expansions remaining: 1248
+avgExpansionDelay: 2.0
+ maximum reachable depth
+624
+expansionDelay: 2
+
+ expansionTimeDelta 834202
+ expansionCountDelta 1
+ timePerExpansion: 834202
+
+For expansion: 76
+expansions remaining: 1059
+avgExpansionDelay: 2.0
+ maximum reachable depth
+529
+expansionDelay: 2
+
+ expansionTimeDelta 742529
+ expansionCountDelta 1
+ timePerExpansion: 742529
+
+For expansion: 77
+expansions remaining: 1189
+avgExpansionDelay: 2.0
+ maximum reachable depth
+594
+expansionDelay: 2
+
+ expansionTimeDelta 735005
+ expansionCountDelta 1
+ timePerExpansion: 735005
+
+For expansion: 78
+expansions remaining: 1200
+avgExpansionDelay: 2.0
+ maximum reachable depth
+600
+expansionDelay: 2
+
+ expansionTimeDelta 737984
+ expansionCountDelta 1
+ timePerExpansion: 737984
+
+For expansion: 79
+expansions remaining: 1194
+avgExpansionDelay: 2.0
+ maximum reachable depth
+597
+expansionDelay: 2
+
+ expansionTimeDelta 768084
+ expansionCountDelta 1
+ timePerExpansion: 768084
+
+For expansion: 80
+expansions remaining: 1147
+avgExpansionDelay: 2.0
+ maximum reachable depth
+573
+expansionDelay: 2
+
+ expansionTimeDelta 743866
+ expansionCountDelta 1
+ timePerExpansion: 743866
+
+For expansion: 81
+expansions remaining: 1183
+avgExpansionDelay: 2.0
+ maximum reachable depth
+591
+expansionDelay: 2
+
+ expansionTimeDelta 799861
+ expansionCountDelta 1
+ timePerExpansion: 799861
+
+For expansion: 82
+expansions remaining: 1099
+avgExpansionDelay: 2.0
+ maximum reachable depth
+549
+expansionDelay: 2
+
+ expansionTimeDelta 782626
+ expansionCountDelta 1
+ timePerExpansion: 782626
+
+For expansion: 83
+expansions remaining: 1122
+avgExpansionDelay: 2.0
+ maximum reachable depth
+561
+expansionDelay: 2
+
+ expansionTimeDelta 771218
+ expansionCountDelta 1
+ timePerExpansion: 771218
+
+For expansion: 84
+expansions remaining: 1138
+avgExpansionDelay: 2.0
+ maximum reachable depth
+569
+expansionDelay: 2
+
+ expansionTimeDelta 757752
+ expansionCountDelta 1
+ timePerExpansion: 757752
+
+For expansion: 85
+expansions remaining: 1157
+avgExpansionDelay: 2.0
+ maximum reachable depth
+578
+expansionDelay: 2
+
+ expansionTimeDelta 675626
+ expansionCountDelta 1
+ timePerExpansion: 675626
+
+For expansion: 86
+expansions remaining: 1297
+avgExpansionDelay: 2.0
+ maximum reachable depth
+648
+expansionDelay: 2
+
+ expansionTimeDelta 728698
+ expansionCountDelta 1
+ timePerExpansion: 728698
+
+For expansion: 87
+expansions remaining: 1201
+avgExpansionDelay: 2.0
+ maximum reachable depth
+600
+expansionDelay: 2
+
+ expansionTimeDelta 740061
+ expansionCountDelta 1
+ timePerExpansion: 740061
+
+For expansion: 88
+expansions remaining: 1182
+avgExpansionDelay: 2.0
+ maximum reachable depth
+591
+expansionDelay: 2
+
+ expansionTimeDelta 718511
+ expansionCountDelta 1
+ timePerExpansion: 718511
+
+For expansion: 89
+expansions remaining: 1216
+avgExpansionDelay: 2.0
+ maximum reachable depth
+608
+expansionDelay: 2
+
+ expansionTimeDelta 740682
+ expansionCountDelta 1
+ timePerExpansion: 740682
+
+For expansion: 90
+expansions remaining: 1179
+avgExpansionDelay: 2.0
+ maximum reachable depth
+589
+expansionDelay: 2
+
+ expansionTimeDelta 698573
+ expansionCountDelta 1
+ timePerExpansion: 698573
+
+For expansion: 91
+expansions remaining: 1249
+avgExpansionDelay: 2.0
+ maximum reachable depth
+624
+expansionDelay: 2
+
+ expansionTimeDelta 807715
+ expansionCountDelta 1
+ timePerExpansion: 807715
+
+For expansion: 92
+expansions remaining: 1079
+avgExpansionDelay: 2.0
+ maximum reachable depth
+539
+expansionDelay: 2
+
+ expansionTimeDelta 680727
+ expansionCountDelta 1
+ timePerExpansion: 680727
+
+For expansion: 93
+expansions remaining: 1280
+avgExpansionDelay: 2.0
+ maximum reachable depth
+640
+expansionDelay: 2
+
+ expansionTimeDelta 752260
+ expansionCountDelta 1
+ timePerExpansion: 752260
+
+For expansion: 94
+expansions remaining: 1157
+avgExpansionDelay: 2.0
+ maximum reachable depth
+578
+expansionDelay: 2
+
+ expansionTimeDelta 701251
+ expansionCountDelta 1
+ timePerExpansion: 701251
+
+For expansion: 95
+expansions remaining: 1240
+avgExpansionDelay: 2.0
+ maximum reachable depth
+620
+expansionDelay: 2
+
+ expansionTimeDelta 714822
+ expansionCountDelta 1
+ timePerExpansion: 714822
+
+For expansion: 96
+expansions remaining: 1216
+avgExpansionDelay: 2.0
+ maximum reachable depth
+608
+expansionDelay: 2
+
+ expansionTimeDelta 707833
+ expansionCountDelta 1
+ timePerExpansion: 707833
+
+For expansion: 97
+expansions remaining: 1227
+avgExpansionDelay: 2.0
+ maximum reachable depth
+613
+expansionDelay: 2
+
+ expansionTimeDelta 775808
+ expansionCountDelta 1
+ timePerExpansion: 775808
+
+For expansion: 98
+expansions remaining: 1118
+avgExpansionDelay: 2.0
+ maximum reachable depth
+559
+expansionDelay: 2
+
+ expansionTimeDelta 888160
+ expansionCountDelta 1
+ timePerExpansion: 888160
+
+For expansion: 99
+expansions remaining: 976
+avgExpansionDelay: 2.0
+ maximum reachable depth
+488
+expansionDelay: 2
+
+ expansionTimeDelta 932502
+ expansionCountDelta 1
+ timePerExpansion: 932502
+
+For expansion: 100
+expansions remaining: 928
+avgExpansionDelay: 2.0
+ maximum reachable depth
+464
+expansionDelay: 2
+
+ expansionTimeDelta 1059139
+ expansionCountDelta 1
+ timePerExpansion: 1059139
+
+For expansion: 101
+expansions remaining: 816
+avgExpansionDelay: 2.0
+ maximum reachable depth
+408
+Pruning <55, 286>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 815
+avgExpansionDelay: 2.0
+ maximum reachable depth
+407
+Pruning <56, 285>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 814
+avgExpansionDelay: 2.0
+ maximum reachable depth
+407
+Pruning <56, 284>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 814
+avgExpansionDelay: 2.0
+ maximum reachable depth
+407
+Pruning <56, 283>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 813
+avgExpansionDelay: 2.0
+ maximum reachable depth
+406
+Pruning <56, 282>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 812
+avgExpansionDelay: 2.0
+ maximum reachable depth
+406
+Pruning <56, 281>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 812
+avgExpansionDelay: 2.0
+ maximum reachable depth
+406
+Pruning <56, 280>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 811
+avgExpansionDelay: 2.0
+ maximum reachable depth
+405
+Pruning <56, 279>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 811
+avgExpansionDelay: 2.0
+ maximum reachable depth
+405
+Pruning <56, 278>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 811
+avgExpansionDelay: 2.0
+ maximum reachable depth
+405
+Pruning <53, 277>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 810
+avgExpansionDelay: 2.0
+ maximum reachable depth
+405
+Pruning <53, 276>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 810
+avgExpansionDelay: 2.0
+ maximum reachable depth
+405
+Pruning <53, 275>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 809
+avgExpansionDelay: 2.0
+ maximum reachable depth
+404
+Pruning <51, 274>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 809
+avgExpansionDelay: 2.0
+ maximum reachable depth
+404
+Pruning <51, 273>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 809
+avgExpansionDelay: 2.0
+ maximum reachable depth
+404
+Pruning <51, 272>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 808
+avgExpansionDelay: 2.0
+ maximum reachable depth
+404
+Pruning <51, 271>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 808
+avgExpansionDelay: 2.0
+ maximum reachable depth
+404
+Pruning <51, 270>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 807
+avgExpansionDelay: 2.0
+ maximum reachable depth
+403
+Pruning <51, 269>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 807
+avgExpansionDelay: 2.0
+ maximum reachable depth
+403
+Pruning <51, 268>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 807
+avgExpansionDelay: 2.0
+ maximum reachable depth
+403
+Pruning <51, 267>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 806
+avgExpansionDelay: 2.0
+ maximum reachable depth
+403
+Pruning <51, 266>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 806
+avgExpansionDelay: 2.0
+ maximum reachable depth
+403
+Pruning <51, 265>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 805
+avgExpansionDelay: 2.0
+ maximum reachable depth
+402
+Pruning <51, 264>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 805
+avgExpansionDelay: 2.0
+ maximum reachable depth
+402
+Pruning <51, 263>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 805
+avgExpansionDelay: 2.0
+ maximum reachable depth
+402
+Pruning <51, 262>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 804
+avgExpansionDelay: 2.0
+ maximum reachable depth
+402
+Pruning <51, 261>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 804
+avgExpansionDelay: 2.0
+ maximum reachable depth
+402
+Pruning <51, 260>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 803
+avgExpansionDelay: 2.0
+ maximum reachable depth
+401
+Pruning <51, 259>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 803
+avgExpansionDelay: 2.0
+ maximum reachable depth
+401
+Pruning <51, 258>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 802
+avgExpansionDelay: 2.0
+ maximum reachable depth
+401
+Pruning <51, 257>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 802
+avgExpansionDelay: 2.0
+ maximum reachable depth
+401
+Pruning <51, 256>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 802
+avgExpansionDelay: 2.0
+ maximum reachable depth
+401
+Pruning <51, 255>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 801
+avgExpansionDelay: 2.0
+ maximum reachable depth
+400
+Pruning <51, 254>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 801
+avgExpansionDelay: 2.0
+ maximum reachable depth
+400
+Pruning <51, 253>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 800
+avgExpansionDelay: 2.0
+ maximum reachable depth
+400
+Pruning <51, 252>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 800
+avgExpansionDelay: 2.0
+ maximum reachable depth
+400
+Pruning <51, 251>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 800
+avgExpansionDelay: 2.0
+ maximum reachable depth
+400
+Pruning <51, 250>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 799
+avgExpansionDelay: 2.0
+ maximum reachable depth
+399
+Pruning <51, 249>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 799
+avgExpansionDelay: 2.0
+ maximum reachable depth
+399
+Pruning <51, 248>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 799
+avgExpansionDelay: 2.0
+ maximum reachable depth
+399
+Pruning <51, 247>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 798
+avgExpansionDelay: 2.0
+ maximum reachable depth
+399
+Pruning <51, 246>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 798
+avgExpansionDelay: 2.0
+ maximum reachable depth
+399
+Pruning <51, 245>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 797
+avgExpansionDelay: 2.0
+ maximum reachable depth
+398
+Pruning <51, 244>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 797
+avgExpansionDelay: 2.0
+ maximum reachable depth
+398
+Pruning <51, 243>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 796
+avgExpansionDelay: 2.0
+ maximum reachable depth
+398
+Pruning <51, 242>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 796
+avgExpansionDelay: 2.0
+ maximum reachable depth
+398
+Pruning <51, 241>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 796
+avgExpansionDelay: 2.0
+ maximum reachable depth
+398
+Pruning <51, 240>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 795
+avgExpansionDelay: 2.0
+ maximum reachable depth
+397
+Pruning <51, 239>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 795
+avgExpansionDelay: 2.0
+ maximum reachable depth
+397
+Pruning <51, 238>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 795
+avgExpansionDelay: 2.0
+ maximum reachable depth
+397
+Pruning <51, 237>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 794
+avgExpansionDelay: 2.0
+ maximum reachable depth
+397
+Pruning <51, 236>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 794
+avgExpansionDelay: 2.0
+ maximum reachable depth
+397
+Pruning <51, 235>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 793
+avgExpansionDelay: 2.0
+ maximum reachable depth
+396
+Pruning <51, 234>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 793
+avgExpansionDelay: 2.0
+ maximum reachable depth
+396
+Pruning <51, 233>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 792
+avgExpansionDelay: 2.0
+ maximum reachable depth
+396
+Pruning <51, 232>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 792
+avgExpansionDelay: 2.0
+ maximum reachable depth
+396
+Pruning <51, 231>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 792
+avgExpansionDelay: 2.0
+ maximum reachable depth
+396
+Pruning <51, 230>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 791
+avgExpansionDelay: 2.0
+ maximum reachable depth
+395
+Pruning <51, 229>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 791
+avgExpansionDelay: 2.0
+ maximum reachable depth
+395
+Pruning <51, 228>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 791
+avgExpansionDelay: 2.0
+ maximum reachable depth
+395
+Pruning <51, 227>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 790
+avgExpansionDelay: 2.0
+ maximum reachable depth
+395
+Pruning <51, 226>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 790
+avgExpansionDelay: 2.0
+ maximum reachable depth
+395
+Pruning <51, 225>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 789
+avgExpansionDelay: 2.0
+ maximum reachable depth
+394
+Pruning <51, 224>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 789
+avgExpansionDelay: 2.0
+ maximum reachable depth
+394
+Pruning <51, 223>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 789
+avgExpansionDelay: 2.0
+ maximum reachable depth
+394
+Pruning <51, 222>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 788
+avgExpansionDelay: 2.0
+ maximum reachable depth
+394
+Pruning <51, 221>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 788
+avgExpansionDelay: 2.0
+ maximum reachable depth
+394
+Pruning <51, 220>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 788
+avgExpansionDelay: 2.0
+ maximum reachable depth
+394
+Pruning <51, 219>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 787
+avgExpansionDelay: 2.0
+ maximum reachable depth
+393
+Pruning <51, 218>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 787
+avgExpansionDelay: 2.0
+ maximum reachable depth
+393
+Pruning <51, 217>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 786
+avgExpansionDelay: 2.0
+ maximum reachable depth
+393
+Pruning <51, 216>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 786
+avgExpansionDelay: 2.0
+ maximum reachable depth
+393
+Pruning <51, 215>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 786
+avgExpansionDelay: 2.0
+ maximum reachable depth
+393
+Pruning <51, 214>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 785
+avgExpansionDelay: 2.0
+ maximum reachable depth
+392
+Pruning <51, 213>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 785
+avgExpansionDelay: 2.0
+ maximum reachable depth
+392
+Pruning <51, 212>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 784
+avgExpansionDelay: 2.0
+ maximum reachable depth
+392
+Pruning <51, 211>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 784
+avgExpansionDelay: 2.0
+ maximum reachable depth
+392
+Pruning <51, 210>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 784
+avgExpansionDelay: 2.0
+ maximum reachable depth
+392
+Pruning <51, 209>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 783
+avgExpansionDelay: 2.0
+ maximum reachable depth
+391
+Pruning <51, 208>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 783
+avgExpansionDelay: 2.0
+ maximum reachable depth
+391
+Pruning <51, 207>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 783
+avgExpansionDelay: 2.0
+ maximum reachable depth
+391
+Pruning <51, 206>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 782
+avgExpansionDelay: 2.0
+ maximum reachable depth
+391
+Pruning <51, 205>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 782
+avgExpansionDelay: 2.0
+ maximum reachable depth
+391
+Pruning <51, 204>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 781
+avgExpansionDelay: 2.0
+ maximum reachable depth
+390
+Pruning <51, 203>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 781
+avgExpansionDelay: 2.0
+ maximum reachable depth
+390
+Pruning <51, 202>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 781
+avgExpansionDelay: 2.0
+ maximum reachable depth
+390
+Pruning <51, 201>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 780
+avgExpansionDelay: 2.0
+ maximum reachable depth
+390
+Pruning <51, 200>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 780
+avgExpansionDelay: 2.0
+ maximum reachable depth
+390
+Pruning <51, 199>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 779
+avgExpansionDelay: 2.0
+ maximum reachable depth
+389
+Pruning <51, 198>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 779
+avgExpansionDelay: 2.0
+ maximum reachable depth
+389
+Pruning <51, 197>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 779
+avgExpansionDelay: 2.0
+ maximum reachable depth
+389
+Pruning <51, 196>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 778
+avgExpansionDelay: 2.0
+ maximum reachable depth
+389
+Pruning <51, 195>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 778
+avgExpansionDelay: 2.0
+ maximum reachable depth
+389
+Pruning <51, 194>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 778
+avgExpansionDelay: 2.0
+ maximum reachable depth
+389
+Pruning <51, 193>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 777
+avgExpansionDelay: 2.0
+ maximum reachable depth
+388
+Pruning <51, 192>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 777
+avgExpansionDelay: 2.0
+ maximum reachable depth
+388
+Pruning <51, 191>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 776
+avgExpansionDelay: 2.0
+ maximum reachable depth
+388
+Pruning <51, 190>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 776
+avgExpansionDelay: 2.0
+ maximum reachable depth
+388
+Pruning <55, 277>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 776
+avgExpansionDelay: 2.0
+ maximum reachable depth
+388
+Pruning <54, 277>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 775
+avgExpansionDelay: 2.0
+ maximum reachable depth
+387
+Pruning <52, 274>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 775
+avgExpansionDelay: 2.0
+ maximum reachable depth
+387
+Pruning <49, 275>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 775
+avgExpansionDelay: 2.0
+ maximum reachable depth
+387
+Pruning <49, 274>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 774
+avgExpansionDelay: 2.0
+ maximum reachable depth
+387
+Pruning <49, 273>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 774
+avgExpansionDelay: 2.0
+ maximum reachable depth
+387
+Pruning <49, 272>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 773
+avgExpansionDelay: 2.0
+ maximum reachable depth
+386
+Pruning <49, 271>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 773
+avgExpansionDelay: 2.0
+ maximum reachable depth
+386
+Pruning <49, 270>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 773
+avgExpansionDelay: 2.0
+ maximum reachable depth
+386
+Pruning <49, 269>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 772
+avgExpansionDelay: 2.0
+ maximum reachable depth
+386
+Pruning <49, 268>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 772
+avgExpansionDelay: 2.0
+ maximum reachable depth
+386
+Pruning <49, 267>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 772
+avgExpansionDelay: 2.0
+ maximum reachable depth
+386
+Pruning <49, 266>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 771
+avgExpansionDelay: 2.0
+ maximum reachable depth
+385
+Pruning <49, 265>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 771
+avgExpansionDelay: 2.0
+ maximum reachable depth
+385
+Pruning <49, 264>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 770
+avgExpansionDelay: 2.0
+ maximum reachable depth
+385
+Pruning <49, 263>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 770
+avgExpansionDelay: 2.0
+ maximum reachable depth
+385
+Pruning <49, 262>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 770
+avgExpansionDelay: 2.0
+ maximum reachable depth
+385
+Pruning <49, 261>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 769
+avgExpansionDelay: 2.0
+ maximum reachable depth
+384
+Pruning <49, 260>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 769
+avgExpansionDelay: 2.0
+ maximum reachable depth
+384
+Pruning <49, 259>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 768
+avgExpansionDelay: 2.0
+ maximum reachable depth
+384
+Pruning <49, 258>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 768
+avgExpansionDelay: 2.0
+ maximum reachable depth
+384
+Pruning <49, 257>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 768
+avgExpansionDelay: 2.0
+ maximum reachable depth
+384
+Pruning <49, 256>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 767
+avgExpansionDelay: 2.0
+ maximum reachable depth
+383
+Pruning <49, 255>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 767
+avgExpansionDelay: 2.0
+ maximum reachable depth
+383
+Pruning <49, 254>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 766
+avgExpansionDelay: 2.0
+ maximum reachable depth
+383
+Pruning <49, 253>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 766
+avgExpansionDelay: 2.0
+ maximum reachable depth
+383
+Pruning <49, 252>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 766
+avgExpansionDelay: 2.0
+ maximum reachable depth
+383
+Pruning <49, 251>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 765
+avgExpansionDelay: 2.0
+ maximum reachable depth
+382
+Pruning <49, 250>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 765
+avgExpansionDelay: 2.0
+ maximum reachable depth
+382
+Pruning <49, 249>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 765
+avgExpansionDelay: 2.0
+ maximum reachable depth
+382
+Pruning <49, 248>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 764
+avgExpansionDelay: 2.0
+ maximum reachable depth
+382
+Pruning <49, 247>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 764
+avgExpansionDelay: 2.0
+ maximum reachable depth
+382
+Pruning <49, 246>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 764
+avgExpansionDelay: 2.0
+ maximum reachable depth
+382
+Pruning <49, 245>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 763
+avgExpansionDelay: 2.0
+ maximum reachable depth
+381
+Pruning <49, 244>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 763
+avgExpansionDelay: 2.0
+ maximum reachable depth
+381
+Pruning <49, 243>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 763
+avgExpansionDelay: 2.0
+ maximum reachable depth
+381
+Pruning <49, 242>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 762
+avgExpansionDelay: 2.0
+ maximum reachable depth
+381
+Pruning <49, 241>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 762
+avgExpansionDelay: 2.0
+ maximum reachable depth
+381
+Pruning <49, 240>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 761
+avgExpansionDelay: 2.0
+ maximum reachable depth
+380
+Pruning <49, 239>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 761
+avgExpansionDelay: 2.0
+ maximum reachable depth
+380
+Pruning <49, 238>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 761
+avgExpansionDelay: 2.0
+ maximum reachable depth
+380
+Pruning <49, 237>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 760
+avgExpansionDelay: 2.0
+ maximum reachable depth
+380
+Pruning <49, 236>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 760
+avgExpansionDelay: 2.0
+ maximum reachable depth
+380
+Pruning <49, 235>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 760
+avgExpansionDelay: 2.0
+ maximum reachable depth
+380
+Pruning <49, 234>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 759
+avgExpansionDelay: 2.0
+ maximum reachable depth
+379
+Pruning <49, 233>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 759
+avgExpansionDelay: 2.0
+ maximum reachable depth
+379
+Pruning <49, 232>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 759
+avgExpansionDelay: 2.0
+ maximum reachable depth
+379
+Pruning <49, 231>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 758
+avgExpansionDelay: 2.0
+ maximum reachable depth
+379
+Pruning <49, 230>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 758
+avgExpansionDelay: 2.0
+ maximum reachable depth
+379
+Pruning <49, 229>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 757
+avgExpansionDelay: 2.0
+ maximum reachable depth
+378
+Pruning <49, 228>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 757
+avgExpansionDelay: 2.0
+ maximum reachable depth
+378
+Pruning <49, 227>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 757
+avgExpansionDelay: 2.0
+ maximum reachable depth
+378
+Pruning <49, 226>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 756
+avgExpansionDelay: 2.0
+ maximum reachable depth
+378
+Pruning <49, 225>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 756
+avgExpansionDelay: 2.0
+ maximum reachable depth
+378
+Pruning <49, 224>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 756
+avgExpansionDelay: 2.0
+ maximum reachable depth
+378
+Pruning <49, 223>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 755
+avgExpansionDelay: 2.0
+ maximum reachable depth
+377
+Pruning <49, 222>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 755
+avgExpansionDelay: 2.0
+ maximum reachable depth
+377
+Pruning <49, 221>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 755
+avgExpansionDelay: 2.0
+ maximum reachable depth
+377
+Pruning <49, 220>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 754
+avgExpansionDelay: 2.0
+ maximum reachable depth
+377
+Pruning <49, 219>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 754
+avgExpansionDelay: 2.0
+ maximum reachable depth
+377
+Pruning <49, 218>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 753
+avgExpansionDelay: 2.0
+ maximum reachable depth
+376
+Pruning <49, 217>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 753
+avgExpansionDelay: 2.0
+ maximum reachable depth
+376
+Pruning <49, 216>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 753
+avgExpansionDelay: 2.0
+ maximum reachable depth
+376
+Pruning <49, 215>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 752
+avgExpansionDelay: 2.0
+ maximum reachable depth
+376
+Pruning <49, 214>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 752
+avgExpansionDelay: 2.0
+ maximum reachable depth
+376
+Pruning <49, 213>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 752
+avgExpansionDelay: 2.0
+ maximum reachable depth
+376
+Pruning <49, 212>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 751
+avgExpansionDelay: 2.0
+ maximum reachable depth
+375
+Pruning <49, 211>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 751
+avgExpansionDelay: 2.0
+ maximum reachable depth
+375
+Pruning <49, 210>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 751
+avgExpansionDelay: 2.0
+ maximum reachable depth
+375
+Pruning <49, 209>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 750
+avgExpansionDelay: 2.0
+ maximum reachable depth
+375
+Pruning <49, 208>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 750
+avgExpansionDelay: 2.0
+ maximum reachable depth
+375
+Pruning <49, 207>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 750
+avgExpansionDelay: 2.0
+ maximum reachable depth
+375
+Pruning <49, 206>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 749
+avgExpansionDelay: 2.0
+ maximum reachable depth
+374
+Pruning <49, 205>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 749
+avgExpansionDelay: 2.0
+ maximum reachable depth
+374
+Pruning <49, 204>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 749
+avgExpansionDelay: 2.0
+ maximum reachable depth
+374
+Pruning <49, 203>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 748
+avgExpansionDelay: 2.0
+ maximum reachable depth
+374
+Pruning <49, 202>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 748
+avgExpansionDelay: 2.0
+ maximum reachable depth
+374
+Pruning <49, 201>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 748
+avgExpansionDelay: 2.0
+ maximum reachable depth
+374
+Pruning <49, 200>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 747
+avgExpansionDelay: 2.0
+ maximum reachable depth
+373
+Pruning <49, 199>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 747
+avgExpansionDelay: 2.0
+ maximum reachable depth
+373
+Pruning <49, 198>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 747
+avgExpansionDelay: 2.0
+ maximum reachable depth
+373
+Pruning <49, 197>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 746
+avgExpansionDelay: 2.0
+ maximum reachable depth
+373
+Pruning <49, 196>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 746
+avgExpansionDelay: 2.0
+ maximum reachable depth
+373
+Pruning <49, 195>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 746
+avgExpansionDelay: 2.0
+ maximum reachable depth
+373
+Pruning <49, 194>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 745
+avgExpansionDelay: 2.0
+ maximum reachable depth
+372
+Pruning <49, 193>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 745
+avgExpansionDelay: 2.0
+ maximum reachable depth
+372
+Pruning <49, 192>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 745
+avgExpansionDelay: 2.0
+ maximum reachable depth
+372
+Pruning <49, 191>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 744
+avgExpansionDelay: 2.0
+ maximum reachable depth
+372
+Pruning <49, 190>
+Pruning cell, expansion count = 101
+
+For expansion: 101
+expansions remaining: 744
+avgExpansionDelay: 2.0
+ maximum reachable depth
+372
+Pruning <50, 189>
+Pruning cell, expansion count = 101
+No plan found within deadline

@@ -55,7 +55,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	long timeAtLastDifferentMeasurement;
 	long countExpansionsAtLastDifferentMeasurement;
 	long timePerExpansion;
-	
+
 	private int expansionCount = 0;
 
 	@Override
@@ -75,7 +75,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				long timeDeadline = timeCurrent + searchTime;
 
 				Trace.Enable(false);
-				
+
 				System.out.println("current time (ns): " + timeCurrent);
 				System.out.println("deadline: " + timeDeadline);
 				Trace.Enable(true);
@@ -247,7 +247,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 								// cost might make it viable.
 								if (mapInfo.isClosed(neighbor) == true)
 								{
-									mapInfo.reopenCell((GridCell) neighbor, expansionCount);
+									mapInfo.reopenCell(neighbor, expansionCount);
 								}
 							}
 						}
@@ -287,7 +287,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					System.out.println("Pruning " + current.getCoord());
 					System.out.println("Pruning cell, expansion count = " + expansionCount + ", settleCount = " + expansionCountForSettling);
 					mapInfo.pruneCell(current);
-					
+
 				}
 			}
 			else
