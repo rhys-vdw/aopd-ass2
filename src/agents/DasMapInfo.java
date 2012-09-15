@@ -102,6 +102,19 @@ public class DasMapInfo {
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.offer(cellInfo);
 	}
+	
+	public void openCell(GridCell cell, float newGCost, int expansionCount, GridCell parent)
+	{
+		DasCellInfo dci;
+		dci = getCellInfo(cell);
+		System.out.println("it was opened from " + dci.getCellMembership());
+		
+		dci.setCellMembership(CellSetMembership.OPEN);
+		dci.setGCost(newGCost);
+		dci.setExpansionNumber(expansionCount);
+		dci.setParent(getCellInfo(parent));
+		openQueue.offer(dci);
+	}
 
 	/**
 	 * Returns true if there are no cells in the open set.
@@ -356,5 +369,10 @@ public class DasMapInfo {
 	/* get cell info associated with cell. */
 	private DasCellInfo getCellInfo(GridCell cell) {
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
+	}
+	
+	public boolean cellExists(GridCell cell)
+	{
+		return(getCellInfo(cell) != null);
 	}
 }

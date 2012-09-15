@@ -23,7 +23,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// Percentage of deadline to be used generating plan. (As opposed to moving
 	// along the plan afterwards.)
-	final private float SEARCH_TIME_FRACTION = 0.97f;
+	final private float SEARCH_TIME_FRACTION = 0.95f;
 
 	// Should the open and closed sets be regenerated?
 	boolean shouldUpdateOpen = false;
@@ -36,7 +36,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	final private int SETTLING_EXPANSION_COUNT = 200;
 
 	// This is the size of the sliding window, in entries.
-	final private int EXPANSION_DELAY_WINDOW_LENGTH = 15;
+	final private int EXPANSION_DELAY_WINDOW_LENGTH = 10;
 
 	// Sliding window to calculate average single step error.
 	private SlidingWindow expansionDelayWindow = new SlidingWindow(
@@ -197,26 +197,35 @@ public class DeadlineAwareSearch implements PlanningAgent
 					{
 //						System.out.println("Generating Child " + count++);
 						// consider node if it can be entered and is not in closed or pruned list
-						if (map.isBlocked(neighbor) == false &&
-						    mapInfo.isClosed((GridCell) neighbor) == false &&
-						    mapInfo.isPruned((GridCell) neighbor) == false)
+						if (map.isBlocked(neighbor) == false)
 						{
-							if (mapInfo.isOpen((GridCell) neighbor) == false)
-							{
-								float neighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
-								float neighborHCost = map.hCost(neighbor, goal);
+							float neighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
+							float neighborHCost = map.hCost(neighbor, goal);
 
-								//System.out.println("g: " + neighborGCost + " h" + neighborHCost);
-								// TODO: this is currently assuming manhattan grid world. See Issue #11
-								int neighborDCheapestRaw = (int) dCostManhattan((GridCell)neighbor, goal);
-								//System.out.println("d" + nNeighbourDCost);
-								// Add the neighbor to the open set!
+							//System.out.println("g: " + neighborGCost + " h" + neighborHCost);
+							// TODO: this is currently assuming manhattan grid world. See Issue #11
+							int neighborDCheapestRaw = (int) dCostManhattan((GridCell)neighbor, goal);
+							//System.out.println("d" + nNeighbourDCost);
+							
+							// Add the neighbor to the open set!
+							if (!mapInfo.cellExists((GridCell)neighbor))
+							{
 								mapInfo.add((GridCell) neighbor, neighborGCost, neighborHCost,
-										neighborDCheapestRaw, expansionCount, current);
+									neighborDCheapestRaw, expansionCount, current);
 							}
+							// Potentially improve the cell characteristics!
+							else
+							{
+								// If the cell has a better g cost than what it used to, move to open list
+								if (neighborGCost < mapInfo.getGCost((GridCell)neighbor) && mapInfo.isClosed((GridCell)neighbor))
+								{									
+									mapInfo.openCell((GridCell)neighbor, neighborGCost, expansionCount, current);
+								}
+							}
+						}
 							// Do we need the following case handling? Is the above enough to add s' to open? Step 12 of algorithm
 							/* else if (gCost < mapInfo.getGCost((GridCell) neighbor)) */
-						}
+
 					}
 					// Increment number of expansions.
 					expansionCount++;

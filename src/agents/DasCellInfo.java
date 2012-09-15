@@ -140,6 +140,11 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 	{
 		return(this.nExpansionNumber);
 	}
+	
+	public void setExpansionNumber(int _expansionNumber)
+	{
+		nExpansionNumber = _expansionNumber;
+	}
 
 	/**
 	 * Compare the f cost of this cell to another.
@@ -155,20 +160,21 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 			if (Math.abs(this.hCost - other.hCost) < EPSILON)
 			{
 				// Both f and h are the same, in which case, return 0
-				float err1 = this.getDCheapestWithError();
-				float err2 = other.getDCheapestWithError();
+				//float err1 = 0;
+				//float err2 = 1;
 				//System.out.println(this.cell.getCoord() + "with h" + this.hCost + "is the same as " + other.cell.getCoord() + "with h" + other.hCost);
-				//System.out.println("tie breaker on dCheapest " + err1 + " vs. " + err2);
-				//System.out.println("dCheapest " + this.getDCheapestWithError() + " vs: " + other.getDCheapestWithError());
-				if (err1 < err2)
-				{
-					nReturnValue = -1;
-				}
-				else if (err1 > err2)
-				{
-					nReturnValue = 1;
-				}
-				else
+				//System.out.println("tie breaker on depth " + err1 + " vs. " + err2);
+				//if (err1 != err2)
+				//	System.out.println("test");
+				//if (err1 < err2)
+				//{
+				//	nReturnValue = -1;
+				//}
+				//else if (err1 > err2)
+				//{
+				//	nReturnValue = 1;
+				//}
+				//else
 				{
 					nReturnValue = 0;
 				}
