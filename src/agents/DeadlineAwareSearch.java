@@ -36,10 +36,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
-	final private int SETTLING_EXPANSION_COUNT = 200;
+	final private int SETTLING_EXPANSION_COUNT = 5000;
 
 	// Updating count that needs to be reached to indicate that we are settled.
-	private int expansionCountForSettling;
+	private int expansionCountForSettling = SETTLING_EXPANSION_COUNT;
 
 
 	// This is the size of the sliding window, in entries.
@@ -210,8 +210,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 					//System.out.println("Found path to goal! cost = " + mapInfo.getGCost(current));
 					//TODO: this is a potentially expensive operation!
 					incumbentPlan = mapInfo.computePlan(goal);
-					// The below hack is to test finding the first goal!
-					//return incumbentPlan;
 				}
 				else if ( (expansionCount <= expansionCountForSettling) ||
 						(mapInfo.getDCheapestWithError(current) < calculateMaxReachableDepth(timeDeadline)))
@@ -287,7 +285,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				else /* expansionCount > settlingCount && dCheapest > dMax */
 				{
 					System.out.println("Pruning " + current.getCoord());
-					System.out.println("Pruning cell, expansion count = " + expansionCount);
+					System.out.println("Pruning cell, expansion count = " + expansionCount + ", settleCount = " + expansionCountForSettling);
 					mapInfo.pruneCell(current);
 					
 				}
