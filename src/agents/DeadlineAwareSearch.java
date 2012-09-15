@@ -36,7 +36,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
-	final private int SETTLING_EXPANSION_COUNT = 5000;
+	final private int SETTLING_EXPANSION_COUNT = 200;
 
 	// Updating count that needs to be reached to indicate that we are settled.
 	private int expansionCountForSettling = SETTLING_EXPANSION_COUNT;
@@ -296,8 +296,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 				if (!mapInfo.isPrunedEmpty())
 				{
 					int exp = calculateExpansionsRemaining(timeDeadline);
-					return null;
-					/*
+					//return null;
+					
 
 					mapInfo.recoverPrunedStates(exp);
 					expansionDelayWindow.reset();
@@ -305,7 +305,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
 					//return null;
 
-					*/
+					
 				}
 				else
 				{
