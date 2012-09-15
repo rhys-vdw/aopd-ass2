@@ -406,9 +406,9 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	 * @return 0, -1 or 1 if a is equal to, less than or greater than b respectively
 	 */
 	public int compare(GridCell a, GridCell b) {
-		int fCompare = compareFloat(getFCost(a), getFCost(b));
 
 		// Compare total cost estimate.
+		int fCompare = compareFloat(getFCost(a), getFCost(b));
 		if (fCompare != 0) {
 			return fCompare;
 		}
