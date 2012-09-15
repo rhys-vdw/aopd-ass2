@@ -254,15 +254,14 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		return gCosts[gc.getX()][gc.getY()];
 	}
 
-	public void setOpenGCost(GridCell cell, float gCost) {
+	private void setQueuedGCost(GridCell cell, float gCost, PriorityQueue<GridCell> queue) {
 		// Remove node from priority queue. (Changing its g cost in place would
 		// cause the heaps to become unsorted.)
-		boolean wasPresent = openQueue.remove(cell);
+		boolean wasPresent = queue.remove(cell);
 
 		// Ensure that it was indeed in the open set.
 		if (wasPresent == false) {
-			throw new IllegalArgumentException(
-					"Cell was not found in the open set!");
+			throw new IllegalArgumentException("Cell was not found priority queue!");
 		}
 
 		// Update g cost.
@@ -270,37 +269,42 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		gCosts[gc.getX()][gc.getY()] = gCost;
 
 		// Reinsert node sorted.
-		openQueue.offer(cell);
+		queue.offer(cell);
 	}
 
-	public void setClosedGCost(GridCell cell, float gCost) {
-		if (getSetMembership(cell) == CellSetMembership.OPEN) {
-			throw new IllegalArgumentException(
-					"Use setOpenGCost() to alter the gCost of a node in the open set!");
+	public void setGCost(GridCell cell, float gCost) {
+		switch (getSetMembership(cell)) {
+			case CLOSED: {
+				GridCoord gc = cell.getCoord();
+				gCosts[gc.getX()][gc.getY()] = gCost;
+				break;
+			}
+			case OPEN: {
+				setQueuedGCost(cell, gCost, openQueue);
+				break;
+			}
+			case PRUNED: {
+				setQueuedGCost(cell, gCost, prunedQueue);
+				break;
+			}
+			case NONE: {
+				throw new IllegalArgumentException("Cell is not in a set.");
+			}
+			default: {
+				assert false;
+			}
 		}
-
-		GridCoord gc = cell.getCoord();
-		gCosts[gc.getX()][gc.getY()] = gCost;
 	}
 
+	/**
+	 * Get heuristic cost estimate from this cell to the goal.
+	 * NOTE: We don't need write access to this for this assignment.
+	 * @param cell the cell h is estimated from
+	 */
 	public float getHCost(GridCell cell) {
 		GridCoord gc = cell.getCoord();
 		return hCosts[gc.getX()][gc.getY()];
 	}
-
-	/* NOTE: we don't need this for this assignment.
-	public void setHCost(GridCell cell, float hCost) {
-		DasCellInfo cellInfo = safeGetCellInfo(cell);
-
-		// TODO: should we allow this? I think it might be necessary
-		if (cellInfo.getCellMembership() == CellSetMembership.OPEN) {
-			throw new IllegalArgumentException(
-					"Cell's g cost cannot be altered whilst in the open set.");
-		}
-
-		cellInfo.setHCost(hCost);
-	}
-	*/
 
 	private int getDepth(GridCell cell) {
 		GridCoord gc = cell.getCoord();
@@ -353,7 +357,18 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	 */
 	public CellSetMembership getSetMembership(GridCell cell) {
 		GridCoord gc = cell.getCoord();
-		return sets[gc.getX()][gc.getY()];
+		CellSetMembership set = sets[gc.getX()][gc.getY()];
+		return set == null ? CellSetMembership.NONE : set;
+	}
+
+	/**
+	 * Has this cell been added yet?
+	 * @param cell the cell to check
+	 * @return true if the cell belongs to any set, otherwise false
+	 */
+	public boolean cellExists(GridCell cell) {
+		GridCoord gc = cell.getCoord();
+		return (sets[gc.getX()][gc.getY()] != null);
 	}
 
 	/**
