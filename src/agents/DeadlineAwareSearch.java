@@ -156,9 +156,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 		// Initialize open set with start node.
 		float hCost = map.hCost(start, goal);
 		int dCost = dCostManhattan((GridCell)start, goal);
-		mapInfo.addStartCell(start, hCost, dCost);
+
 
 		ComputedPlan incumbentPlan = null;
+		incumbentPlan = speedierSearch(map, start,goal);
+		//System.out.println("time after greedy: " + System.nanoTime());
+		//System.out.println("time left: " + (timeDeadline - System.nanoTime()));
+		
+		mapInfo.addStartCell(start, hCost, dCost);
 
 		// Continue until time has run out
 		while (System.nanoTime() < timeDeadline)
@@ -336,6 +341,43 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		return exp;
 	}
+	
+	private ComputedPlan speedierSearch(GridDomain map, GridCell start, GridCell goal)
+	{
+		
+		GreedyMapInfo mapInfo = new GreedyMapInfo(map);
+		float hCost = map.hCost(start, goal);
+		mapInfo.add(start, 0, hCost);
+
+		ComputedPlan incumbentPlan = null;
+
+		while (mapInfo.isOpenEmpty() == false)
+		{
+			GridCell current = mapInfo.closeCheapestOpen();
+			if (current == goal)
+			{
+				System.out.print("Goal found with speedier search, GCost" + mapInfo.getGCost(current));
+				incumbentPlan = mapInfo.computePlan(current);
+				break;
+			}
+			
+			for (State neighbor : map.getSuccessors(current))
+			{
+				if (map.isBlocked(neighbor) == false &&
+						mapInfo.isClosed((GridCell) neighbor) == false &&
+						mapInfo.isOpen((GridCell)neighbor) == false)
+				{
+					float hNeighbor = map.hCost(neighbor, goal);
+					float gNeighbor = mapInfo.getGCost((GridCell)current) + map.cost(current, neighbor);
+					mapInfo.add((GridCell) neighbor, gNeighbor, hNeighbor, current);
+				}
+			}
+		}
+		
+		return(incumbentPlan);
+	}
+	
+	
 
 	// -- Apparate Debug Output --
 
