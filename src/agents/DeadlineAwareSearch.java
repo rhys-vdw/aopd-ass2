@@ -42,7 +42,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	
 
 	// This is the size of the sliding window, in entries.
-	final private int EXPANSION_DELAY_WINDOW_LENGTH = 10;
+	final private int EXPANSION_DELAY_WINDOW_LENGTH = 20;
 
 	// Sliding window to calculate average single step error.
 	private SlidingWindow expansionDelayWindow = new SlidingWindow(
@@ -58,6 +58,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 	long timeAtLastDifferentMeasurement;
 	long countExpansionsAtLastDifferentMeasurement;
 	long timePerExpansion;
+	
+	private int expansionCount = 0;
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
@@ -75,8 +77,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) * SEARCH_TIME_FRACTION);
 				long timeDeadline = timeCurrent + searchTime;
 
-				System.out.println("current time (ns): " + timeCurrent);
-				System.out.println("deadline: " + timeDeadline);
+				//System.out.println("current time (ns): " + timeCurrent);
+				//System.out.println("deadline: " + timeDeadline);
 				Trace.Enable(false);
 				
 				// a new plan has been generated, update open and closed debug sets.
@@ -162,7 +164,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		// Track the number of expansions performed -  e_curr value
 		// TODO: investigate refactoring this to long to avoid potential truncactions in operations
-		int expansionCount = 0;
+
 
 		// Initialize open set with start node.
 		float hCost = map.hCost(start, goal);
@@ -178,8 +180,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 		
 		long timeAfterGreedy = threadMX.getCurrentThreadCpuTime();
 		long timeUntilDeadline = timeDeadline - timeAfterGreedy;
-		System.out.println("time after greedy: " + timeAfterGreedy);
-		System.out.println("time left: " + timeUntilDeadline);
+		//System.out.println("time after greedy: " + timeAfterGreedy);
+		//System.out.println("time left: " + timeUntilDeadline);
 		
 		
 		
@@ -207,13 +209,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// than that of the incumbent solution
 				if (current == goal)
 				{
-					System.out.println("Found path to goal! cost = " + mapInfo.getGCost(current));
+					//System.out.println("Found path to goal! cost = " + mapInfo.getGCost(current));
 					//TODO: this is a potentially expensive operation!
 					incumbentPlan = mapInfo.computePlan(goal);
 					// The below hack is to test finding the first goal!
 					//return incumbentPlan;
 				}
-				else if (expansionCount <= expansionCountForSettling ||
+				else if ( (expansionCount <= expansionCountForSettling) ||
 						(mapInfo.getDCheapestWithError(current) < calculateMaxReachableDepth(timeDeadline)))
 				{
 					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + dMax);
@@ -261,6 +263,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 					// Insert expansion delay into sliding window.
 					int expansionDelay = expansionCount - mapInfo.getExpansionNumber(current);
+					System.out.println("expansionDelay: " + expansionDelay);
 					expansionDelayWindow.push(expansionDelay);
 
 					// Calculate expansion interval.
@@ -272,10 +275,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 						timePerExpansion = expansionTimeDelta / expansionCountDelta;
 						timeAtLastDifferentMeasurement = timeCurrent;
 						countExpansionsAtLastDifferentMeasurement = expansionCount;
-						System.out.println(
-								"\n expansionTimeDelta " + expansionTimeDelta + 
-								"\n expansionCountDelta " + expansionCountDelta + 
-								"\n timePerExpansion: " + timePerExpansion);
+//						System.out.println(
+//								"\n expansionTimeDelta " + expansionTimeDelta + 
+//								"\n expansionCountDelta " + expansionCountDelta + 
+//								"\n timePerExpansion: " + timePerExpansion);
 					}
 					
 
@@ -284,8 +287,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 				else
 				{
-					//System.out.println("Pruning " + current.getCoord());
+					
+					System.out.println("Pruning " + current.getCoord());
 					mapInfo.pruneCell(current);
+					
 				}
 			}
 			else
@@ -294,20 +299,22 @@ public class DeadlineAwareSearch implements PlanningAgent
 				if (!mapInfo.isPrunedEmpty())
 				{
 					int exp = calculateExpansionsRemaining(timeDeadline);
+					
 					mapInfo.recoverPrunedStates(exp);
 					expansionDelayWindow.reset();
 					//expansionIntervalWindow.reset();
 					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
+					//return null;
 				}
 				else
 				{
-					System.out.println("Pruned and open are empty");
+					//System.out.println("Pruned and open are empty");
 					break;
 				}
 
 			}
 		}
-		System.out.println("Returning solution with " + incumbentPlan.getLength() + " nodes");
+		//System.out.println("Returning solution with " + incumbentPlan.getLength() + " nodes");
 		return incumbentPlan;
 	}
 
@@ -342,9 +349,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 	{
 		double avgExpansionDelay = expansionDelayWindow.getAvg();
 
-		int dMax = (int) (calculateExpansionsRemaining(timeDeadline) / avgExpansionDelay);
+		int exp = calculateExpansionsRemaining(timeDeadline);
+		int dMax = (int) (exp / avgExpansionDelay);
 
-//		System.out.println(dMax + " maximum reachable depth");
+		System.out.println("\nFor expansion: " + expansionCount +
+				"\nexpansions remaining: " + exp +
+				"\navgExpansionDelay: " + avgExpansionDelay +
+				"\n maximum reachable depth\n" + dMax);
 		return dMax;
 	}
 
