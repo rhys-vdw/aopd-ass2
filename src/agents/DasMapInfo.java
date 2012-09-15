@@ -107,7 +107,7 @@ public class DasMapInfo {
 	{
 		DasCellInfo dci;
 		dci = getCellInfo(cell);
-		System.out.println("it was opened from " + dci.getCellMembership());
+		//System.out.println("it was opened from " + dci.getCellMembership());
 		
 		dci.setCellMembership(CellSetMembership.OPEN);
 		dci.setGCost(newGCost);
@@ -207,7 +207,7 @@ public class DasMapInfo {
 			count++;
 		}
 		
-		//System.out.println("Recovering " + count + " nodes");
+		System.out.println("Recovering " + count + " nodes");
 	}
 
 	public GridCell getParent(GridCell cell) {
