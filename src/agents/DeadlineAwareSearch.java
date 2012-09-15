@@ -358,8 +358,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 		System.out.println("\nFor expansion: " + expansionCount +
 				"\nexpansions remaining: " + exp +
 				"\navgExpansionDelay: " + avgExpansionDelay +
-				"\n maximum reachable depth\n" + dMax);
-		return dMax;
+				"\n maximum reachable depth: " + dMax);
+		return 3*dMax;
 	}
 
 	/**
