@@ -11,6 +11,7 @@ import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+
 public class DeadlineAwareSearch implements PlanningAgent
 {
 	private ComputedPlan plan;
@@ -36,10 +37,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
 	final private int SETTLING_EXPANSION_COUNT = 200;
-	
+
 	// Updating count that needs to be reached to indicate that we are settled.
 	private int expansionCountForSettling;
-	
+
 
 	// This is the size of the sliding window, in entries.
 	final private int EXPANSION_DELAY_WINDOW_LENGTH = 10;
@@ -48,13 +49,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private SlidingWindow expansionDelayWindow = new SlidingWindow(
 			EXPANSION_DELAY_WINDOW_LENGTH);
 
-	// r value
-	//private SlidingWindow expansionIntervalWindow = new SlidingWindow(
-	//		EXPANSION_DELAY_WINDOW_LENGTH);
-	
 	// For timing
 	final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
-	
+
 	long timeAtLastDifferentMeasurement;
 	long countExpansionsAtLastDifferentMeasurement;
 	long timePerExpansion;
@@ -69,7 +66,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			// If there is no plan, generate one.
 			if (plan == null)
 			{
-				
+
 				// TODO: base search buffer on the length of the solution.
 				long timeCurrent = threadMX.getCurrentThreadCpuTime();
 				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) * SEARCH_TIME_FRACTION);
@@ -77,8 +74,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 				System.out.println("current time (ns): " + timeCurrent);
 				System.out.println("deadline: " + timeDeadline);
-				Trace.Enable(false);
-				
+				Trace.Enable(true);
+
 				// a new plan has been generated, update open and closed debug sets.
 				shouldUpdateOpen = true;
 				shouldUpdateClosed = true;
@@ -152,7 +149,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			GridCell goal, long timeDeadline) {
 
 
-		
+
 		//System.out.println("Generating a new plan");
 
 		// Map info exists outside of this function so that its open and closed
@@ -170,22 +167,22 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 
 		ComputedPlan incumbentPlan = null;
-		incumbentPlan = speedierSearch(map, start,goal);
-		
-		
+		//incumbentPlan = speedierSearch(map, start,goal);
+
+
 		assert threadMX.isCurrentThreadCpuTimeSupported();
 		threadMX.setThreadCpuTimeEnabled(true);
-		
+
 		long timeAfterGreedy = threadMX.getCurrentThreadCpuTime();
 		long timeUntilDeadline = timeDeadline - timeAfterGreedy;
 		System.out.println("time after greedy: " + timeAfterGreedy);
 		System.out.println("time left: " + timeUntilDeadline);
-		
-		
-		
+
+
+
 		mapInfo.addStartCell(start, hCost, dCost);
-		
-		timeAtLastDifferentMeasurement = threadMX.getCurrentThreadCpuTime(); 
+
+		timeAtLastDifferentMeasurement = threadMX.getCurrentThreadCpuTime();
 		// Continue until time has run out
 		while (threadMX.getCurrentThreadCpuTime() < timeDeadline)
 		{
@@ -218,44 +215,42 @@ public class DeadlineAwareSearch implements PlanningAgent
 				{
 					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + dMax);
 					int count = 0;
-					
+
 					// Expand current node. TODO: move this into its own method.
-					for (State neighbor : map.getSuccessors(current))
+					for (State stateIter : map.getSuccessors(current))
 					{
-//						System.out.println("Generating Child " + count++);
+						GridCell neighbor = (GridCell) stateIter;
+						//System.out.println("Generating Child " + count++);
 						// consider node if it can be entered and is not in closed or pruned list
 						if (map.isBlocked(neighbor) == false)
 						{
 							float neighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
 							float neighborHCost = map.hCost(neighbor, goal);
 
-							//System.out.println("g: " + neighborGCost + " h" + neighborHCost);
-							// TODO: this is currently assuming manhattan grid world. See Issue #11
-							int neighborDCheapestRaw = (int) dCostManhattan((GridCell)neighbor, goal);
-							//System.out.println("d" + nNeighbourDCost);
-							
-							// Add the neighbor to the open set!
-							if (!mapInfo.cellExists((GridCell)neighbor))
+							// NOTE: Using map's h cost estimate as d cheapest estimate.
+							int neighborDCheapestRaw = (int) map.hCost(neighbor, goal);
+
+							if (!mapInfo.cellExists(neighbor))
 							{
-								mapInfo.add((GridCell) neighbor, neighborGCost, neighborHCost,
-									neighborDCheapestRaw, expansionCount, current);
+								// Node has not been seen before, add it to the open set.
+								mapInfo.add(neighbor, neighborGCost, neighborHCost,
+										neighborDCheapestRaw, expansionCount, current);
 							}
-							// Potentially improve the cell characteristics!
-							else
+							else if (neighborGCost < mapInfo.getGCost(neighbor))
 							{
-								// If the cell has a better g cost than what it used to, move to open list
-								if (neighborGCost < mapInfo.getGCost((GridCell)neighbor) &&
-								    mapInfo.isClosed((GridCell)neighbor))
+								// Shorter path to node found, update gCost.
+								mapInfo.setGCost(neighbor, neighborGCost);
+
+								// If node was closed, put it back into the open list. The new
+								// cost might make it viable.
+								if (mapInfo.isClosed(neighbor) == true)
 								{
-									mapInfo.setGCost((GridCell) neighbor, neighborGCost);
 									mapInfo.reopenCell((GridCell) neighbor, expansionCount, current);
 								}
 							}
 						}
-							// Do we need the following case handling? Is the above enough to add s' to open? Step 12 of algorithm
-							/* else if (gCost < mapInfo.getGCost((GridCell) neighbor)) */
+					} // end expansion
 
-					}
 					// Increment number of expansions.
 					expansionCount++;
 
@@ -272,19 +267,22 @@ public class DeadlineAwareSearch implements PlanningAgent
 						timePerExpansion = expansionTimeDelta / expansionCountDelta;
 						timeAtLastDifferentMeasurement = timeCurrent;
 						countExpansionsAtLastDifferentMeasurement = expansionCount;
+						/*
 						System.out.println(
-								"\n expansionTimeDelta " + expansionTimeDelta + 
-								"\n expansionCountDelta " + expansionCountDelta + 
+								"\n expansionTimeDelta " + expansionTimeDelta +
+								"\n expansionCountDelta " + expansionCountDelta +
 								"\n timePerExpansion: " + timePerExpansion);
+								*/
 					}
-					
+
 
 					// Insert expansion interval into sliding window.
 					//expansionIntervalWindow.push(expansionInterval);
 				}
-				else
+				else /* expansionCount > settlingCount && dCheapest > dMax */
 				{
 					//System.out.println("Pruning " + current.getCoord());
+					System.out.println("Pruning cell, expansion count = " + expansionCount);
 					mapInfo.pruneCell(current);
 				}
 			}
@@ -294,10 +292,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 				if (!mapInfo.isPrunedEmpty())
 				{
 					int exp = calculateExpansionsRemaining(timeDeadline);
+					return null;
+					/*
 					mapInfo.recoverPrunedStates(exp);
 					expansionDelayWindow.reset();
 					//expansionIntervalWindow.reset();
 					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
+					*/
 				}
 				else
 				{
@@ -307,7 +308,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 			}
 		}
-		System.out.println("Returning solution with " + incumbentPlan.getLength() + " nodes");
+		//System.out.println("Returning solution with " + incumbentPlan.getLength() + " nodes");
 		return incumbentPlan;
 	}
 
@@ -376,10 +377,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		return exp;
 	}
-	
+
 	private ComputedPlan speedierSearch(GridDomain map, GridCell start, GridCell goal)
 	{
-		
+
 		GreedyMapInfo mapInfo = new GreedyMapInfo(map);
 		float hCost = map.hCost(start, goal);
 		mapInfo.add(start, 0, hCost);
@@ -395,7 +396,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				incumbentPlan = mapInfo.computePlan(current);
 				break;
 			}
-			
+
 			for (State neighbor : map.getSuccessors(current))
 			{
 				if (map.isBlocked(neighbor) == false &&
@@ -408,11 +409,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 			}
 		}
-		
+
 		return(incumbentPlan);
 	}
-	
-	
+
+
 
 	// -- Apparate Debug Output --
 
