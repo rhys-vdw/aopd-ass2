@@ -136,13 +136,12 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		openQueue.offer(cell);
 	}
 
-	public void reopenCell(GridCell cell, int expansionCount, GridCell parent) {
+	public void reopenCell(GridCell cell, int expansionCount) {
 		int x = cell.getCoord().getX();
 		int y = cell.getCoord().getY();
 
 		sets[x][y] = CellSetMembership.OPEN;
 		expansionNumbers[x][y] = expansionCount;
-		parents[x][y] = parent;
 	}
 
 	/**

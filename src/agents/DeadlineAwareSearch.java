@@ -240,6 +240,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 							{
 								// Shorter path to node found, update gCost.
 								mapInfo.setGCost(neighbor, neighborGCost);
+								mapInfo.setParent(neighbor, current);
 
 								// If node was closed, put it back into the open list. The new
 								// cost might make it viable.
