@@ -14,7 +14,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 {
 	private ComputedPlan plan;
 
-	DasMapInfo mapInfo;
+	//DasMapInfo mapInfo;
+	FastDasMapInfo mapInfo;
 
 	// number of steps taken in current plan
 	private int stepNo = 0;
@@ -147,7 +148,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		// Map info exists outside of this function so that its open and closed
 		// sets for debug display.
-		mapInfo = new DasMapInfo(map);
+		//mapInfo = new DasMapInfo(map);
+		mapInfo = new FastDasMapInfo(map);
 
 		// Track the number of expansions performed -  e_curr value
 		// TODO: investigate refactoring this to long to avoid potential truncactions in operations
@@ -222,9 +224,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 							else
 							{
 								// If the cell has a better g cost than what it used to, move to open list
-								if (neighborGCost < mapInfo.getGCost((GridCell)neighbor) && mapInfo.isClosed((GridCell)neighbor))
-								{									
-									mapInfo.openCell((GridCell)neighbor, neighborGCost, expansionCount, current);
+								if (neighborGCost < mapInfo.getGCost((GridCell)neighbor) &&
+								    mapInfo.isClosed((GridCell)neighbor))
+								{
+									mapInfo.setGCost((GridCell) neighbor, neighborGCost);
+									mapInfo.reopenCell((GridCell) neighbor, expansionCount, current);
 								}
 							}
 						}

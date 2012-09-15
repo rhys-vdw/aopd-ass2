@@ -102,13 +102,13 @@ public class DasMapInfo {
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.offer(cellInfo);
 	}
-	
+
 	public void openCell(GridCell cell, float newGCost, int expansionCount, GridCell parent)
 	{
 		DasCellInfo dci;
 		dci = getCellInfo(cell);
 		System.out.println("it was opened from " + dci.getCellMembership());
-		
+
 		dci.setCellMembership(CellSetMembership.OPEN);
 		dci.setGCost(newGCost);
 		dci.setExpansionNumber(expansionCount);
@@ -196,7 +196,7 @@ public class DasMapInfo {
 		int count = 0;
 
 		while (dSum < expansionCount && prunedQueue.size() > 0) {
-			
+
 			DasCellInfo cellInfo = prunedQueue.poll();
 
 			dSum += cellInfo.getDCheapestWithError();
@@ -206,7 +206,7 @@ public class DasMapInfo {
 			openQueue.offer(cellInfo);
 			count++;
 		}
-		
+
 		//System.out.println("Recovering " + count + " nodes");
 	}
 
@@ -348,7 +348,7 @@ public class DasMapInfo {
 		}
 		return open;
 	}
-	
+
 	/** Return an ArrayList of all GridCells currently in the pruned set. */
 	public ArrayList<GridCell> getPrunedArrayList() {
 		ArrayList<GridCell> pruned = new ArrayList<GridCell>(prunedQueue.size());
@@ -356,7 +356,7 @@ public class DasMapInfo {
 			pruned.add(cellInfo.getCell());
 		}
 		return pruned;
-	}	
+	}
 
 	private DasCellInfo safeGetCellInfo(GridCell cell) {
 		DasCellInfo cellInfo = getCellInfo(cell);
@@ -370,7 +370,7 @@ public class DasMapInfo {
 	private DasCellInfo getCellInfo(GridCell cell) {
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
-	
+
 	public boolean cellExists(GridCell cell)
 	{
 		return(getCellInfo(cell) != null);

@@ -2,6 +2,7 @@ package agents;
 
 public enum CellSetMembership 
 { 
+	NONE ("no set"),
 	OPEN   ("open set"), 
 	CLOSED ("closed set"),
 	PRUNED ("pruned set");
