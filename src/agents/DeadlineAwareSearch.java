@@ -9,6 +9,9 @@ import au.rmit.ract.planning.pathplanning.entity.SearchDomain;
 import pplanning.interfaces.PlanningAgent;
 import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
+
+import java.io.PrintStream;
+import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
@@ -43,7 +46,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 
 	// This is the size of the sliding window, in entries.
-	final private int EXPANSION_DELAY_WINDOW_LENGTH = 20;
+	final private int EXPANSION_DELAY_WINDOW_LENGTH = 10;
 
 	// Sliding window to calculate average single step error.
 	private SlidingWindow expansionDelayWindow = new SlidingWindow(
@@ -63,6 +66,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 			int stepLeft, long stepTime, long timeLeft) {
 
 		try {
+			
+			// Better way to disable all traces
+//			System.setOut(new PrintStream(new OutputStream() {
+//				  public void write(int b) {
+//				    // NO-OP
+//				  }
+//				}));
+			
 			Trace.Enable(false);
 
 			// If there is no plan, generate one.
@@ -186,6 +197,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 		mapInfo.addStartCell(start, hCost, dCost);
 
 		timeAtLastDifferentMeasurement = threadMX.getCurrentThreadCpuTime();
+		float dCheapestWithError = 1;
+		int dMax = 2000;
 		// Continue until time has run out
 		while (threadMX.getCurrentThreadCpuTime() < timeDeadline)
 		{
@@ -195,14 +208,31 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 			if (!mapInfo.isOpenEmpty()) {
 				GridCell current = mapInfo.closeCheapestOpen();
+				System.out.println("\n*************\nClosing " + current);
+				System.out.println("h: " +  mapInfo.getHCost(current) + " g: " + mapInfo.getGCost(current));
 
 				// If this node has a higher g cost than the incumbent plan, discard it.
 				if (incumbentPlan != null
 						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
+					System.out.println("Not bothering to explore a cell that goes down a path further than incumbent!");
 					continue;
 				}
 
-				//System.out.println(current.getCoord() +" " +  mapInfo.getFCost(current));
+				
+				System.out.println("expansionCount/Settling = " + expansionCount + " / " + expansionCountForSettling);
+				
+				// TODO: Moved these calculations up here, for debugging purposes.. They should really be calculated under the elsif case, 
+				// for maintainability
+				if (expansionCount > expansionCountForSettling)
+				{
+
+					dCheapestWithError = mapInfo.getDCheapestWithError(current);
+					dMax = calculateMaxReachableDepth(timeDeadline);
+					
+					System.out.println("d^cheapest = " + dCheapestWithError +
+					           "\ndMax = " + dMax);
+				}
+
 				// If the current state is a goal state, and the cost to get there was cheaper
 				// than that of the incumbent solution
 				if (current == goal)
@@ -212,7 +242,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					incumbentPlan = mapInfo.computePlan(goal);
 				}
 				else if ( (expansionCount <= expansionCountForSettling) ||
-						(mapInfo.getDCheapestWithError(current) < calculateMaxReachableDepth(timeDeadline)))
+						(dCheapestWithError < dMax))
 				{
 					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + dMax);
 					int count = 0;
@@ -221,7 +251,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 					for (State stateIter : map.getSuccessors(current))
 					{
 						GridCell neighbor = (GridCell) stateIter;
-						//System.out.println("Generating Child " + count++);
+						System.out.println("Generating Child " + count++ + " " + neighbor + 
+								", expansionCount = " + expansionCount + " parent exp: " + mapInfo.getExpansionNumber(current));
 						// consider node if it can be entered and is not in closed or pruned list
 						if (map.isBlocked(neighbor) == false)
 						{
@@ -250,6 +281,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 									mapInfo.reopenCell(neighbor, expansionCount);
 								}
 							}
+							System.out.println("child added/modified has g: " + mapInfo.getGCost(neighbor) +
+									           " h: " + mapInfo.getHCost(current) +
+									           " f: " + mapInfo.getFCost(current));
 						}
 					} // end expansion
 
@@ -271,10 +305,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 						timeAtLastDifferentMeasurement = timeCurrent;
 						countExpansionsAtLastDifferentMeasurement = expansionCount;
 
-						System.out.println(
-								"\n expansionTimeDelta " + expansionTimeDelta +
-								"\n expansionCountDelta " + expansionCountDelta +
-								"\n timePerExpansion: " + timePerExpansion);
+//						System.out.println(
+//								"\n expansionTimeDelta " + expansionTimeDelta +
+//								"\n expansionCountDelta " + expansionCountDelta +
+//								"\n timePerExpansion: " + timePerExpansion);
 
 					}
 
@@ -295,21 +329,23 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// Open list is empty, so we need to repopulate it.
 				if (!mapInfo.isPrunedEmpty())
 				{
-					int exp = calculateExpansionsRemaining(timeDeadline);
 					//return null;
-					
+					int exp = calculateExpansionsRemaining(timeDeadline);
 
+					
 					mapInfo.recoverPrunedStates(exp);
 					expansionDelayWindow.reset();
 					//expansionIntervalWindow.reset();
+
 					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
+					System.out.println("******* NEW EXPANSION COUNT FOR SETTLING: " + expansionCountForSettling);
 					//return null;
 
 					
 				}
 				else
 				{
-					//System.out.println("Pruned and open are empty");
+					System.out.println("Pruned and open are empty");
 					break;
 				}
 
@@ -357,7 +393,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				"\nexpansions remaining: " + exp +
 				"\navgExpansionDelay: " + avgExpansionDelay +
 				"\n maximum reachable depth: " + dMax);
-		return 3*dMax;
+		return dMax;
 	}
 
 	/**
@@ -381,10 +417,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 		float averageRate = 1.0f / timePerExpansion;
 		int exp = (int) (timeRemaining * averageRate);
 
-//		System.out.println("Calculating expansions remaining:" +
-//				"\nexpansions remaining: " + exp +
-//				"\ntime remaining: " + timeRemaining +
-//				"\naverage expansion rate: " + averageRate);
+		System.out.println("Calculating expansions remaining:" +
+				"\ntime remaining: " + timeRemaining +
+				"\ntime per expansion " + timePerExpansion +
+				"\naverage expansion rate: " + averageRate +
+				"\nexpansions remaining: " + exp + "\n");
 
 		return exp;
 	}
@@ -430,6 +467,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	private ArrayList<GridCell> closedNodes;
 	private ArrayList<GridCell> prunedNodes;
+	private ArrayList<GridCell> openNodes;
 
 	@Override
 	public Boolean showInfo() {
@@ -442,6 +480,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 		if (shouldUpdateClosed) {
 			shouldUpdateClosed = false;
 			closedNodes = mapInfo.getClosedArrayList();
+
+			//closedNodes.addAll(prunedNodes);
 		}
 		return closedNodes;
 	}
@@ -450,9 +490,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 	public ArrayList<GridCell> unexpandedNodes() {
 		if (shouldUpdateOpen) {
 			shouldUpdateOpen = false;
+			openNodes = mapInfo.getOpenArrayList();
 			prunedNodes = mapInfo.getPrunedArrayList();
+			openNodes.addAll(prunedNodes);
 		}
-		return prunedNodes;
+		return openNodes;
 	}
 
 

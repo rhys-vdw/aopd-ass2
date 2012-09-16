@@ -10,7 +10,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 	private float fCost;
 	private int dCheapestRaw;
 	private CellSetMembership cellSetMembership;
-	private int nExpansionNumber; // TODO: should this be final?
+	private int nExpansionNumber; 
 
 	// The below are required for the d_cheapest calculation
 	private int dError = 0;
@@ -162,7 +162,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 				// Both f and h are the same, in which case, return 0
 				//float err1 = 0;
 				//float err2 = 1;
-				//System.out.println(this.cell.getCoord() + "with h" + this.hCost + "is the same as " + other.cell.getCoord() + "with h" + other.hCost);
+				System.out.println(this.cell.getCoord() + "with h" + this.hCost + "is the same as " + other.cell.getCoord() + "with h" + other.hCost);
 				//System.out.println("tie breaker on depth " + err1 + " vs. " + err2);
 				//if (err1 != err2)
 				//	System.out.println("test");

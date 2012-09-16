@@ -120,6 +120,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		// Set cell properties
 		gCosts[x][y] = gCost;
 		hCosts[x][y] = hCost;
+		
 		dCheapestRaws[x][y] = dCheapestRaw;
 		expansionNumbers[x][y] = expansionNumber;
 

@@ -201,7 +201,11 @@ public class DasMapInfo {
 
 			// add to open set
 			cellInfo.setCellMembership(CellSetMembership.OPEN);
-			openQueue.offer(cellInfo);
+			boolean added = openQueue.offer(cellInfo);
+			if (added)
+				System.out.println("Successfully restored " + cellInfo.getCell());
+			else
+				System.out.println("Failed to restore " + cellInfo.getCell());
 			count++;
 		}
 
