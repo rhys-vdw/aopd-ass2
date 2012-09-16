@@ -60,6 +60,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 	long timePerExpansion = 1;
 
 	private int expansionCount = 0;
+	
+	private boolean foundDASSolution = false;
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
@@ -238,7 +240,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				if (current == goal)
 				{
 					System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
-					//TODO: this is a potentially expensive operation!
+					foundDASSolution = true;
 					incumbentPlan = mapInfo.computePlan(goal);
 				}
 				else if ( (expansionCount <= expansionCountForSettling) ||
@@ -355,10 +357,43 @@ public class DeadlineAwareSearch implements PlanningAgent
 				
 				timeUntilDeadline = timeDeadline - threadMX.getCurrentThreadCpuTime();
 			}
-			//System.out.println("Time left: " + (timeDeadline - threadMX.getCurrentThreadCpuTime()));
+			//System.out.println("Time left: " + timeUntilDeadline);
 		}
 		//System.out.println("Returning solution with " + incumbentPlan.getLength() + " nodes");
-		return incumbentPlan;
+		if (!foundDASSolution)
+		{
+			ComputedPlan pathNew = new ComputedPlan();
+			// Combined the DAS partial plan with the greedy solution
+			for (int iterSteps = incumbentPlan.getLength();
+					iterSteps != 0 ; iterSteps--)
+			{
+				
+				GridCell cell = (GridCell) incumbentPlan.getStep(iterSteps);
+				pathNew.prependStep(cell);
+				if (mapInfo.cellExists(cell))
+				{
+					// We have an improved solution! Get the upstream from the DAS mapInfo!
+					for (DasCellInfo cellInfo = mapInfo.Info(goal);
+						     cellInfo.getParent() != null;
+						     cellInfo = cellInfo.getParent())
+						{
+							GridCell cell = cellInfo.getCell();
+							//System.out.println("Prepending " + gc);
+							plan.prependStep(cell);
+						}
+
+						//Trace.print("...Done.");
+
+						plan.setCost(getGCost(goal));
+				}
+			}
+			return incumbentPlan;
+		}
+		else
+		{
+			// Return the DAS solution
+			return incumbentPlan;
+		}
 	}
 
 	/**
