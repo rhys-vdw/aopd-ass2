@@ -1,11 +1,12 @@
 package agents;
 
-public enum CellSetMembership 
-{ 
+public enum CellSetMembership
+{
 	NONE ("no set"),
-	OPEN   ("open set"), 
+	OPEN   ("open set"),
 	CLOSED ("closed set"),
-	PRUNED ("pruned set");
+	PRUNED ("pruned set"),
+	SEEN ("seen set");
 
 	private String name;
 
