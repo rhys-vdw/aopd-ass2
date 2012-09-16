@@ -373,21 +373,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 				if (mapInfo.cellExists(cell))
 				{
 					// We have an improved solution! Get the upstream from the DAS mapInfo!
-					for (DasCellInfo cellInfo = mapInfo.Info(goal);
-						     cellInfo.getParent() != null;
-						     cellInfo = cellInfo.getParent())
-						{
-							GridCell cell = cellInfo.getCell();
-							//System.out.println("Prepending " + gc);
-							plan.prependStep(cell);
-						}
-
-						//Trace.print("...Done.");
-
-						plan.setCost(getGCost(goal));
+					while (cell != null) {
+						pathNew.prependStep(cell);
+						cell = mapInfo.getParent(cell);
+					}
 				}
 			}
-			return incumbentPlan;
+			return pathNew;
 		}
 		else
 		{
