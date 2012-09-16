@@ -370,7 +370,7 @@ public class DasMapInfo {
 	}
 
 	/* get cell info associated with cell. */
-	private DasCellInfo getCellInfo(GridCell cell) {
+	public DasCellInfo getCellInfo(GridCell cell) {
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
 
