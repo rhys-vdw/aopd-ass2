@@ -26,6 +26,8 @@ public class RestartingWeightedAStar implements PlanningAgent {
 	private final float DECAY_RATE = 0.6f;
 
 	private final long MS_TO_NS = 1000000;
+	
+	final private long SEARCH_END_TIME_OFFSET = 20000000;
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
@@ -37,7 +39,7 @@ public class RestartingWeightedAStar implements PlanningAgent {
 
 			if (plan == null) {
 				long currentTime = threadMX.getCurrentThreadCpuTime();
-				long searchTime = timeLeft * MS_TO_NS;
+				long searchTime = timeLeft * MS_TO_NS - SEARCH_END_TIME_OFFSET;
 
 				plan = generatePlan(map, start, goal, currentTime + searchTime);
 				stepNo = 0;

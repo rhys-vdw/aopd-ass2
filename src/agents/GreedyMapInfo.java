@@ -30,7 +30,7 @@ public class GreedyMapInfo
 	public ComputedPlan computePlan(GridCell goal) {
 		ComputedPlan plan = new ComputedPlan();
 
-		Trace.print("Greedy Generating plan...");
+		//Trace.print("Greedy Generating plan...");
 
 		for (GreedyCellInfo cell = getCellInfo(goal);
 		     cell.getParent() != null;
@@ -40,7 +40,7 @@ public class GreedyMapInfo
 			plan.prependStep(gc);
 		}
 
-		Trace.print("...Done.");
+		//Trace.print("...Done.");
 
 		plan.setCost(getGCost(goal));
 		return plan;

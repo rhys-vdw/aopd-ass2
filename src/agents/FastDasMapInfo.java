@@ -80,7 +80,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	public ComputedPlan computePlan(GridCell goal)
 	{
 
-		Trace.print("Generating new incumbent plan...");
+		//Trace.print("Generating new incumbent plan...");
 
 		ComputedPlan plan = new ComputedPlan();
 

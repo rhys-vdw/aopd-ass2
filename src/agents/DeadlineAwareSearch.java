@@ -29,7 +29,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// Percentage of deadline to be used generating plan. (As opposed to moving
 	// along the plan afterwards.)
-	final private float SEARCH_TIME_FRACTION = 0.97f;
+	final private long SEARCH_END_TIME_OFFSET = 20000000;
 
 	// Should the open and closed sets be regenerated?
 	boolean shouldUpdateOpen = false;
@@ -84,7 +84,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 				// TODO: base search buffer on the length of the solution.
 				long timeCurrent = threadMX.getCurrentThreadCpuTime();
-				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) * SEARCH_TIME_FRACTION);
+				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) - SEARCH_END_TIME_OFFSET);
 				long timeDeadline = timeCurrent + searchTime;
 
 				Trace.Enable(false);
@@ -239,7 +239,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// than that of the incumbent solution
 				if (current == goal)
 				{
-					System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
+					//System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
 					foundDASSolution = true;
 					incumbentPlan = mapInfo.computePlan(goal);
 				}
@@ -247,7 +247,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 						(dCheapestWithError < dMax))
 				{
 					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + dMax);
-					int count = 0;
 
 					// Expand current node. TODO: move this into its own method.
 					for (State stateIter : map.getSuccessors(current))
@@ -317,10 +316,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 //								"\n timePerExpansion: " + timePerExpansion);
 
 					}
-
-
-					// Insert expansion interval into sliding window.
-					//expansionIntervalWindow.push(expansionInterval);
 				}
 				else /* expansionCount > settlingCount && dCheapest > dMax */
 				{
@@ -335,17 +330,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// Open list is empty, so we need to repopulate it.
 				if (!mapInfo.isPrunedEmpty())
 				{
-					//return null;
 					int exp = calculateExpansionsRemaining(timeDeadline);
-
-					
 					mapInfo.recoverPrunedStates(exp);
-					//expansionDelayWindow.reset();
+					expansionDelayWindow.reset();
 					//expansionIntervalWindow.reset();
 
 					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
 //					System.out.println("******* NEW EXPANSION COUNT FOR SETTLING: " + expansionCountForSettling);
-					//return null;
 
 					
 				}
@@ -360,12 +351,15 @@ public class DeadlineAwareSearch implements PlanningAgent
 			//System.out.println("Time left: " + timeUntilDeadline);
 		}
 		//System.out.println("Returning solution with " + incumbentPlan.getLength() + " nodes");
-		if (!foundDASSolution)
+		
+		
+		// This is where we make a hybrid speedier/DAS plan!
+		if (!foundDASSolution && incumbentPlan != null)
 		{
 			ComputedPlan pathNew = new ComputedPlan();
 			// Combined the DAS partial plan with the greedy solution
-			for (int iterSteps = incumbentPlan.getLength();
-					iterSteps != 0 ; iterSteps--)
+			for (int iterSteps = incumbentPlan.getLength()-1;
+					iterSteps >= 0 ; iterSteps--)
 			{
 				
 				GridCell cell = (GridCell) incumbentPlan.getStep(iterSteps);
@@ -374,12 +368,15 @@ public class DeadlineAwareSearch implements PlanningAgent
 				{
 					// We have an improved solution! Get the upstream from the DAS mapInfo!
 					while (cell != null) {
+						//System.out.println("Prepending " + cell);
 						pathNew.prependStep(cell);
 						cell = mapInfo.getParent(cell);
 					}
+					return pathNew;
 				}
 			}
-			return pathNew;
+			return incumbentPlan;
+
 		}
 		else
 		{
@@ -474,7 +471,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			GridCell current = mapInfo.closeCheapestOpen();
 			if (current == goal)
 			{
-				System.out.println("Goal found with speedier search, GCost" + mapInfo.getGCost(current));
+				//System.out.println("Goal found with speedier search, GCost " + mapInfo.getGCost(current));
 				incumbentPlan = mapInfo.computePlan(current);
 				break;
 			}
