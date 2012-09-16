@@ -20,7 +20,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private ComputedPlan plan;
 
 	//DasMapInfo mapInfo;
-	DasMapInfo mapInfo;
+	FastDasMapInfo mapInfo;
 
 	// number of steps taken in current plan
 	private int stepNo = 0;
@@ -29,7 +29,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// Percentage of deadline to be used generating plan. (As opposed to moving
 	// along the plan afterwards.)
-	final private float SEARCH_TIME_FRACTION = 0.98f;
+	final private float SEARCH_TIME_FRACTION = 0.97f;
 
 	// Should the open and closed sets be regenerated?
 	boolean shouldUpdateOpen = false;
@@ -57,7 +57,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	long timeAtLastDifferentMeasurement;
 	long countExpansionsAtLastDifferentMeasurement;
-	long timePerExpansion;
+	long timePerExpansion = 1;
 
 	private int expansionCount = 0;
 
@@ -170,7 +170,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		// Map info exists outside of this function so that its open and closed
 		// sets for debug display.
 		//mapInfo = new DasMapInfo(map);
-		mapInfo = new DasMapInfo(map);
+		mapInfo = new FastDasMapInfo(map);
 
 		// Track the number of expansions performed -  e_curr value
 		// TODO: investigate refactoring this to long to avoid potential truncactions in operations
@@ -200,7 +200,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		float dCheapestWithError = 1;
 		int dMax = 2000;
 		// Continue until time has run out
-		while (threadMX.getCurrentThreadCpuTime() < timeDeadline)
+		while (timeUntilDeadline > 0)
 		{
 			//System.out.println("expansionCount:" + expansionCount);
 			// TODO: is this a good inital value?
@@ -271,22 +271,22 @@ public class DeadlineAwareSearch implements PlanningAgent
 //								           " h: " + mapInfo.getHCost(neighbor) +
 //								           " f: " + mapInfo.getFCost(neighbor));
 							}
-							else if (neighborGCost < mapInfo.getGCost(neighbor))
-							{
-								// Shorter path to node found, update gCost.
-								//mapInfo.setGCost(neighbor, neighborGCost);
-								//mapInfo.setParent(neighbor, current);
-
-								// If node was closed, put it back into the open list. The new
-								// cost might make it viable.
-								if (mapInfo.isClosed(neighbor) == true)
-								{
-									mapInfo.reopenCell(neighbor, neighborGCost, expansionCount ,current);
-//									System.out.println("child modified has g: " + mapInfo.getGCost(neighbor) +
-//									           " h: " + mapInfo.getHCost(neighbor) +
-//									           " f: " + mapInfo.getFCost(neighbor));
-								}
-							}
+//							else if (neighborGCost < mapInfo.getGCost(neighbor))
+//							{
+//								// Shorter path to node found, update gCost.
+//								mapInfo.setGCost(neighbor, neighborGCost);
+//								mapInfo.setParent(neighbor, current);
+//
+//								// If node was closed, put it back into the open list. The new
+//								// cost might make it viable.
+//								if (mapInfo.isClosed(neighbor) == true)
+//								{
+//									mapInfo.reopenCell(neighbor, /*neighborGCost, */expansionCount /*,current*/);
+////									System.out.println("child modified has g: " + mapInfo.getGCost(neighbor) +
+////									           " h: " + mapInfo.getHCost(neighbor) +
+////									           " f: " + mapInfo.getFCost(neighbor));
+//								}
+//							}
 
 						}
 					} // end expansion
@@ -338,7 +338,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 					
 					mapInfo.recoverPrunedStates(exp);
-					expansionDelayWindow.reset();
+					//expansionDelayWindow.reset();
 					//expansionIntervalWindow.reset();
 
 					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
@@ -352,7 +352,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 //					System.out.println("Pruned and open are empty");
 					break;
 				}
-
+				
+				timeUntilDeadline = timeDeadline - threadMX.getCurrentThreadCpuTime();
 			}
 			//System.out.println("Time left: " + (timeDeadline - threadMX.getCurrentThreadCpuTime()));
 		}

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Random;
 import java.lang.IllegalStateException;
 import java.lang.IllegalArgumentException;
 
@@ -28,6 +29,8 @@ import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
  */
 public class FastDasMapInfo implements Comparator<GridCell> {
 
+	// Used in the case of tiebreakers after f and h.
+	static Random rand = new Random(System.nanoTime());
 	// Added this data for debugging - probably not useful in our actual algorithm,
 	// is just to aid analysis.
 	GridDomain map;
@@ -44,6 +47,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	private float[][]             gCosts;
 	private float[][]             hCosts;
 	private int[][]               dCheapestRaws;
+	private float[][]             dCheapestWithErrors;
 	private int[][]               dErrors;
 	private int[][]               expansionNumbers;
 	private int[][]               cumulativeErrors;
@@ -57,15 +61,16 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		int width = map.getWidth();
 		int height = map.getHeight();
 
-		this.sets             = new CellSetMembership[width][height];
-		this.gCosts           = new float[width][height];
-		this.hCosts           = new float[width][height];
-		this.parents          = new GridCell[width][height];
-		this.dCheapestRaws    = new int[width][height];
-		this.dErrors          = new int[width][height];
-		this.expansionNumbers = new int[width][height];
-		this.cumulativeErrors = new int[width][height];
-		this.depths           = new int[width][height];
+		this.sets             		= new CellSetMembership[width][height];
+		this.gCosts           		= new float[width][height];
+		this.hCosts           		= new float[width][height];
+		this.parents          		= new GridCell[width][height];
+		this.dCheapestRaws    		= new int[width][height];
+		this.dCheapestWithErrors 	= new float[width][height];
+		this.dErrors          		= new int[width][height];
+		this.expansionNumbers 		= new int[width][height];
+		this.cumulativeErrors 		= new int[width][height];
+		this.depths           		= new int[width][height];
 
 		// Initialize queues for open and pruned sets.
 		this.openQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY, this);
@@ -123,6 +128,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		
 		dCheapestRaws[x][y] = dCheapestRaw;
 		expansionNumbers[x][y] = expansionNumber;
+		dCheapestWithErrors[x][y] = calculateDCheapestWithError(cell);
 
 		// Calculate depth data based on parent
 		parents[x][y] = parent;
@@ -333,18 +339,23 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		GridCoord gc = cell.getCoord();
 		return cumulativeErrors[gc.getX()][gc.getY()];
 	}
+	
+	public float calculateDCheapestWithError(GridCell cell)
+	{
+		float avgError = getAverageError(cell);
+		if (avgError < 1.0f - EPSILON) 
+		{
+			float dCheapest = (float) getDCheapestRaw(cell);
+			return dCheapest / (1.0f - avgError);
+		}
+		return Float.POSITIVE_INFINITY;
+	}
 
 	// TODO: consider caching this value
 	public float getDCheapestWithError(GridCell cell) {
 
 		GridCoord gc = cell.getCoord();
-
-		float averageError = getAverageError(cell);
-		if (averageError < 1.0f - EPSILON) {
-			float dCheapest = (float) getDCheapestRaw(cell);
-			return dCheapest / (1.0f - averageError);
-		}
-		return Float.POSITIVE_INFINITY;
+		return(dCheapestWithErrors[gc.getX()][gc.getY()]);
 	}
 
 	/**
@@ -442,7 +453,22 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		}
 
 		// Break ties on heuristic estimate.
-		return compareFloat(getHCost(a), getHCost(b));
+		int hCompare = compareFloat(getHCost(a), getHCost(b));
+		if (hCompare != 0)
+		{
+			return hCompare;
+		}
+		
+
+		int min = 1;
+		int max = 2;		
+		int randomNum = rand.nextInt(max - min + 1) + min;
+		//System.out.println(randomNum);
+		if (randomNum == 1)
+			return(1);
+		else
+			return(-1);
+		
 	}
 
 	public boolean equals() { return false; }
