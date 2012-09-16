@@ -9,6 +9,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 	private float hCost;
 	private float fCost;
 	private int dCheapestRaw;
+	private float dCheapestWithError;
 	private CellSetMembership cellSetMembership;
 	private int nExpansionNumber; 
 
@@ -19,6 +20,8 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 	private int nPartialSolutionDepth = 0; // Node depth so far
 
 	private final float EPSILON = 0.001f; // used for floating point comparisons
+	
+	
 
 	public int getDepth()
 	{
@@ -72,22 +75,27 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		return this.dCheapestRaw;
 	}
 
-	public float getDCheapestWithError() {
-		float dCheapestWithError = 0.0f;
+	public void calculateDCheapestWithError() {
+		float d_cheapest_with_error = 0.0f;
 		float avgError = this.getAverageError();
 
 		//System.out.println("avgError: " + avgError);
 
 		if (avgError < 1.0f-EPSILON)
 		{
-			dCheapestWithError = (float)this.dCheapestRaw / (1.0f-avgError);
+			d_cheapest_with_error = (float)this.dCheapestRaw / (1.0f-avgError);
 		}
 		else
 		{
-			dCheapestWithError = Float.POSITIVE_INFINITY;
+			d_cheapest_with_error = Float.POSITIVE_INFINITY;
 		}
 
-		return(dCheapestWithError);
+		this.dCheapestWithError = d_cheapest_with_error;
+	}
+	
+	public float getDCheapestWithError()
+	{
+		return(this.dCheapestWithError);
 	}
 
 	/** Read only. */
@@ -152,7 +160,6 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 	 */
 	public int compareTo(DasCellInfo other) {
 		// compare f cost of either cell
-
 		int nReturnValue;
 		// Check if the values are "the same" 
 		if (Math.abs(this.fCost - other.fCost) < EPSILON)
@@ -162,7 +169,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 				// Both f and h are the same, in which case, return 0
 				//float err1 = 0;
 				//float err2 = 1;
-				System.out.println(this.cell.getCoord() + "with h" + this.hCost + "is the same as " + other.cell.getCoord() + "with h" + other.hCost);
+				//System.out.println(this.cell.getCoord() + "with h" + this.hCost + "is the same as " + other.cell.getCoord() + "with h" + other.hCost);
 				//System.out.println("tie breaker on depth " + err1 + " vs. " + err2);
 				//if (err1 != err2)
 				//	System.out.println("test");
@@ -201,7 +208,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 
 	/**
 	 * Update the total cost estimate of this path. Should be called every time
-	 * gCost of hCost is modified.
+	 * gCost or hCost is modified.
 	 */
 	void updateFCost() {
 		this.fCost = gCost + hCost;
@@ -235,6 +242,7 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 		// Set d cheapest and error.
 		this.dCheapestRaw = dCheapestRaw;
 
+
 		// Set expansion number.
 		this.nExpansionNumber = expansionNumber;
 
@@ -251,7 +259,8 @@ class DasCellInfo implements Comparable<DasCellInfo> {
 			this.dError = dCheapestRaw - parent.dCheapestRaw + 1;
 			this.nCumulativeErrorOfPartialSolution = parent.getCumulativeError() + dError;
 		}
-
+		//System.out.println("cellinfo constructed with f" + this.fCost);
+		calculateDCheapestWithError();
 		/*
 		System.out.println("d = " + dCheapestRaw + " d_error = " + dError + " d^ = " + getDCheapestWithError());
 		*/

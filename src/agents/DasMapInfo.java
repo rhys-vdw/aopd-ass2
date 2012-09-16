@@ -50,7 +50,7 @@ public class DasMapInfo {
 	{
 		ComputedPlan plan = new ComputedPlan();
 
-		Trace.print("Generating new incumbent plan...");
+		//Trace.print("Generating new incumbent plan...");
 
 		for (DasCellInfo cellInfo = getCellInfo(goal);
 		     cellInfo.getParent() != null;
@@ -61,7 +61,7 @@ public class DasMapInfo {
 			plan.prependStep(cell);
 		}
 
-		Trace.print("...Done.");
+		//Trace.print("...Done.");
 
 		plan.setCost(getGCost(goal));
 		return plan;
@@ -193,7 +193,7 @@ public class DasMapInfo {
 		int dSum = 0;
 		int count = 0;
 
-		while (dSum < expansionCount && prunedQueue.size() > 0) {
+		while (dSum <= expansionCount && prunedQueue.size() > 0) {
 
 			DasCellInfo cellInfo = prunedQueue.poll();
 
@@ -202,15 +202,15 @@ public class DasMapInfo {
 			// add to open set
 			cellInfo.setCellMembership(CellSetMembership.OPEN);
 			boolean added = openQueue.offer(cellInfo);
-			if (added)
-				System.out.println("Successfully restored " + cellInfo.getCell());
-			else
-				System.out.println("Failed to restore " + cellInfo.getCell());
+//			if (added)
+//				System.out.println("Successfully restored " + cellInfo.getCell());
+//			else
+//				System.out.println("Failed to restore " + cellInfo.getCell());
 			count++;
 		}
 
 		
-		System.out.println("Recovering " + count + " nodes");
+		//System.out.println("Recovering " + count + " nodes");
 	}
 
 	public GridCell getParent(GridCell cell) {
@@ -377,5 +377,18 @@ public class DasMapInfo {
 	public boolean cellExists(GridCell cell)
 	{
 		return(getCellInfo(cell) != null);
+	}
+	
+	public void reopenCell(GridCell cell, float newGCost, int expansionCount, GridCell parent) 
+	{
+		DasCellInfo dci;
+		dci = getCellInfo(cell);
+		//System.out.println("it was opened from " + dci.getCellMembership());
+		
+		dci.setCellMembership(CellSetMembership.OPEN);
+		dci.setGCost(newGCost);
+		dci.setExpansionNumber(expansionCount);
+		dci.setParent(getCellInfo(parent));
+		openQueue.offer(dci);
 	}
 }
