@@ -271,22 +271,22 @@ public class DeadlineAwareSearch implements PlanningAgent
 //								           " h: " + mapInfo.getHCost(neighbor) +
 //								           " f: " + mapInfo.getFCost(neighbor));
 							}
-//							else if (neighborGCost < mapInfo.getGCost(neighbor))
-//							{
-//								// Shorter path to node found, update gCost.
-//								mapInfo.setGCost(neighbor, neighborGCost);
-//								mapInfo.setParent(neighbor, current);
-//
-//								// If node was closed, put it back into the open list. The new
-//								// cost might make it viable.
-//								if (mapInfo.isClosed(neighbor) == true)
-//								{
-//									mapInfo.reopenCell(neighbor, /*neighborGCost, */expansionCount /*,current*/);
-////									System.out.println("child modified has g: " + mapInfo.getGCost(neighbor) +
-////									           " h: " + mapInfo.getHCost(neighbor) +
-////									           " f: " + mapInfo.getFCost(neighbor));
-//								}
-//							}
+							else if (neighborGCost < mapInfo.getGCost(neighbor))
+							{
+								// Shorter path to node found, update gCost.
+								mapInfo.setGCost(neighbor, neighborGCost);
+								mapInfo.setParent(neighbor, current);
+
+								// If node was closed, put it back into the open list. The new
+								// cost might make it viable.
+								if (mapInfo.isClosed(neighbor) == true)
+								{
+									mapInfo.reopenCell(neighbor, /*neighborGCost, */expansionCount /*,current*/);
+//									System.out.println("child modified has g: " + mapInfo.getGCost(neighbor) +
+//									           " h: " + mapInfo.getHCost(neighbor) +
+//									           " f: " + mapInfo.getFCost(neighbor));
+								}
+							}
 
 						}
 					} // end expansion
