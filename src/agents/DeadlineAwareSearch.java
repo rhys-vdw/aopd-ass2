@@ -51,11 +51,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 	// Sliding window to calculate average single step error.
 	private SlidingWindow expansionDelayWindow = new SlidingWindow(
 			EXPANSION_DELAY_WINDOW_LENGTH);
+	
+	private SlidingWindow expansionTimeWindow = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH);
 
 	// For timing
 	final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
 
-	long timeAtLastDifferentMeasurement;
+	long timeAtLastExpansion;
 	long countExpansionsAtLastDifferentMeasurement;
 	long timePerExpansion = 1;
 
@@ -198,7 +200,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		mapInfo.addStartCell(start, hCost, dCost);
 
-		timeAtLastDifferentMeasurement = threadMX.getCurrentThreadCpuTime();
+		timeAtLastExpansion = threadMX.getCurrentThreadCpuTime();
 		float dCheapestWithError = 1;
 		int dMax = 2000;
 		// Continue until time has run out
@@ -302,20 +304,21 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 					// Calculate expansion interval.
 					long timeCurrent = threadMX.getCurrentThreadCpuTime();
-					if (timeCurrent != timeAtLastDifferentMeasurement)
-					{
-						long expansionTimeDelta = timeCurrent - timeAtLastDifferentMeasurement;
-						long expansionCountDelta = expansionCount - countExpansionsAtLastDifferentMeasurement;
-						timePerExpansion = expansionTimeDelta / expansionCountDelta;
-						timeAtLastDifferentMeasurement = timeCurrent;
-						countExpansionsAtLastDifferentMeasurement = expansionCount;
+					//if (timeCurrent != timeAtLastDifferentMeasurement)
+					//{
+					long expansionTimeDelta = timeCurrent - timeAtLastExpansion;
+					//long expansionCountDelta = expansionCount - countExpansionsAtLastDifferentMeasurement;
+					//timePerExpansion = expansionTimeDelta / expansionCountDelta;
+					timeAtLastExpansion = timeCurrent;
+					//countExpansionsAtLastDifferentMeasurement = expansionCount;
+					expansionTimeWindow.push(expansionTimeDelta);
 
 //						System.out.println(
 //								"\n expansionTimeDelta " + expansionTimeDelta +
 //								"\n expansionCountDelta " + expansionCountDelta +
 //								"\n timePerExpansion: " + timePerExpansion);
 
-					}
+					//}
 				}
 				else /* expansionCount > settlingCount && dCheapest > dMax */
 				{
@@ -446,7 +449,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		//float averageRate = 1.0f / averageInterval;
 		//float averageRate = 1.0f / timePerExpansion;
 		
-		int exp = (int) (timeRemaining / (timePerExpansion));
+		int exp = (int) (timeRemaining * expansionTimeWindow.getAvg());
 
 //		System.out.println("Calculating expansions remaining:" +
 //				"\ntime remaining: " + timeRemaining +
