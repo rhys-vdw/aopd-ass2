@@ -52,7 +52,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private SlidingWindow expansionDelayWindow = new SlidingWindow(
 			EXPANSION_DELAY_WINDOW_LENGTH);
 	
-	private SlidingWindow expansionTimeWindow = new SlidingWindow(200);
+	private SlidingWindow expansionTimeWindow = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH);
 
 	// For timing
 	final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
@@ -207,8 +207,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 		while (timeUntilDeadline > 0)
 		{
 			//System.out.println("\n************STARTING NEW ITERATION*****************\nexpansionCount:" + expansionCount);
-			// TODO: is this a good inital value?
-
 
 			if (!mapInfo.isOpenEmpty()) {
 				GridCell current = mapInfo.closeCheapestOpen();
@@ -551,9 +549,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 					if (mapInfo.isClosed(cell) == true)
 					{
 						mapInfo.reopenCell(cell, /*neighborGCost, */expansionCount /*,current*/);
-//						System.out.println("child modified has g: " + mapInfo.getGCost(neighbor) +
-//						           " h: " + mapInfo.getHCost(neighbor) +
-//						           " f: " + mapInfo.getFCost(neighbor));
+//						System.out.println("child modified has g: " + mapInfo.getGCost(cell) +
+//						           " h: " + mapInfo.getHCost(cell) +
+//						           " f: " + mapInfo.getFCost(cell));
 					}
 				}
 				
