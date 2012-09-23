@@ -35,23 +35,41 @@ public class DeadlineAwareSearch implements PlanningAgent
 	boolean shouldUpdateOpen = false;
 	boolean shouldUpdateClosed = false;
 
-	// List of x, y offsets to find neighbors in for both world types.
-	// NOTE: I've used 1D arrays because Java has no 2D arrays, only jagged arrays.
-	int[] ManhattanNeighbors = {
-		 0, -1,
-		 1,  0,
-		 0,  1,
-		-1,  0 };
+		// List of x, y offsets to find neighbors in for both world types.
+		// NOTE: I've used 1D arrays because Java has no 2D arrays, only jagged arrays.
+		private static final int[] MANHATTAN_NEIGHBOR_OFFSETS = {
+			0, -1,
+			1,  0,
+			0,  1,
+			-1,  0 };
 
-	int[] EuclideanNeighbors = {
-		-1, -1,
-		 0, -1,
-		 1, -1,
-		 1,  0,
-		 1,  1,
-		 0,  1,
-		-1,  1,
-		-1,  0 };
+		private static final int[] EUCLIDEAN_NEIGHBOR_OFFSETS = {
+			-1, -1,
+			0, -1,
+			1, -1,
+			1,  0,
+			1,  1,
+			0,  1,
+			-1,  1,
+			-1,  0 };
+
+	private enum GridType {
+		MANHATTAN (MANHATTAN_NEIGHBOR_OFFSETS),
+		EUCLIDEAN (EUCLIDEAN_NEIGHBOR_OFFSETS);
+
+		final int[] neighborOffsets;
+
+		int[] getNeighborOffsets () {
+			return this.neighborOffsets;
+		}
+
+		GridType(int[] neighborOffsets) {
+			this.neighborOffsets = neighborOffsets;
+		}
+	}
+
+	private GridType gridType = null;
+
 
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
@@ -68,7 +86,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private SlidingWindow expansionDelayWindow = new SlidingWindow(
 			EXPANSION_DELAY_WINDOW_LENGTH);
 
-	private SlidingWindow expansionTimeWindow = new SlidingWindow(200);
+	private SlidingWindow expansionTimeWindow = new SlidingWindow(
+			EXPANSION_DELAY_WINDOW_LENGTH);
 
 	// For timing
 	final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
@@ -96,6 +115,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 			Trace.Enable(false);
 
+			if (gridType == null) {
+				gridType = checkGridType(map);
+			}
+
 			// If there is no plan, generate one.
 			if (plan == null)
 			{
@@ -114,7 +137,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// a new plan has been generated, update open and closed debug sets.
 				shouldUpdateOpen = true;
 				shouldUpdateClosed = true;
-
 
 				plan = generatePlan(map, start, goal, timeDeadline);
 
@@ -223,8 +245,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 		while (timeUntilDeadline > 0)
 		{
 			//System.out.println("\n************STARTING NEW ITERATION*****************\nexpansionCount:" + expansionCount);
-			// TODO: is this a good inital value?
-
 
 			if (!mapInfo.isOpenEmpty()) {
 				GridCell current = mapInfo.closeCheapestOpen();
@@ -234,7 +254,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// If this node has a higher g cost than the incumbent plan, discard it.
 				if (incumbentPlan != null
 						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
-//					System.out.println("Not bothering to explore a cell that goes down a path further than incumbent!");
+					//System.out.println("Not bothering to explore cell " + current);
+					timeUntilDeadline = timeDeadline - threadMX.getCurrentThreadCpuTime();
 					continue;
 				}
 
@@ -264,55 +285,40 @@ public class DeadlineAwareSearch implements PlanningAgent
 				else if ( (expansionCount <= expansionCountForSettling) ||
 						(dCheapestWithError < dMax))
 				{
+					// Expand current node. TODO: move this into its own method.
+
 					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + dMax);
 
-					// Expand current node. TODO: move this into its own method.
 					//long timeBeforeGetSucc = threadMX.getCurrentThreadCpuTime();
 					//long timeAfterGetSucc;
 
-					// Need to be flexible for euclid/manhatten... proof of performance.
-					int curr_x = current.getCoord().getX();
-					int curr_y = current.getCoord().getY();
-					GridCell cellNorth = map.getCell(curr_x, curr_y-1);
-					GridCell cellSouth = map.getCell(curr_x, curr_y+1);
-					GridCell cellEast = map.getCell(curr_x+1, curr_y);
-					GridCell cellWest = map.getCell(curr_x-1, curr_y);
+					// Generate all neighboring cells.
+					int[] offsets = gridType.getNeighborOffsets();
+					for (int i = 0; i < offsets.length; i += 2) {
 
-					if (cellNorth != null)
-						generateCell(map, goal, current, cellNorth);
-					if (cellSouth != null)
-						generateCell(map, goal, current, cellSouth);
-					if (cellEast != null)
-						generateCell(map, goal, current, cellEast);
-					if (cellWest != null)
-						generateCell(map, goal, current, cellWest);
+						// Get x, y coordinates of neighbor.
+						int x = current.getCoord().getX() + offsets[i];
+						int y = current.getCoord().getY() + offsets[i + 1];
+
+						// If cell exists, generate it.
+						GridCell cell = map.getCell(x, y);
+						if (cell != null) {
+							generateCell(map, goal, current, cell);
+						}
+					}
 
 					// Increment number of expansions.
 					expansionCount++;
 
 					// Insert expansion delay into sliding window.
 					int expansionDelay = expansionCount - mapInfo.getExpansionNumber(current);
-					//System.out.println("expansionDelay: " + expansionDelay);
 					expansionDelayWindow.push(expansionDelay);
 
 					// Calculate expansion interval.
 					long timeCurrent = threadMX.getCurrentThreadCpuTime();
-					//if (timeCurrent != timeAtLastDifferentMeasurement)
-					//{
 					long expansionTimeDelta = timeCurrent - timeAtLastExpansion;
-					//long expansionCountDelta = expansionCount - countExpansionsAtLastDifferentMeasurement;
-					//timePerExpansion = expansionTimeDelta / expansionCountDelta;
-					timeAtLastExpansion = timeCurrent;
-					//countExpansionsAtLastDifferentMeasurement = expansionCount;
 					expansionTimeWindow.push(expansionTimeDelta);
-
-//						System.out.println(
-//
-//								"\n expansionTimeDelta " + expansionTimeDelta
-//
-//								);
-
-					//}
+					timeAtLastExpansion = timeCurrent;
 				}
 				else /* expansionCount > settlingCount && dCheapest > dMax */
 				{
@@ -382,6 +388,52 @@ public class DeadlineAwareSearch implements PlanningAgent
 			return incumbentPlan;
 		}
 	}
+
+	private void generateCell(GridDomain map, GridCell goal, GridCell parent, GridCell cell)
+	{
+		//for (State stateIter : map.getSuccessors(current))
+			//System.out.println("Generating " + cell + " from parent: " + parent);
+//					", expansionCount = " + expansionCount + " parent exp: " + mapInfo.getExpansionNumber(current));
+			// consider node if it can be entered and is not in closed or pruned list
+			if (map.isBlocked(cell) == false)
+			{
+				float cellGCost = mapInfo.getGCost(cell) + map.cost(parent, cell);
+				float cellHCost = map.hCost(cell, goal);
+
+				// NOTE: Using map's h cost estimate as d cheapest estimate.
+				int cellDCheapestRaw = (int) cellHCost;
+
+				if (!mapInfo.cellExists(cell))
+				{
+					// Node has not been seen before, add it to the open set.
+					mapInfo.add(cell, cellGCost, cellHCost,
+							cellDCheapestRaw, expansionCount, parent);
+//					System.out.println("child added has g: " + mapInfo.getGCost(neighbor) +
+//					           " h: " + mapInfo.getHCost(neighbor) +
+//					           " f: " + mapInfo.getFCost(neighbor) +
+//					           " d^cheapest: " + mapInfo.getDCheapestWithError(neighbor));
+				}
+				else if (cellGCost < mapInfo.getGCost(cell))
+				{
+					// Shorter path to node found, update gCost.
+					mapInfo.setGCost(parent, cellGCost);
+					mapInfo.setParent(cell, parent);
+
+					// If node was closed, put it back into the open list. The new
+					// cost might make it viable.
+					if (mapInfo.isClosed(cell) == true)
+					{
+						mapInfo.reopenCell(cell, /*neighborGCost, */expansionCount /*,current*/);
+//						System.out.println("child modified has g: " + mapInfo.getGCost(cell) +
+//						           " h: " + mapInfo.getHCost(cell) +
+//						           " f: " + mapInfo.getFCost(cell));
+					}
+				}
+
+			//	timeBeforeGetSucc = threadMX.getCurrentThreadCpuTime();
+
+			}
+		} // end expansion
 
 	/**
 	 * Estimate the number of expansions required to move from one state to
@@ -532,51 +584,24 @@ public class DeadlineAwareSearch implements PlanningAgent
 		return plan;
 	}
 
-	private void generateCell(GridDomain map, GridCell goal, GridCell parent, GridCell cell)
-	{
-		//for (State stateIter : map.getSuccessors(current))
-			//System.out.println("Generating " + cell + " from parent: " + parent);
-//					", expansionCount = " + expansionCount + " parent exp: " + mapInfo.getExpansionNumber(current));
-			// consider node if it can be entered and is not in closed or pruned list
-			if (map.isBlocked(cell) == false)
-			{
-				float cellGCost = mapInfo.getGCost(cell) + map.cost(parent, cell);
-				float cellHCost = map.hCost(cell, goal);
+	/**
+	 * Determine whether grid is four or eight directional. This is expensive,
+	 * only ever call it once per execution.
+	 * TODO: Is there a better way to do this?
+	 */
+	private GridType checkGridType(GridDomain map) {
+		// Get center cell (so that it is not on the perimeter)
+		GridCell cell = map.getCell(map.getWidth() / 2, map.getHeight() / 2);
 
-				// NOTE: Using map's h cost estimate as d cheapest estimate.
-				int cellDCheapestRaw = (int) cellHCost;
+		// Judge map type on number of successors.
+		int successorCount = map.getSuccessors(cell).size();
+		if (successorCount == 8) {
+			return GridType.EUCLIDEAN;
+		}
 
-				if (!mapInfo.cellExists(cell))
-				{
-					// Node has not been seen before, add it to the open set.
-					mapInfo.add(cell, cellGCost, cellHCost,
-							cellDCheapestRaw, expansionCount, parent);
-//					System.out.println("child added has g: " + mapInfo.getGCost(neighbor) +
-//					           " h: " + mapInfo.getHCost(neighbor) +
-//					           " f: " + mapInfo.getFCost(neighbor) +
-//					           " d^cheapest: " + mapInfo.getDCheapestWithError(neighbor));
-				}
-				else if (cellGCost < mapInfo.getGCost(cell))
-				{
-					// Shorter path to node found, update gCost.
-					mapInfo.setGCost(parent, cellGCost);
-					mapInfo.setParent(cell, parent);
+		assert successorCount == 4;
 
-					// If node was closed, put it back into the open list. The new
-					// cost might make it viable.
-					if (mapInfo.isClosed(cell) == true)
-					{
-						mapInfo.reopenCell(cell, /*neighborGCost, */expansionCount /*,current*/);
-//						System.out.println("child modified has g: " + mapInfo.getGCost(neighbor) +
-//						           " h: " + mapInfo.getHCost(neighbor) +
-//						           " f: " + mapInfo.getFCost(neighbor));
-					}
-				}
-
-			//	timeBeforeGetSucc = threadMX.getCurrentThreadCpuTime();
-
-			}
-		} // end expansion
-
+		return GridType.MANHATTAN;
 	}
+}
 
