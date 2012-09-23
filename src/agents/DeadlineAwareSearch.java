@@ -52,14 +52,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private SlidingWindow expansionDelayWindow = new SlidingWindow(
 			EXPANSION_DELAY_WINDOW_LENGTH);
 	
-	private SlidingWindow expansionTimeWindow = new SlidingWindow(EXPANSION_DELAY_WINDOW_LENGTH);
+	private SlidingWindow expansionTimeWindow = new SlidingWindow(200);
 
 	// For timing
 	final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
 
 	long timeAtLastExpansion;
-	long countExpansionsAtLastDifferentMeasurement;
-	long timePerExpansion = 1;
+	//long countExpansionsAtLastDifferentMeasurement;
+	//long timePerExpansion = 1;
 
 	private int expansionCount = 0;
 	
@@ -206,19 +206,19 @@ public class DeadlineAwareSearch implements PlanningAgent
 		// Continue until time has run out
 		while (timeUntilDeadline > 0)
 		{
-			//System.out.println("expansionCount:" + expansionCount);
+			//System.out.println("\n************STARTING NEW ITERATION*****************\nexpansionCount:" + expansionCount);
 			// TODO: is this a good inital value?
 
 
 			if (!mapInfo.isOpenEmpty()) {
 				GridCell current = mapInfo.closeCheapestOpen();
-//				System.out.println("\n*************\nClosing " + current);
+//				System.out.println("Closing " + current);
 //				System.out.println("h: " +  mapInfo.getHCost(current) + " g: " + mapInfo.getGCost(current));
 
 				// If this node has a higher g cost than the incumbent plan, discard it.
 				if (incumbentPlan != null
 						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
-					//System.out.println("Not bothering to explore a cell that goes down a path further than incumbent!");
+//					System.out.println("Not bothering to explore a cell that goes down a path further than incumbent!");
 					continue;
 				}
 
@@ -241,7 +241,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// than that of the incumbent solution
 				if (current == goal)
 				{
-					//System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
+//					System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
 					foundDASSolution = true;
 					incumbentPlan = mapInfo.computePlan(goal);
 				}
@@ -251,48 +251,25 @@ public class DeadlineAwareSearch implements PlanningAgent
 					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + dMax);
 
 					// Expand current node. TODO: move this into its own method.
-					for (State stateIter : map.getSuccessors(current))
-					{
-						GridCell neighbor = (GridCell) stateIter;
-//						System.out.println("Generating Child " + count++ + " " + neighbor + 
-//								", expansionCount = " + expansionCount + " parent exp: " + mapInfo.getExpansionNumber(current));
-						// consider node if it can be entered and is not in closed or pruned list
-						if (map.isBlocked(neighbor) == false)
-						{
-							float neighborGCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
-							float neighborHCost = map.hCost(neighbor, goal);
-
-							// NOTE: Using map's h cost estimate as d cheapest estimate.
-							int neighborDCheapestRaw = (int) map.hCost(neighbor, goal);
-
-							if (!mapInfo.cellExists(neighbor))
-							{
-								// Node has not been seen before, add it to the open set.
-								mapInfo.add(neighbor, neighborGCost, neighborHCost,
-										neighborDCheapestRaw, expansionCount, current);
-//								System.out.println("child added has g: " + mapInfo.getGCost(neighbor) +
-//								           " h: " + mapInfo.getHCost(neighbor) +
-//								           " f: " + mapInfo.getFCost(neighbor));
-							}
-							else if (neighborGCost < mapInfo.getGCost(neighbor))
-							{
-								// Shorter path to node found, update gCost.
-								mapInfo.setGCost(neighbor, neighborGCost);
-								mapInfo.setParent(neighbor, current);
-
-								// If node was closed, put it back into the open list. The new
-								// cost might make it viable.
-								if (mapInfo.isClosed(neighbor) == true)
-								{
-									mapInfo.reopenCell(neighbor, /*neighborGCost, */expansionCount /*,current*/);
-//									System.out.println("child modified has g: " + mapInfo.getGCost(neighbor) +
-//									           " h: " + mapInfo.getHCost(neighbor) +
-//									           " f: " + mapInfo.getFCost(neighbor));
-								}
-							}
-
-						}
-					} // end expansion
+					//long timeBeforeGetSucc = threadMX.getCurrentThreadCpuTime();
+					//long timeAfterGetSucc;
+					
+					// Need to be flexible for euclid/manhatten... proof of performance.
+					int curr_x = current.getCoord().getX();
+					int curr_y = current.getCoord().getY();
+					GridCell cellNorth = map.getCell(curr_x, curr_y-1);
+					GridCell cellSouth = map.getCell(curr_x, curr_y+1);
+					GridCell cellEast = map.getCell(curr_x+1, curr_y);
+					GridCell cellWest = map.getCell(curr_x-1, curr_y);
+					
+					if (cellNorth != null)
+						generateCell(map, goal, current, cellNorth);
+					if (cellSouth != null)
+						generateCell(map, goal, current, cellSouth);
+					if (cellEast != null)
+						generateCell(map, goal, current, cellEast);
+					if (cellWest != null)
+						generateCell(map, goal, current, cellWest);
 
 					// Increment number of expansions.
 					expansionCount++;
@@ -314,9 +291,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 					expansionTimeWindow.push(expansionTimeDelta);
 
 //						System.out.println(
-//								"\n expansionTimeDelta " + expansionTimeDelta +
-//								"\n expansionCountDelta " + expansionCountDelta +
-//								"\n timePerExpansion: " + timePerExpansion);
+//								
+//								"\n expansionTimeDelta " + expansionTimeDelta 
+//								 
+//								);
 
 					//}
 				}
@@ -336,10 +314,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 					int exp = calculateExpansionsRemaining(timeDeadline);
 					mapInfo.recoverPrunedStates(exp);
 					expansionDelayWindow.reset();
-					//expansionIntervalWindow.reset();
+					expansionTimeWindow.reset();
 
 					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
 //					System.out.println("******* NEW EXPANSION COUNT FOR SETTLING: " + expansionCountForSettling);
+					
 
 					
 				}
@@ -422,10 +401,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 		int exp = calculateExpansionsRemaining(timeDeadline);
 		int dMax = (int) (exp / avgExpansionDelay);
 
-//		System.out.println("\nFor expansion: " + expansionCount +
+//		System.out.println("\n---------calculateMaxReachableDepth---------\n " +
 //				"\nexpansions remaining: " + exp +
 //				"\navgExpansionDelay: " + avgExpansionDelay +
-//				"\n maximum reachable depth: " + dMax);
+//				"\n dMax: " + dMax);
 		return dMax;
 	}
 
@@ -445,15 +424,15 @@ public class DeadlineAwareSearch implements PlanningAgent
 	public int calculateExpansionsRemaining(long timeDeadline)
 	{
 		long timeRemaining = timeDeadline - threadMX.getCurrentThreadCpuTime();
-		//float averageInterval = expansionIntervalWindow.getAvg();
+		float averageExpTime = expansionTimeWindow.getAvg();
 		//float averageRate = 1.0f / averageInterval;
 		//float averageRate = 1.0f / timePerExpansion;
 		
-		int exp = (int) (timeRemaining * expansionTimeWindow.getAvg());
+		int exp = (int) (timeRemaining / averageExpTime);
 
-//		System.out.println("Calculating expansions remaining:" +
+//		System.out.println("\n------calculateExpansionsRemaining-------\n" +
 //				"\ntime remaining: " + timeRemaining +
-//				"\ntime per expansion " + timePerExpansion +
+//				//"\ntime per expansion " + timePerExpansion +
 //				//"\naverage expansion rate: " + averageRate +
 //				"\nexpansions remaining: " + exp + "\n");
 
@@ -536,4 +515,52 @@ public class DeadlineAwareSearch implements PlanningAgent
 	public ComputedPlan getPath() {
 		return plan;
 	}
-}
+	
+	private void generateCell(GridDomain map, GridCell goal, GridCell parent, GridCell cell)
+	{
+		//for (State stateIter : map.getSuccessors(current))
+			//System.out.println("Generating " + cell + " from parent: " + parent); 
+//					", expansionCount = " + expansionCount + " parent exp: " + mapInfo.getExpansionNumber(current));
+			// consider node if it can be entered and is not in closed or pruned list
+			if (map.isBlocked(cell) == false)
+			{
+				float cellGCost = mapInfo.getGCost(cell) + map.cost(parent, cell);
+				float cellHCost = map.hCost(cell, goal);
+
+				// NOTE: Using map's h cost estimate as d cheapest estimate.
+				int cellDCheapestRaw = (int) cellHCost;
+
+				if (!mapInfo.cellExists(cell))
+				{
+					// Node has not been seen before, add it to the open set.
+					mapInfo.add(cell, cellGCost, cellHCost,
+							cellDCheapestRaw, expansionCount, parent);
+//					System.out.println("child added has g: " + mapInfo.getGCost(neighbor) +
+//					           " h: " + mapInfo.getHCost(neighbor) +
+//					           " f: " + mapInfo.getFCost(neighbor) +
+//					           " d^cheapest: " + mapInfo.getDCheapestWithError(neighbor));
+				}
+				else if (cellGCost < mapInfo.getGCost(cell))
+				{
+					// Shorter path to node found, update gCost.
+					mapInfo.setGCost(parent, cellGCost);
+					mapInfo.setParent(cell, parent);
+
+					// If node was closed, put it back into the open list. The new
+					// cost might make it viable.
+					if (mapInfo.isClosed(cell) == true)
+					{
+						mapInfo.reopenCell(cell, /*neighborGCost, */expansionCount /*,current*/);
+//						System.out.println("child modified has g: " + mapInfo.getGCost(neighbor) +
+//						           " h: " + mapInfo.getHCost(neighbor) +
+//						           " f: " + mapInfo.getFCost(neighbor));
+					}
+				}
+				
+			//	timeBeforeGetSucc = threadMX.getCurrentThreadCpuTime();
+
+			}
+		} // end expansion
+
+	}
+

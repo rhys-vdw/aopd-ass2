@@ -251,7 +251,9 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 			// Add to opened priority queue.
 			openQueue.offer(cell);
 			count++;
+//			System.out.println("Recovering " + cell);
 		}
+//		System.out.println("Recovered " + count + " nodes");
 	}
 
 	public GridCell getParent(GridCell cell) {
@@ -343,12 +345,19 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	public float calculateDCheapestWithError(GridCell cell)
 	{
 		float avgError = getAverageError(cell);
+		float dCheapestWithError;
+		
 		if (avgError < 1.0f - EPSILON) 
 		{
 			float dCheapest = (float) getDCheapestRaw(cell);
-			return dCheapest / (1.0f - avgError);
+			 dCheapestWithError = dCheapest / (1.0f - avgError);
 		}
-		return Float.POSITIVE_INFINITY;
+		else
+			dCheapestWithError = Float.POSITIVE_INFINITY;
+		
+		//System.out.println("calculate dCheapestWithError = " + dCheapestWithError);
+		return(dCheapestWithError);
+		
 	}
 
 	// TODO: consider caching this value
@@ -366,7 +375,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		if (getDepth(cell) == 0) {
 			return 0;
 		}
-		return getCumulativeError(cell) / getDepth(cell);
+		return (float)(getCumulativeError(cell) / getDepth(cell));
 	}
 
 	public int getExpansionNumber(GridCell cell) {
@@ -449,15 +458,19 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		// Compare total cost estimate.
 		int fCompare = compareFloat(getFCost(a), getFCost(b));
 		if (fCompare != 0) {
+
 			return fCompare;
 		}
+		//System.out.println("TIE BREAK on F" + a + b);
 
 		// Break ties on heuristic estimate.
 		int hCompare = compareFloat(getHCost(a), getHCost(b));
 		if (hCompare != 0)
 		{
+
 			return hCompare;
 		}
+//		System.out.println("TIE BREAK on H" + a + b);
 		
 
 		int min = 1;
