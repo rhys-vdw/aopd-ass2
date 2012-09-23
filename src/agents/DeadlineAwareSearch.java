@@ -35,7 +35,23 @@ public class DeadlineAwareSearch implements PlanningAgent
 	boolean shouldUpdateOpen = false;
 	boolean shouldUpdateClosed = false;
 
-	// These values needs tuning!
+	// List of x, y offsets to find neighbors in for both world types.
+	// NOTE: I've used 1D arrays because Java has no 2D arrays, only jagged arrays.
+	int[] ManhattanNeighbors = {
+		 0, -1,
+		 1,  0,
+		 0,  1,
+		-1,  0 };
+
+	int[] EuclideanNeighbors = {
+		-1, -1,
+		 0, -1,
+		 1, -1,
+		 1,  0,
+		 1,  1,
+		 0,  1,
+		-1,  1,
+		-1,  0 };
 
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
@@ -51,7 +67,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	// Sliding window to calculate average single step error.
 	private SlidingWindow expansionDelayWindow = new SlidingWindow(
 			EXPANSION_DELAY_WINDOW_LENGTH);
-	
+
 	private SlidingWindow expansionTimeWindow = new SlidingWindow(200);
 
 	// For timing
@@ -62,7 +78,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	//long timePerExpansion = 1;
 
 	private int expansionCount = 0;
-	
+
 	private boolean foundDASSolution = false;
 
 	@Override
@@ -70,14 +86,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 			int stepLeft, long stepTime, long timeLeft) {
 
 		try {
-			
+
 			// Better way to disable all traces
 //			System.setOut(new PrintStream(new OutputStream() {
 //				  public void write(int b) {
 //				    // NO-OP
 //				  }
 //				}));
-			
+
 			Trace.Enable(false);
 
 			// If there is no plan, generate one.
@@ -222,17 +238,17 @@ public class DeadlineAwareSearch implements PlanningAgent
 					continue;
 				}
 
-				
+
 //				System.out.println("expansionCount/Settling = " + expansionCount + " / " + expansionCountForSettling);
-				
-				// TODO: Moved these calculations up here, for debugging purposes.. They should really be calculated under the elsif case, 
+
+				// TODO: Moved these calculations up here, for debugging purposes.. They should really be calculated under the elsif case,
 				// for maintainability
 				if (expansionCount > expansionCountForSettling)
 				{
 
 					dCheapestWithError = mapInfo.getDCheapestWithError(current);
 					dMax = calculateMaxReachableDepth(timeDeadline);
-					
+
 //					System.out.println("d^cheapest = " + dCheapestWithError +
 //					           "\ndMax = " + dMax);
 				}
@@ -253,7 +269,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					// Expand current node. TODO: move this into its own method.
 					//long timeBeforeGetSucc = threadMX.getCurrentThreadCpuTime();
 					//long timeAfterGetSucc;
-					
+
 					// Need to be flexible for euclid/manhatten... proof of performance.
 					int curr_x = current.getCoord().getX();
 					int curr_y = current.getCoord().getY();
@@ -261,7 +277,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					GridCell cellSouth = map.getCell(curr_x, curr_y+1);
 					GridCell cellEast = map.getCell(curr_x+1, curr_y);
 					GridCell cellWest = map.getCell(curr_x-1, curr_y);
-					
+
 					if (cellNorth != null)
 						generateCell(map, goal, current, cellNorth);
 					if (cellSouth != null)
@@ -291,9 +307,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 					expansionTimeWindow.push(expansionTimeDelta);
 
 //						System.out.println(
-//								
-//								"\n expansionTimeDelta " + expansionTimeDelta 
-//								 
+//
+//								"\n expansionTimeDelta " + expansionTimeDelta
+//
 //								);
 
 					//}
@@ -318,23 +334,23 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
 //					System.out.println("******* NEW EXPANSION COUNT FOR SETTLING: " + expansionCountForSettling);
-					
 
-					
+
+
 				}
 				else
 				{
 //					System.out.println("Pruned and open are empty");
 					break;
 				}
-				
+
 				timeUntilDeadline = timeDeadline - threadMX.getCurrentThreadCpuTime();
 			}
 			//System.out.println("Time left: " + timeUntilDeadline);
 		}
 		//System.out.println("Returning solution with " + incumbentPlan.getLength() + " nodes");
-		
-		
+
+
 		// This is where we make a hybrid speedier/DAS plan!
 		if (!foundDASSolution && incumbentPlan != null)
 		{
@@ -343,7 +359,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			for (int iterSteps = incumbentPlan.getLength()-1;
 					iterSteps >= 0 ; iterSteps--)
 			{
-				
+
 				GridCell cell = (GridCell) incumbentPlan.getStep(iterSteps);
 				pathNew.prependStep(cell);
 				if (mapInfo.cellExists(cell))
@@ -427,7 +443,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		float averageExpTime = expansionTimeWindow.getAvg();
 		//float averageRate = 1.0f / averageInterval;
 		//float averageRate = 1.0f / timePerExpansion;
-		
+
 		int exp = (int) (timeRemaining / averageExpTime);
 
 //		System.out.println("\n------calculateExpansionsRemaining-------\n" +
@@ -515,11 +531,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 	public ComputedPlan getPath() {
 		return plan;
 	}
-	
+
 	private void generateCell(GridDomain map, GridCell goal, GridCell parent, GridCell cell)
 	{
 		//for (State stateIter : map.getSuccessors(current))
-			//System.out.println("Generating " + cell + " from parent: " + parent); 
+			//System.out.println("Generating " + cell + " from parent: " + parent);
 //					", expansionCount = " + expansionCount + " parent exp: " + mapInfo.getExpansionNumber(current));
 			// consider node if it can be entered and is not in closed or pruned list
 			if (map.isBlocked(cell) == false)
@@ -556,7 +572,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 //						           " f: " + mapInfo.getFCost(neighbor));
 					}
 				}
-				
+
 			//	timeBeforeGetSucc = threadMX.getCurrentThreadCpuTime();
 
 			}
