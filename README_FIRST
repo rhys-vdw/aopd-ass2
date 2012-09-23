@@ -1,0 +1,9 @@
+# the following agents are included with submission:
+
+# DAS:
+agentclass=agents.MyRestartAStarAgent
+
+# RWA*:
+agentclass=agents.MyCoolAgent
+
+# See report for clarification.
