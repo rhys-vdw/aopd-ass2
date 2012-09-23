@@ -216,7 +216,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// If this node has a higher g cost than the incumbent plan, discard it.
 				if (incumbentPlan != null
 						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
-//					System.out.println("Not bothering to explore a cell that goes down a path further than incumbent!");
+					System.out.println("Not bothering to explore cell " + current);
+					timeUntilDeadline = timeDeadline - threadMX.getCurrentThreadCpuTime();
 					continue;
 				}
 
