@@ -128,7 +128,6 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		
 		dCheapestRaws[x][y] = dCheapestRaw;
 		expansionNumbers[x][y] = expansionNumber;
-		dCheapestWithErrors[x][y] = calculateDCheapestWithError(cell);
 
 		// Calculate depth data based on parent
 		parents[x][y] = parent;
@@ -136,6 +135,9 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 			depths[x][y] = getDepth(parent) + 1;
 			dErrors[x][y] = dCheapestRaw - getDCheapestRaw(parent) + 1;
 			cumulativeErrors[x][y] = getCumulativeError(parent);
+			dCheapestWithErrors[x][y] = calculateDCheapestWithError(cell);
+		} else {
+			dCheapestWithErrors[x][y] = dCheapestRaw;
 		}
 
 		// Add to open set.
