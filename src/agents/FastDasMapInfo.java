@@ -133,8 +133,9 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		parents[x][y] = parent;
 		if (parent != null) {
 			depths[x][y] = getDepth(parent) + 1;
-			dErrors[x][y] = dCheapestRaw - getDCheapestRaw(parent) + 1;
-			cumulativeErrors[x][y] = getCumulativeError(parent);
+			int dError = dCheapestRaw - getDCheapestRaw(parent) + 1;
+			dErrors[x][y] = dError;
+			cumulativeErrors[x][y] = getCumulativeError(parent) + dError;
 			dCheapestWithErrors[x][y] = calculateDCheapestWithError(cell);
 		} else {
 			dCheapestWithErrors[x][y] = dCheapestRaw;
