@@ -339,10 +339,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 					expansionTimeWindow.reset();
 
 					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
-//					System.out.println("******* NEW EXPANSION COUNT FOR SETTLING: " + expansionCountForSettling);
-
-
-
 				}
 				else
 				{
@@ -391,49 +387,41 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	private void generateCell(GridDomain map, GridCell goal, GridCell parent, GridCell cell)
 	{
-		//for (State stateIter : map.getSuccessors(current))
 			//System.out.println("Generating " + cell + " from parent: " + parent);
 //					", expansionCount = " + expansionCount + " parent exp: " + mapInfo.getExpansionNumber(current));
 			// consider node if it can be entered and is not in closed or pruned list
 			if (map.isBlocked(cell) == false)
 			{
-				float cellGCost = mapInfo.getGCost(cell) + map.cost(parent, cell);
-				float cellHCost = map.hCost(cell, goal);
+				float gCost = mapInfo.getGCost(parent) + map.cost(parent, cell);
+				float hCost = map.hCost(cell, goal);
 
-				// NOTE: Using map's h cost estimate as d cheapest estimate.
-				int cellDCheapestRaw = (int) cellHCost;
+				// TODO: Stop using map's h cost estimate as d cheapest estimate.
+				int dCheapestRaw = (int) hCost;
 
 				if (!mapInfo.cellExists(cell))
 				{
 					// Node has not been seen before, add it to the open set.
-					mapInfo.add(cell, cellGCost, cellHCost,
-							cellDCheapestRaw, expansionCount, parent);
+					mapInfo.add(cell, gCost, hCost, dCheapestRaw, expansionCount, parent);
 //					System.out.println("child added has g: " + mapInfo.getGCost(neighbor) +
 //					           " h: " + mapInfo.getHCost(neighbor) +
 //					           " f: " + mapInfo.getFCost(neighbor) +
 //					           " d^cheapest: " + mapInfo.getDCheapestWithError(neighbor));
 				}
-				else if (cellGCost < mapInfo.getGCost(cell))
+				else if (gCost < mapInfo.getGCost(cell))
 				{
-					// Shorter path to node found, update gCost.
-					mapInfo.setGCost(parent, cellGCost);
-					mapInfo.setParent(cell, parent);
+					// Shorter path to node found.
+					mapInfo.setPathToCell(cell, gCost, expansionCount, parent);
 
-					// If node was closed, put it back into the open list. The new
-					// cost might make it viable.
-					if (mapInfo.isClosed(cell) == true)
+					// If node was closed, put it back into the open list. The new cost
+					// might make it viable. Pruned cells needn't be reopened as their
+					// dCheapest value is unaffected.
+					if (mapInfo.isClosed(cell))
 					{
-						mapInfo.reopenCell(cell, /*neighborGCost, */expansionCount /*,current*/);
-//						System.out.println("child modified has g: " + mapInfo.getGCost(cell) +
-//						           " h: " + mapInfo.getHCost(cell) +
-//						           " f: " + mapInfo.getFCost(cell));
+						mapInfo.reopenCell(cell);
 					}
 				}
-
-			//	timeBeforeGetSucc = threadMX.getCurrentThreadCpuTime();
-
 			}
-		} // end expansion
+		}
 
 	/**
 	 * Estimate the number of expansions required to move from one state to

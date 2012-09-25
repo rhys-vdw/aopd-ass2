@@ -122,36 +122,58 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		int x = cell.getCoord().getX();
 		int y = cell.getCoord().getY();
 
-		// Set cell properties
-		gCosts[x][y] = gCost;
+		// Set cell properties that will not change
 		hCosts[x][y] = hCost;
-		
 		dCheapestRaws[x][y] = dCheapestRaw;
-		expansionNumbers[x][y] = expansionNumber;
 
-		// Calculate depth data based on parent
-		parents[x][y] = parent;
-		if (parent != null) {
-			depths[x][y] = getDepth(parent) + 1;
-			int dError = dCheapestRaw - getDCheapestRaw(parent) + 1;
-			dErrors[x][y] = dError;
-			cumulativeErrors[x][y] = getCumulativeError(parent) + dError;
-			dCheapestWithErrors[x][y] = calculateDCheapestWithError(cell);
-		} else {
-			dCheapestWithErrors[x][y] = dCheapestRaw;
-		}
+		// Update other cell properties
+		setPathToCell(cell, gCost, expansionNumber, parent);
 
 		// Add to open set.
 		sets[x][y] = CellSetMembership.OPEN;
 		openQueue.offer(cell);
 	}
 
-	public void reopenCell(GridCell cell, int expansionCount) {
+	public void setPathToCell(GridCell cell, float gCost, int expansionNumber,
+			GridCell parent) {
+
 		int x = cell.getCoord().getX();
 		int y = cell.getCoord().getY();
 
-		// Update expansion number
-		expansionNumbers[x][y] = expansionCount;
+		// Set cell properties
+		setGCost(cell, gCost);
+		expansionNumbers[x][y] = expansionNumber;
+
+		// Reuse old dCheapestRaw value
+		int dCheapestRaw = getDCheapestRaw(cell);
+
+		// Calculate depth data and error based on parent
+		parents[x][y] = parent;
+		if (parent != null) {
+			depths[x][y] = getDepth(parent) + 1;
+			int dError =  dCheapestRaw - getDCheapestRaw(parent) + 1;
+			dErrors[x][y] = dError;
+			cumulativeErrors[x][y] = getCumulativeError(parent) + dError;
+			dCheapestWithErrors[x][y] = calculateDCheapestWithError(cell);
+		} else {
+			dCheapestWithErrors[x][y] = dCheapestRaw;
+		}
+	}
+
+	/**
+	 * Move cell that has already been added to open list. Never call this on an
+	 * open cell.
+	 */
+	public void reopenCell(GridCell cell) {
+		// Should only be called when no info exists for node.
+		CellSetMembership prevSet = getSetMembership(cell);
+		if (prevSet == CellSetMembership.OPEN) {
+			throw new IllegalArgumentException("Cannot open cell " + cell +
+					", already in the open set!");
+		}
+
+		int x = cell.getCoord().getX();
+		int y = cell.getCoord().getY();
 
 		// Add to open set
 		sets[x][y] = CellSetMembership.OPEN;
@@ -163,7 +185,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	 * @return true if there are no cells in the open set
 	 */
 	public boolean isOpenEmpty() {
-		return (openQueue.size() == 0);
+		return openQueue.isEmpty();
 	}
 
 	/**
@@ -296,8 +318,9 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		queue.offer(cell);
 	}
 
-	public void setGCost(GridCell cell, float gCost) {
+	private void setGCost(GridCell cell, float gCost) {
 		switch (getSetMembership(cell)) {
+			case NONE:
 			case CLOSED: {
 				GridCoord gc = cell.getCoord();
 				gCosts[gc.getX()][gc.getY()] = gCost;
@@ -310,9 +333,6 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 			case PRUNED: {
 				setQueuedGCost(cell, gCost, prunedQueue);
 				break;
-			}
-			case NONE: {
-				throw new IllegalArgumentException("Cell is not in a set.");
 			}
 			default: {
 				assert false;
@@ -348,19 +368,16 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	public float calculateDCheapestWithError(GridCell cell)
 	{
 		float avgError = getAverageError(cell);
-		float dCheapestWithError;
-		
-		if (avgError < 1.0f - EPSILON) 
-		{
+		float result;
+
+		if (avgError < 1.0f - EPSILON) {
 			float dCheapest = (float) getDCheapestRaw(cell);
-			 dCheapestWithError = dCheapest / (1.0f - avgError);
+			result = dCheapest / (1.0f - avgError);
+		} else {
+			result = Float.POSITIVE_INFINITY;
 		}
-		else
-			dCheapestWithError = Float.POSITIVE_INFINITY;
-		
-		//System.out.println("calculate dCheapestWithError = " + dCheapestWithError);
-		return(dCheapestWithError);
-		
+
+		return result;
 	}
 
 	// TODO: consider caching this value
