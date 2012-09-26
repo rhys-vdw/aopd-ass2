@@ -260,14 +260,13 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	 *                   recovered
 	 */
 	public void recoverPrunedStates(int expansionCount) {
-		// the sum of d^cheapest for each cell reopened
-		int dSum = 0;
-		int count = 0;
+		int expansionsRemaining = expansionCount;
 
-		while (dSum < expansionCount && prunedQueue.size() > 0) {
+		while (expansionsRemaining > 0 && prunedQueue.size() > 0) 
+		{
 			GridCell cell = prunedQueue.poll();
 
-			dSum += getDCheapestWithError(cell);
+			expansionsRemaining -= getDCheapestWithError(cell);
 
 			// Set set attribute to opened.
 			GridCoord gc = cell.getCoord();
@@ -275,7 +274,6 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 
 			// Add to opened priority queue.
 			openQueue.offer(cell);
-			count++;
 //			System.out.println("Recovering " + cell);
 		}
 //		System.out.println("Recovered " + count + " nodes");
@@ -493,14 +491,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 //		System.out.println("TIE BREAK on H" + a + b);
 		
 
-		int min = 1;
-		int max = 2;		
-		int randomNum = rand.nextInt(max - min + 1) + min;
-		//System.out.println(randomNum);
-		if (randomNum == 1)
-			return(1);
-		else
-			return(-1);
+		return(-1);
 		
 	}
 

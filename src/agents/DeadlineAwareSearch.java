@@ -73,7 +73,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
-	final private int SETTLING_EXPANSION_COUNT = 200;
+	final private int SETTLING_EXPANSION_COUNT = 100;
 
 	// Updating count that needs to be reached to indicate that we are settled.
 	private int expansionCountForSettling = SETTLING_EXPANSION_COUNT;
@@ -127,12 +127,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 				long timeCurrent = threadMX.getCurrentThreadCpuTime();
 				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) - SEARCH_END_TIME_OFFSET);
 				long timeDeadline = timeCurrent + searchTime;
-
-				Trace.Enable(false);
-
-//				System.out.println("current time (ns): " + timeCurrent);
-//				System.out.println("deadline: " + timeDeadline);
-				Trace.Enable(true);
 
 				// a new plan has been generated, update open and closed debug sets.
 				shouldUpdateOpen = true;
@@ -205,8 +199,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
 			GridCell goal, long timeDeadline) {
 
-
-
 		//System.out.println("Generating a new plan");
 
 		// Map info exists outside of this function so that its open and closed
@@ -224,8 +216,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 
 		ComputedPlan incumbentPlan = null;
-		incumbentPlan = speedierSearch(map, start,goal);
-
+		//incumbentPlan = speedierSearch(map, start,goal);
 
 		assert threadMX.isCurrentThreadCpuTimeSupported();
 		threadMX.setThreadCpuTimeEnabled(true);
@@ -244,11 +235,12 @@ public class DeadlineAwareSearch implements PlanningAgent
 		// Continue until time has run out
 		while (timeUntilDeadline > 0)
 		{
-			//System.out.println("\n************STARTING NEW ITERATION*****************\nexpansionCount:" + expansionCount);
+			//System.out.println("\n************STARTING NEW ITERATION*****************\n");
+			//System.out.println("expansionCount/Settling = " + expansionCount + " / " + expansionCountForSettling);
 
 			if (!mapInfo.isOpenEmpty()) {
 				GridCell current = mapInfo.closeCheapestOpen();
-//				System.out.println("Closing " + current);
+				//System.out.println("Closing " + current);
 //				System.out.println("h: " +  mapInfo.getHCost(current) + " g: " + mapInfo.getGCost(current));
 
 				// If this node has a higher g cost than the incumbent plan, discard it.
@@ -260,7 +252,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 
 
-//				System.out.println("expansionCount/Settling = " + expansionCount + " / " + expansionCountForSettling);
+
 
 				// TODO: Moved these calculations up here, for debugging purposes.. They should really be calculated under the elsif case,
 				// for maintainability
@@ -278,9 +270,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// than that of the incumbent solution
 				if (current == goal)
 				{
-//					System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
+					System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
 					foundDASSolution = true;
 					incumbentPlan = mapInfo.computePlan(goal);
+					//return(incumbentPlan);
 				}
 				else if ( (expansionCount <= expansionCountForSettling) ||
 						(dCheapestWithError < dMax))
@@ -339,15 +332,17 @@ public class DeadlineAwareSearch implements PlanningAgent
 					expansionTimeWindow.reset();
 
 					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
+					//System.out.println("Depruning - new settling limit = " + expansionCountForSettling);
 				}
 				else
 				{
-//					System.out.println("Pruned and open are empty");
+					System.out.println("Pruned and open are empty");
 					break;
 				}
 
-				timeUntilDeadline = timeDeadline - threadMX.getCurrentThreadCpuTime();
+				
 			}
+			timeUntilDeadline = timeDeadline - threadMX.getCurrentThreadCpuTime();
 			//System.out.println("Time left: " + timeUntilDeadline);
 		}
 		//System.out.println("Returning solution with " + incumbentPlan.getLength() + " nodes");
