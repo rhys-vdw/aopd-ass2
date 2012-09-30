@@ -262,8 +262,10 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	public void recoverPrunedStates(int expansionCount) {
 		int expansionsRemaining = expansionCount;
 
+		int count = 0;
 		while (expansionsRemaining > 0 && prunedQueue.size() > 0) 
 		{
+			count++;
 			GridCell cell = prunedQueue.poll();
 
 			expansionsRemaining -= getDCheapestWithError(cell);
@@ -274,9 +276,10 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 
 			// Add to opened priority queue.
 			openQueue.offer(cell);
-//			System.out.println("Recovering " + cell);
+			System.out.println("Recovering " + cell);
+			//printCell(cell);
 		}
-//		System.out.println("Recovered " + count + " nodes");
+		System.out.println("Recovered " + count + " nodes");
 	}
 
 	public GridCell getParent(GridCell cell) {
@@ -493,6 +496,35 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 
 		return(-1);
 		
+	}
+	
+	void printCell(GridCell cell)
+	{
+		int x = cell.getCoord().getX();
+		int y = cell.getCoord().getY();
+		CellSetMembership mem = sets[x][y];
+		GridCell parent = parents[x][y];
+		float g =  gCosts[x][y];
+		float h =  hCosts[x][y];
+		int dRaw = dCheapestRaws[x][y];
+		float dCheapestWithError = dCheapestWithErrors[x][y];
+		int dError = dErrors[x][y];
+		int expansionNumber = expansionNumbers[x][y];
+		int cumulativeError = cumulativeErrors[x][y]; 
+		int depth = depths[x][y];
+		System.out.println("\nPrinting data for cell " + cell);
+		
+		System.out.println("Set Membership: " + mem);
+		System.out.println("Parent: " + parent);
+		System.out.println("g: " + g);
+		System.out.println("h: " + h);
+		System.out.println("dCheapestRaw: " + dRaw);
+		System.out.println("dCheapestWithError: " + dCheapestWithError);
+		System.out.println("dError: " + dError);
+		System.out.println("ExpansionNumber: " + expansionNumber);
+		System.out.println("CumulativeError: " + cumulativeError);
+		System.out.println("Depth: " + depth );
+		System.out.println("\n************************");
 	}
 
 	public boolean equals() { return false; }
