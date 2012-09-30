@@ -9,6 +9,7 @@ import au.rmit.ract.planning.pathplanning.entity.SearchDomain;
 import pplanning.interfaces.PlanningAgent;
 import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
+import pplanning.simviewer.model.SuccessorIterator;
 
 import java.io.PrintStream;
 import java.io.OutputStream;
@@ -287,24 +288,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 				{
 					// Expand current node. TODO: move this into its own method.
 
-					//Trace.print("(reachable) d_cheapest: " + estimateGoalDepth(current) + " d_max: " + dMax);
-
-					//long timeBeforeGetSucc = threadMX.getCurrentThreadCpuTime();
-					//long timeAfterGetSucc;
-
 					// Generate all neighboring cells.
-					int[] offsets = gridType.getNeighborOffsets();
-					for (int i = 0; i < offsets.length; i += 2) {
-
-						// Get x, y coordinates of neighbor.
-						int x = current.getCoord().getX() + offsets[i];
-						int y = current.getCoord().getY() + offsets[i + 1];
-
-						// If cell exists, generate it.
-						GridCell cell = map.getCell(x, y);
-						if (cell != null) {
-							generateCell(map, goal, current, cell);
-						}
+					//System.out.println("-----> current = " + current);
+					SuccessorIterator neighborIter = map.getNextSuccessor(current);
+					GridCell neighbor;
+					while ((neighbor = neighborIter.next()) != null) {
+						//System.out.println(neighbor);
+						generateCell(map, goal, current, neighbor);
 					}
 
 					// Increment number of expansions.

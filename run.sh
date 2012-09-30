@@ -14,4 +14,4 @@ echo ================================================
 
 
 echo
-java -cp bin/:lib/JPathPlan-v1.6.jar:lib/Apparate-v2.8.jar:lib/MyCoolAgent.jar pplanning.simviewer.controller.Launcher $fileName -
+java -cp bin/:lib/JPathPlan-v1.7.jar:lib/Apparate-v3.0.jar:lib/MyCoolAgent.jar pplanning.simviewer.controller.Launcher $fileName -
