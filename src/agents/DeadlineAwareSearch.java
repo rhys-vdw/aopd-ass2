@@ -392,10 +392,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 				{
 					// Node has not been seen before, add it to the open set.
 					mapInfo.add(cell, gCost, hCost, dCheapestRaw, expansionCount, parent);
-//					System.out.println("child added has g: " + mapInfo.getGCost(neighbor) +
-//					           " h: " + mapInfo.getHCost(neighbor) +
-//					           " f: " + mapInfo.getFCost(neighbor) +
-//					           " d^cheapest: " + mapInfo.getDCheapestWithError(neighbor));
+					System.out.println("child added has g: " + mapInfo.getGCost(cell) +
+					           " h: " + mapInfo.getHCost(cell) +
+					           " f: " + mapInfo.getFCost(cell) +
+					           " d^cheapest: " + mapInfo.getDCheapestWithError(cell));
 				}
 				else if (gCost < mapInfo.getGCost(cell))
 				{
