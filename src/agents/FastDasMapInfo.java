@@ -260,25 +260,34 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	 *                   recovered
 	 */
 	public void recoverPrunedStates(int expansionCount) {
-		// the sum of d^cheapest for each cell reopened
-		int dSum = 0;
+		int expansionsRemaining = expansionCount;
+
 		int count = 0;
-
-		while (dSum < expansionCount && prunedQueue.size() > 0) {
+		while (expansionsRemaining > 0 && prunedQueue.size() > 0) 
+		{
+			count++;
 			GridCell cell = prunedQueue.poll();
+			//System.out.println("Just popped: " + cell + " from the pruned set");
+			//printCell(cell);
+			//GridCell topOfPruned = prunedQueue.peek();
+			//System.out.println("New top of pruned: " + topOfPruned);
+			//printCell(topOfPruned);
 
-			dSum += getDCheapestWithError(cell);
+			expansionsRemaining -= getDCheapestWithError(cell);
 
 			// Set set attribute to opened.
 			GridCoord gc = cell.getCoord();
 			sets[gc.getX()][gc.getY()] = CellSetMembership.OPEN;
 
 			// Add to opened priority queue.
+			//GridCell topOfOpen = openQueue.peek();
+			//System.out.println("Current top of open set: " + topOfOpen);
 			openQueue.offer(cell);
-			count++;
-//			System.out.println("Recovering " + cell);
+			//System.out.println("Pushed " + cell + " onto open set");
+			//topOfOpen = openQueue.peek();
+			//System.out.println("New top of open set: " + topOfOpen);
 		}
-//		System.out.println("Recovered " + count + " nodes");
+		//System.out.println("Recovered " + count + " nodes");
 	}
 
 	public GridCell getParent(GridCell cell) {
@@ -376,7 +385,8 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		} else {
 			result = Float.POSITIVE_INFINITY;
 		}
-
+		//System.out.println("avgError: " + avgError + " result: " + result);
+		//printCell(cell);
 		return result;
 	}
 
@@ -476,6 +486,9 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	public int compare(GridCell a, GridCell b) {
 
 		// Compare total cost estimate.
+		//System.out.println("Comparing a and b");
+		//printCell(a);
+		//printCell(b);
 		int fCompare = compareFloat(getFCost(a), getFCost(b));
 		if (fCompare != 0) {
 
@@ -490,20 +503,52 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 
 			return hCompare;
 		}
-//		System.out.println("TIE BREAK on H" + a + b);
+		//System.out.println("TIE BREAK on H" + a + b);
 		
-
-		int min = 1;
-		int max = 2;		
-		int randomNum = rand.nextInt(max - min + 1) + min;
-		//System.out.println(randomNum);
-		if (randomNum == 1)
+		if (getExpansionNumber(a) < getExpansionNumber(b))
+		{
 			return(1);
-		else
+		}
+		else if (getExpansionNumber(b) < getExpansionNumber(a))
+		{
 			return(-1);
+		}
+		
+		return(-1);
 		
 	}
-
+	
+	void printCell(GridCell cell)
+	{
+		int x = cell.getCoord().getX();
+		int y = cell.getCoord().getY();
+		CellSetMembership mem = sets[x][y];
+		GridCell parent = parents[x][y];
+		float g =  gCosts[x][y];
+		float h =  hCosts[x][y];
+		float f = getFCost(cell);
+		int dRaw = dCheapestRaws[x][y];
+		float dCheapestWithError = dCheapestWithErrors[x][y];
+		int dError = dErrors[x][y];
+		int expansionNumber = expansionNumbers[x][y];
+		int cumulativeError = cumulativeErrors[x][y]; 
+		int depth = depths[x][y];
+		System.out.println("\nPrinting data for cell " + cell);
+		
+		System.out.println("Set Membership: " + mem);
+		System.out.println("Parent: " + parent);
+		System.out.println("g: " + g);
+		System.out.println("h: " + h);
+		System.out.println("f: " + f);
+		System.out.println("dCheapestRaw: " + dRaw);
+		System.out.println("dCheapestWithError: " + dCheapestWithError);
+		System.out.println("dError: " + dError);
+		System.out.println("ExpansionNumber: " + expansionNumber);
+		System.out.println("CumulativeError: " + cumulativeError);
+		System.out.println("Depth: " + depth );
+		System.out.println("\n************************");
+	}
+	
 	public boolean equals() { return false; }
 
 	/* -- DEBUG -- */
