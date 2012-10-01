@@ -1,3 +1,5 @@
+package agents;
+
 import pplanning.simviewer.model.GridCell;
 
 interface DistanceCalculator {

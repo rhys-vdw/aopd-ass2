@@ -36,41 +36,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 	boolean shouldUpdateOpen = false;
 	boolean shouldUpdateClosed = false;
 
-		// List of x, y offsets to find neighbors in for both world types.
-		// NOTE: I've used 1D arrays because Java has no 2D arrays, only jagged arrays.
-		private static final int[] MANHATTAN_NEIGHBOR_OFFSETS = {
-			0, -1,
-			1,  0,
-			0,  1,
-			-1,  0 };
+	private enum GridType { MANHATTAN, CHESSBOARD }
 
-		private static final int[] EUCLIDEAN_NEIGHBOR_OFFSETS = {
-			-1, -1,
-			0, -1,
-			1, -1,
-			1,  0,
-			1,  1,
-			0,  1,
-			-1,  1,
-			-1,  0 };
-
-	private enum GridType {
-		MANHATTAN (MANHATTAN_NEIGHBOR_OFFSETS),
-		EUCLIDEAN (EUCLIDEAN_NEIGHBOR_OFFSETS);
-
-		final int[] neighborOffsets;
-
-		int[] getNeighborOffsets () {
-			return this.neighborOffsets;
-		}
-
-		GridType(int[] neighborOffsets) {
-			this.neighborOffsets = neighborOffsets;
-		}
-	}
-
-	private GridType gridType = null;
-
+	private DistanceCalculator distanceCalculator = null;
 
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
@@ -100,7 +68,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private int expansionCount = 0;
 
 	private boolean foundDASSolution = false;
-	
+
 	private GridCell lastGoal = null;
 
 	@Override
@@ -118,8 +86,17 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 			Trace.Enable(false);
 
-			if (gridType == null) {
-				gridType = checkGridType(map);
+			if (distanceCalculator == null)
+			{
+				GridType gridType = checkGridType(map);
+				if (gridType == GridType.CHESSBOARD)
+				{
+					distanceCalculator = new ChessboardDistanceCalculator();
+				}
+				else if (gridType == GridType.MANHATTAN)
+				{
+					distanceCalculator = new ManhattanDistanceCalculator();
+				}
 			}
 
 			boolean bReplan =
@@ -128,7 +105,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					!lastGoal.equals(goal) || // Goal has changed (equals not implemented?)
 					!plan.contains(start); // sNode is not in the path (sNode out of track)
 
-			if (bReplan) 
+			if (bReplan)
 			// If there is no plan, generate one.
 			{
 
@@ -222,7 +199,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		// Initialize open set with start node.
 		float hCost = map.hCost(start, goal);
-		int dCost = (int)hCost;
+		int dCost = distanceCalculator.dCost(start, goal);
 
 
 		ComputedPlan incumbentPlan = null;
@@ -389,9 +366,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 				float gCost = mapInfo.getGCost(parent) + map.cost(parent, cell);
 				float hCost = map.hCost(cell, goal);
-
-				// TODO: Stop using map's h cost estimate as d cheapest estimate.
-				int dCheapestRaw = (int) hCost;
+				int dCheapestRaw = distanceCalculator.dCost(cell, goal);
 
 				if (!mapInfo.cellExists(cell))
 				{
@@ -417,28 +392,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 			}
 		}
-
-	/**
-	 * Estimate the number of expansions required to move from one state to
-	 * another in a gridworld where only four directional movement is permitted.
-	 * @param from the starting state
-	 * @param to the goal state
-	 */
-	private int dCostManhattan(GridCell from, GridCell to) {
-		return Math.abs(to.getCoord().getX() - from.getCoord().getX()) +
-		       Math.abs(to.getCoord().getY() - from.getCoord().getY());
-	}
-
-	/**
-	 * Estimate the number of expansions required to move from one state to
-	 * another in a gridworld where diagonal movement is permitted.
-	 * @param from the starting state
-	 * @param to the goal state
-	 */
-	private int dCostEuclidean(GridCell from, GridCell to) {
-		return Math.max(Math.abs(to.getCoord().getX() - from.getCoord().getX()),
-		                Math.abs(to.getCoord().getY() - from.getCoord().getY()));
-	}
 
 	/**
 	 * Estimate the number of expansions that can be performed before the deadline (dMax).
@@ -579,7 +532,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		// Judge map type on number of successors.
 		int successorCount = map.getSuccessors(cell).size();
 		if (successorCount == 8) {
-			return GridType.EUCLIDEAN;
+			return GridType.CHESSBOARD;
 		}
 
 		assert successorCount == 4;
