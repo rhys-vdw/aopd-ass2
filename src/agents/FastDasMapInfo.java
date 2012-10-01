@@ -267,6 +267,11 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		{
 			count++;
 			GridCell cell = prunedQueue.poll();
+			//System.out.println("Just popped: " + cell + " from the pruned set");
+			//printCell(cell);
+			//GridCell topOfPruned = prunedQueue.peek();
+			//System.out.println("New top of pruned: " + topOfPruned);
+			//printCell(topOfPruned);
 
 			expansionsRemaining -= getDCheapestWithError(cell);
 
@@ -275,11 +280,14 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 			sets[gc.getX()][gc.getY()] = CellSetMembership.OPEN;
 
 			// Add to opened priority queue.
+			//GridCell topOfOpen = openQueue.peek();
+			//System.out.println("Current top of open set: " + topOfOpen);
 			openQueue.offer(cell);
-			System.out.println("Recovering " + cell);
-			//printCell(cell);
+			//System.out.println("Pushed " + cell + " onto open set");
+			//topOfOpen = openQueue.peek();
+			//System.out.println("New top of open set: " + topOfOpen);
 		}
-		System.out.println("Recovered " + count + " nodes");
+		//System.out.println("Recovered " + count + " nodes");
 	}
 
 	public GridCell getParent(GridCell cell) {
@@ -377,7 +385,8 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		} else {
 			result = Float.POSITIVE_INFINITY;
 		}
-
+		//System.out.println("avgError: " + avgError + " result: " + result);
+		//printCell(cell);
 		return result;
 	}
 
@@ -477,6 +486,9 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	public int compare(GridCell a, GridCell b) {
 
 		// Compare total cost estimate.
+		//System.out.println("Comparing a and b");
+		//printCell(a);
+		//printCell(b);
 		int fCompare = compareFloat(getFCost(a), getFCost(b));
 		if (fCompare != 0) {
 
@@ -491,9 +503,17 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 
 			return hCompare;
 		}
-//		System.out.println("TIE BREAK on H" + a + b);
+		//System.out.println("TIE BREAK on H" + a + b);
 		
-
+		if (getExpansionNumber(a) < getExpansionNumber(b))
+		{
+			return(1);
+		}
+		else if (getExpansionNumber(b) < getExpansionNumber(a))
+		{
+			return(-1);
+		}
+		
 		return(-1);
 		
 	}
@@ -506,6 +526,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		GridCell parent = parents[x][y];
 		float g =  gCosts[x][y];
 		float h =  hCosts[x][y];
+		float f = getFCost(cell);
 		int dRaw = dCheapestRaws[x][y];
 		float dCheapestWithError = dCheapestWithErrors[x][y];
 		int dError = dErrors[x][y];
@@ -518,6 +539,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		System.out.println("Parent: " + parent);
 		System.out.println("g: " + g);
 		System.out.println("h: " + h);
+		System.out.println("f: " + f);
 		System.out.println("dCheapestRaw: " + dRaw);
 		System.out.println("dCheapestWithError: " + dCheapestWithError);
 		System.out.println("dError: " + dError);
@@ -526,7 +548,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		System.out.println("Depth: " + depth );
 		System.out.println("\n************************");
 	}
-
+	
 	public boolean equals() { return false; }
 
 	/* -- DEBUG -- */

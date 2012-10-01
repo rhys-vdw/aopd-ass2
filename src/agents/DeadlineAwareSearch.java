@@ -99,6 +99,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private int expansionCount = 0;
 
 	private boolean foundDASSolution = false;
+	
+	private GridCell lastGoal = null;
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
@@ -119,8 +121,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 				gridType = checkGridType(map);
 			}
 
+			boolean bReplan =
+					plan == null ||			// no last path stored, have yet notr planned before?
+					map.getChangedEdges().size() > 0 ||	// map has had changes
+					!lastGoal.equals(goal) || // Goal has changed (equals not implemented?)
+					!plan.contains(start); // sNode is not in the path (sNode out of track)
+
+			if (bReplan) 
 			// If there is no plan, generate one.
-			if (plan == null)
 			{
 
 				// TODO: base search buffer on the length of the solution.
@@ -143,6 +151,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 				// Plan was found, reset step count.
 				stepNo = 0;
+				lastGoal = goal;
 			}
 
 			// Check if path has been exhausted.
@@ -216,13 +225,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 
 		ComputedPlan incumbentPlan = null;
-		//incumbentPlan = speedierSearch(map, start,goal);
+		incumbentPlan = speedierSearch(map, start,goal);
 
 		assert threadMX.isCurrentThreadCpuTimeSupported();
 		threadMX.setThreadCpuTimeEnabled(true);
 
 		long timeAfterGreedy = threadMX.getCurrentThreadCpuTime();
-		long timeUntilDeadline = timeDeadline - timeAfterGreedy;
+		long timeUntilDeadline = (timeDeadline - timeAfterGreedy);
 
 //		System.out.println("time after greedy: " + timeAfterGreedy);
 //		System.out.println("time left: " + timeUntilDeadline);
@@ -237,7 +246,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 		{
 			//System.out.println("\n************STARTING NEW ITERATION*****************\n");
 			//System.out.println("expansionCount/Settling = " + expansionCount + " / " + expansionCountForSettling);
-
 			if (!mapInfo.isOpenEmpty()) {
 				GridCell current = mapInfo.closeCheapestOpen();
 				//System.out.println("Closing " + current);
@@ -312,6 +320,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 					long expansionTimeDelta = timeCurrent - timeAtLastExpansion;
 					expansionTimeWindow.push(expansionTimeDelta);
 					timeAtLastExpansion = timeCurrent;
+
+
 				}
 				else /* expansionCount > settlingCount && dCheapest > dMax */
 				{
@@ -397,10 +407,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 				{
 					// Node has not been seen before, add it to the open set.
 					mapInfo.add(cell, gCost, hCost, dCheapestRaw, expansionCount, parent);
-//					System.out.println("child added has g: " + mapInfo.getGCost(neighbor) +
-//					           " h: " + mapInfo.getHCost(neighbor) +
-//					           " f: " + mapInfo.getFCost(neighbor) +
-//					           " d^cheapest: " + mapInfo.getDCheapestWithError(neighbor));
+//					System.out.println("child added has g: " + mapInfo.getGCost(cell) +
+//					           " h: " + mapInfo.getHCost(cell) +
+//					           " f: " + mapInfo.getFCost(cell) +
+//					           " d^cheapest: " + mapInfo.getDCheapestWithError(cell));
 				}
 				else if (gCost < mapInfo.getGCost(cell))
 				{
