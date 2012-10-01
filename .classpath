@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="lib/Apparate-v2.8.jar"/>
-	<classpathentry kind="lib" path="lib/JPathPlan-v1.6.jar"/>
+	<classpathentry kind="lib" path="lib/Apparate-v3.0.jar"/>
+	<classpathentry kind="lib" path="lib/JPathPlan-v1.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
