@@ -86,23 +86,22 @@ public class PreferredOperatorAStar implements PlanningAgent {
 			}
 
 			// iterate through neighboring nodes
-			for (State stateIter : map.getSuccessors(current)) {
-				GridCell neighbor = (GridCell) stateIter;
+			for (State state : map.getSuccessors(current)) {
+				GridCell neighbor = (GridCell) state;
 
 				// consider node if it can be entered and is not in closed list
-				if (map.isBlocked(neighbor) == false &&
-						mapInfo.isClosed(neighbor) == false) {
+				if (map.isBlocked(neighbor)) continue;
 
-					// get g cost of neighbor
-					float gCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
+				// get g cost of neighbor
+				float gCost = mapInfo.getGCost(current) + map.cost(current, neighbor);
 
-					if (mapInfo.isOpen(neighbor) == false) {
-						// Node not previously encountered, add it to the open set.
-						mapInfo.add(neighbor, gCost, map.hCost(neighbor, goal), current);
-					} else if (FloatUtil.compare(gCost, mapInfo.getGCost(neighbor)) == -1) {
-						// Cheaper route to node found to node in the open set.
-						mapInfo.setGCost(neighbor, gCost);
-					}
+				if (mapInfo.getSetMembership(neighbor) == CellSetMembership.NONE) {
+					// Node not previously encountered, add it to the open set.
+					mapInfo.add(neighbor, gCost, map.hCost(neighbor, goal), current);
+				} else if (FloatUtil.compare(gCost, mapInfo.getGCost(neighbor)) == -1) {
+					// Cheaper route to node found to node in the open set.
+					mapInfo.setGCost(neighbor, gCost);
+					mapInfo.setParent(neighbor, current);
 				}
 			}
 		}

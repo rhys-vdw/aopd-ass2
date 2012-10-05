@@ -32,6 +32,8 @@ public class PreferredMapInfo implements Comparator<GridCell> {
 	// is just to aid analysis.
 	GridDomain map;
 
+	private static final float WEIGHT = 1.0f;
+
 	private int closedCount = 0;
 
 	// Priority queues for open and pruned sets.
@@ -182,7 +184,7 @@ public class PreferredMapInfo implements Comparator<GridCell> {
 	}
 
 	public float getFCost(GridCell cell) {
-		return getGCost(cell) + 5.0f * getHCost(cell);
+		return getGCost(cell) + WEIGHT * getHCost(cell);
 	}
 
 	public float getGCost(GridCell cell) {
