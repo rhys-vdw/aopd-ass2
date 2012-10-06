@@ -44,8 +44,8 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	// Cell properties.
 	private CellSetMembership[][] sets;
 	private GridCell[][]          parents;
-	private float[][]             gCosts;
-	private float[][]             hCosts;
+	private int[][]             gCosts;
+	private int[][]             hCosts;
 	private int[][]               dCheapestRaws;
 	private float[][]             dCheapestWithErrors;
 	private int[][]               dErrors;
@@ -55,6 +55,8 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 
 	private final float EPSILON = 0.001f; // used for floating point comparisons
 	private final int INITIAL_QUEUE_CAPACITY = 11;
+	
+	//public int lowestDCheapest = Integer.MAX_VALUE;
 
 	public FastDasMapInfo(GridDomain map) {
 		this.map = map;
@@ -62,8 +64,8 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		int height = map.getHeight();
 
 		this.sets             		= new CellSetMembership[width][height];
-		this.gCosts           		= new float[width][height];
-		this.hCosts           		= new float[width][height];
+		this.gCosts           		= new int[width][height];
+		this.hCosts           		= new int[width][height];
 		this.parents          		= new GridCell[width][height];
 		this.dCheapestRaws    		= new int[width][height];
 		this.dCheapestWithErrors 	= new float[width][height];
@@ -75,6 +77,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		// Initialize queues for open and pruned sets.
 		this.openQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY, this);
 		this.prunedQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY, this);
+		
 	}
 
 	public ComputedPlan computePlan(GridCell goal)
@@ -94,9 +97,9 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		return plan;
 	}
 
-	public void addStartCell(GridCell cell, float hCost, int dCheapestRaw) {
+	public void addStartCell(GridCell cell, int hCost, int dCheapestRaw) {
 		// Start cell has zero gCost, and no parent.
-		add(cell, 0f, hCost, dCheapestRaw, 0, null);
+		add(cell, 0, hCost, dCheapestRaw, 0, null);
 	}
 
 	/**
@@ -109,7 +112,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	 *                        was generated
 	 * @param parent          the previous cell in a path
 	 */
-	public void add(GridCell cell, float gCost, float hCost, int dCheapestRaw,
+	public void add(GridCell cell, int gCost, int hCost, int dCheapestRaw,
 			int expansionNumber, GridCell parent)
 	{
 		// Should only be called when no info exists for node.
@@ -132,9 +135,10 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		// Add to open set.
 		sets[x][y] = CellSetMembership.OPEN;
 		openQueue.offer(cell);
+		
 	}
 
-	public void setPathToCell(GridCell cell, float gCost, int expansionNumber,
+	public void setPathToCell(GridCell cell, int gCost, int expansionNumber,
 			GridCell parent) {
 
 		int x = cell.getCoord().getX();
@@ -300,16 +304,16 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		parents[gc.getX()][gc.getY()] = parent;
 	}
 
-	public float getFCost(GridCell cell) {
+	public int getFCost(GridCell cell) {
 		return getGCost(cell) + getHCost(cell);
 	}
 
-	public float getGCost(GridCell cell) {
+	public int getGCost(GridCell cell) {
 		GridCoord gc = cell.getCoord();
 		return gCosts[gc.getX()][gc.getY()];
 	}
 
-	private void setQueuedGCost(GridCell cell, float gCost, PriorityQueue<GridCell> queue) {
+	private void setQueuedGCost(GridCell cell, int gCost, PriorityQueue<GridCell> queue) {
 		// Remove node from priority queue. (Changing its g cost in place would
 		// cause the heaps to become unsorted.)
 		boolean wasPresent = queue.remove(cell);
@@ -327,7 +331,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		queue.offer(cell);
 	}
 
-	private void setGCost(GridCell cell, float gCost) {
+	private void setGCost(GridCell cell, int gCost) {
 		switch (getSetMembership(cell)) {
 			case NONE:
 			case CLOSED: {
@@ -354,7 +358,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 	 * NOTE: We don't need write access to this for this assignment.
 	 * @param cell the cell h is estimated from
 	 */
-	public float getHCost(GridCell cell) {
+	public int getHCost(GridCell cell) {
 		GridCoord gc = cell.getCoord();
 		return hCosts[gc.getX()][gc.getY()];
 	}
@@ -390,11 +394,11 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		return result;
 	}
 
-	// TODO: consider caching this value
 	public float getDCheapestWithError(GridCell cell) {
 
 		GridCoord gc = cell.getCoord();
-		return(dCheapestWithErrors[gc.getX()][gc.getY()]);
+		float dCheapestWithError = dCheapestWithErrors[gc.getX()][gc.getY()];
+		return(dCheapestWithError);
 	}
 
 	/**
@@ -505,14 +509,14 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		}
 		//System.out.println("TIE BREAK on H" + a + b);
 		
-		if (getExpansionNumber(a) < getExpansionNumber(b))
-		{
-			return(1);
-		}
-		else if (getExpansionNumber(b) < getExpansionNumber(a))
-		{
-			return(-1);
-		}
+//		if (getExpansionNumber(a) < getExpansionNumber(b))
+//		{
+//			return(1);
+//		}
+//		else if (getExpansionNumber(b) < getExpansionNumber(a))
+//		{
+//			return(-1);
+//		}
 		
 		return(-1);
 		
