@@ -321,22 +321,49 @@ public class DeadlineAwareSearch implements PlanningAgent
 		if (!foundDASSolution && incumbentPlan != null)
 		{
 			ComputedPlan pathNew = new ComputedPlan();
+			int pathCost = 0;
+			int countGreedy = 0;
+			int countDAS = 0;
+			// Used to track the cost between start point and current node
+			boolean DASPathToNodeIsCheaper = false;
+
 			// Combined the DAS partial plan with the greedy solution
 			for (int iterSteps = incumbentPlan.getLength()-1;
 					iterSteps >= 0 ; iterSteps--)
 			{
-
+				// Step backwards through each step of the greedy search that found the goal
 				GridCell cell = (GridCell) incumbentPlan.getStep(iterSteps);
 				pathNew.prependStep(cell);
+				pathCost += cell.getCellCost();
+				countGreedy++;
 				if (mapInfo.cellExists(cell))
 				{
-					// We have an improved solution! Get the upstream from the DAS mapInfo!
-					while (cell != null) {
-						//System.out.println("Prepending " + cell);
-						pathNew.prependStep(cell);
-						cell = mapInfo.getParent(cell);
+					
+					// We have hooked up with the DAS partial solution! 
+					// Get the upstream from the DAS mapInfo IFF it is cheaper from this point
+					DASPathToNodeIsCheaper = mapInfo.getGCost(cell) < pathCost;
+					if (DASPathToNodeIsCheaper)
+					{
+						while (cell != null) 
+						{
+							//System.out.println("Prepending " + cell);
+							pathCost += cell.getCellCost();
+							pathNew.prependStep(cell);
+							cell = mapInfo.getParent(cell);
+	
+							countDAS++;
+						}
+						
+						pathNew.setCost(pathCost);
+						System.out.println("pathNew cost: " + pathCost + 
+								" incumbentPlan: " + incumbentPlan.getCost());
+						
+						System.out.println("Hybrid solution found! Greedy nodes: " + countGreedy + " DAS nodes: " + countDAS);
+						incumbentPlan = pathNew;
+						
+						break;
 					}
-					return pathNew;
+
 				}
 			}
 			return incumbentPlan;
