@@ -15,7 +15,9 @@ import pplanning.interfaces.PlanningAgent;
 import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
 
-public class PreferredOperatorAStar implements PlanningAgent {
+public class AStar implements PlanningAgent {
+
+	private final static boolean DEBUG = true;
 
 	private ComputedPlan plan;
 	PreferredMapInfo mapInfo;
@@ -84,7 +86,7 @@ public class PreferredOperatorAStar implements PlanningAgent {
 
 			// if goal has been reached, return path
 			if (current == goal) {
-				System.out.println("update count = " + updateCount);
+				if (DEBUG) System.out.println("update count = " + updateCount);
 				return mapInfo.computePlan(goal);
 			}
 
@@ -102,7 +104,7 @@ public class PreferredOperatorAStar implements PlanningAgent {
 					// Node not previously encountered, add it to the open set.
 					mapInfo.add(neighbor, gCost, map.hCost(neighbor, goal), current);
 				} else if (FloatUtil.compare(gCost, mapInfo.getGCost(neighbor)) == -1) {
-					updateCount++;
+					if (DEBUG) updateCount++;
 					// Cheaper route to node found to node in the open set.
 					mapInfo.setGCost(neighbor, gCost);
 					mapInfo.setParent(neighbor, current);
