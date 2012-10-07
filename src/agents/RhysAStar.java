@@ -14,7 +14,8 @@ import au.rmit.ract.planning.pathplanning.entity.SearchDomain;
 import pplanning.interfaces.PlanningAgent;
 import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
-
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 public class RhysAStar implements PlanningAgent {
 	// plan to execute
 	private ComputedPlan plan;
@@ -24,6 +25,8 @@ public class RhysAStar implements PlanningAgent {
 	private int stepNo = 0;
 
 	private GridCell lastGoal = null;
+	HRTimer timer = new HRTimer();
+	final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
@@ -81,7 +84,12 @@ public class RhysAStar implements PlanningAgent {
 		// repeat while states are left in open set
 		while (mapinfo.isOpenEmpty() == false) {
 			GridCell current = mapinfo.closeCheapestOpen();
-
+			
+			//timer.getCurrentNanotime();
+			//timer.getCurrentNanotime();
+			//timer.getCurrentNanotime();
+			
+			
 			Trace.print(current);
 
 			// if goal has been reached, return path
@@ -92,7 +100,9 @@ public class RhysAStar implements PlanningAgent {
 
 			// iterate through neighboring nodes
 			for (State neighbor : map.getSuccessors(current)) {
-
+//				threadMX.getCurrentThreadCpuTime();
+//				threadMX.getCurrentThreadCpuTime();
+//				threadMX.getCurrentThreadCpuTime();
 				// consider node if it can be entered and is not in closed list
 				if (map.isBlocked(neighbor) == false &&
 						mapinfo.isClosed((GridCell) neighbor) == false) {
