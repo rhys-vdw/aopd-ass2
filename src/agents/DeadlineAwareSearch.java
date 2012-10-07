@@ -66,10 +66,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 	//long timePerExpansion = 1;
 
 	private int expansionCount = 0;
+	HRTimer timer = new HRTimer();
 
 	private boolean foundDASSolution = false;
 
 	private GridCell lastGoal = null;
+	
+	private long timeDeadline = 0;
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
@@ -102,15 +105,16 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 
 				// TODO: base search buffer on the length of the solution.
-				long timeCurrent = threadMX.getCurrentThreadCpuTime();
+				
+				long timeCurrent = 	timer.getCurrentNanotime();
 				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) - SEARCH_END_TIME_OFFSET);
-				long timeDeadline = timeCurrent + searchTime;
+				timeDeadline = timeCurrent + searchTime;
 
 				// a new plan has been generated, update open and closed debug sets.
 				shouldUpdateOpen = true;
 				shouldUpdateClosed = true;
 
-				plan = generatePlan(map, start, goal, timeDeadline);
+				plan = generatePlan(map, start, goal);
 
 				// If plan was not found, return start node.
 				if (plan == null)
@@ -176,7 +180,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 	 * 17) 	return incumbent
 	 */
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
-			GridCell goal, long timeDeadline) {
+			GridCell goal) 
+	{
 
 		//System.out.println("Generating a new plan");
 
@@ -197,28 +202,25 @@ public class DeadlineAwareSearch implements PlanningAgent
 		ComputedPlan incumbentPlan = null;
 		incumbentPlan = speedierSearch(map, start,goal);
 
-		assert threadMX.isCurrentThreadCpuTimeSupported();
-		threadMX.setThreadCpuTimeEnabled(true);
+		//assert threadMX.isCurrentThreadCpuTimeSupported();
+		//threadMX.setThreadCpuTimeEnabled(true);
 
-		long timeAfterGreedy = threadMX.getCurrentThreadCpuTime();
-		long timeUntilDeadline = (timeDeadline - timeAfterGreedy);
-
-//		System.out.println("time after greedy: " + timeAfterGreedy);
-//		System.out.println("time left: " + timeUntilDeadline);
+		//long timeAfterGreedy = timer.getCurrentNanotime();
+		//System.out.println("time after greedy: " + timeAfterGreedy);
+		//System.out.println("time left: " + timeUntilDeadline);
 
 		mapInfo.addStartCell(start, hCost, dCost);
 
-		timeAtLastExpansion = threadMX.getCurrentThreadCpuTime();
+		timeAtLastExpansion = timer.getCurrentNanotime();
 		float dCheapestWithError = 1;
 		int dMax = 2000;
 		// Continue until time has run out
-		while (timeUntilDeadline > 0)
+		while (timeDeadline - timer.getCurrentNanotime() > 0)
 		{
 			//System.out.println("\n************STARTING NEW ITERATION*****************\n");
 			//System.out.println("expansionCount/Settling = " + expansionCount + " / " + expansionCountForSettling);
 			if (!mapInfo.isOpenEmpty()) 
 			{
-
 				GridCell current = mapInfo.closeCheapestOpen();
 				//System.out.println("Closing " + current);
 //				System.out.println("h: " +  mapInfo.getHCost(current) + " g: " + mapInfo.getGCost(current));
@@ -227,7 +229,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 				if (incumbentPlan != null
 						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
 					//System.out.println("Not bothering to explore cell " + current);
-					timeUntilDeadline = timeDeadline - threadMX.getCurrentThreadCpuTime();
 					continue;
 				}
 
@@ -237,7 +238,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				{
 
 					dCheapestWithError = mapInfo.getDCheapestWithError(current);
-					dMax = calculateMaxReachableDepth(timeDeadline);
+					dMax = calculateMaxReachableDepth();
 
 //					System.out.println("d^cheapest = " + dCheapestWithError +
 //					           "\ndMax = " + dMax);
@@ -253,7 +254,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					//return(incumbentPlan);
 				}
 				else if ( (expansionCount <= expansionCountForSettling) ||
-						(dCheapestWithError < dMax))
+						(dCheapestWithError <= dMax)) // <?
 				{
 
 					// Generate all neighboring cells.
@@ -275,7 +276,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					expansionDelayWindow.push(expansionDelay);
 
 					// Calculate expansion interval.
-					long timeCurrent = threadMX.getCurrentThreadCpuTime();
+					long timeCurrent = 	timer.getCurrentNanotime();
 					long expansionTimeDelta = timeCurrent - timeAtLastExpansion;
 					expansionTimeWindow.push(expansionTimeDelta);
 					timeAtLastExpansion = timeCurrent;
@@ -295,7 +296,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// Open list is empty, so we need to repopulate it.
 				if (!mapInfo.isPrunedEmpty())
 				{
-					int exp = calculateExpansionsRemaining(timeDeadline);
+					int exp = calculateExpansionsRemaining();
 					mapInfo.recoverPrunedStates(exp);
 					expansionDelayWindow.reset();
 					expansionTimeWindow.reset();
@@ -311,7 +312,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 				
 			}
-			timeUntilDeadline = timeDeadline - threadMX.getCurrentThreadCpuTime();
 			//System.out.println("Time left: " + timeUntilDeadline);
 		}
 		//System.out.println("Returning solution with " + incumbentPlan.getLength() + " nodes");
@@ -382,7 +382,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			//System.out.println("Generating " + cell + " from parent: " + parent);
 //					", expansionCount = " + expansionCount + " parent exp: " + mapInfo.getExpansionNumber(current));
 			// consider node if it can be entered and is not in closed or pruned list
-			if (map.isBlocked(cell) == false)
+			//if (map.isBlocked(cell) == false)
 			{
 				int gCost = mapInfo.getGCost(parent) + (int)map.cost(parent, cell);
 				int hCost = (int)map.hCost(cell, goal);
@@ -419,11 +419,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 	 * @param timeDeadline the time that a solution must be found by (ns)
 	 * @return estimated number of expansions or dMax
 	 */
-	public int calculateMaxReachableDepth(long timeDeadline)
+	public int calculateMaxReachableDepth()
 	{
 		double avgExpansionDelay = expansionDelayWindow.getAvg();
 
-		int exp = calculateExpansionsRemaining(timeDeadline);
+		int exp = calculateExpansionsRemaining();
 		int dMax = (int) (exp / avgExpansionDelay);
 
 //		System.out.println("\n---------calculateMaxReachableDepth---------\n " +
@@ -448,13 +448,12 @@ public class DeadlineAwareSearch implements PlanningAgent
 	 * @param timeDeadline the time of the deadline, in nanoseconds
 	 * @return expansions remaining
 	 */
-	public int calculateExpansionsRemaining(long timeDeadline)
+	public int calculateExpansionsRemaining()
 	{
-		long timeRemaining = timeDeadline - threadMX.getCurrentThreadCpuTime();
 //		expansionTimeWindow.printAll();
 		float averageExpTime = expansionTimeWindow.getAvg();
 
-		int exp = (int) (timeRemaining / averageExpTime);
+		int exp = (int) ( (timeDeadline - timer.getCurrentNanotime()) / averageExpTime);
 
 //		System.out.println("\n------calculateExpansionsRemaining-------\n" +
 //				"\ntime remaining: " + timeRemaining +

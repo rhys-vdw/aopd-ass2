@@ -30,7 +30,7 @@ import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
 public class FastDasMapInfo implements Comparator<GridCell> {
 
 	// Used in the case of tiebreakers after f and h.
-	static Random rand = new Random(System.nanoTime());
+	//static Random rand = new Random(System.nanoTime());
 	// Added this data for debugging - probably not useful in our actual algorithm,
 	// is just to aid analysis.
 	GridDomain map;
