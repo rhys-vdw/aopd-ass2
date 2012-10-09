@@ -269,10 +269,10 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		int count = 0;
 		while (expansionsRemaining > 0 && prunedQueue.size() > 0) 
 		{
-			count++;
+			//count++;
 			GridCell cell = prunedQueue.poll();
-			//System.out.println("Just popped: " + cell + " from the pruned set");
-			//printCell(cell);
+//			System.out.println("Just popped: " + cell + " from the pruned set");
+//			printCell(cell);
 			//GridCell topOfPruned = prunedQueue.peek();
 			//System.out.println("New top of pruned: " + topOfPruned);
 			//printCell(topOfPruned);
@@ -282,6 +282,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 			// Set set attribute to opened.
 			GridCoord gc = cell.getCoord();
 			sets[gc.getX()][gc.getY()] = CellSetMembership.OPEN;
+			//expansionNumbers[gc.getX()][gc.getY()] = count++;
 
 			// Add to opened priority queue.
 			//GridCell topOfOpen = openQueue.peek();
@@ -373,7 +374,7 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 		return dCheapestRaws[gc.getX()][gc.getY()];
 	}
 
-	private int getCumulativeError(GridCell cell) {
+	public int getCumulativeError(GridCell cell) {
 		GridCoord gc = cell.getCoord();
 		return cumulativeErrors[gc.getX()][gc.getY()];
 	}
@@ -403,7 +404,6 @@ public class FastDasMapInfo implements Comparator<GridCell> {
 
 	/**
 	 * Get average single step error.
-	 * TODO: consider caching this value
 	 */
 	private float getAverageError(GridCell cell) {
 		if (getDepth(cell) == 0) {

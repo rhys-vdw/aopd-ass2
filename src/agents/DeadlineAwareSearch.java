@@ -59,7 +59,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			EXPANSION_DELAY_WINDOW_LENGTH);
 
 	// For timing
-	final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
+	//final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
 
 	long timeAtLastExpansion;
 	//long countExpansionsAtLastDifferentMeasurement;
@@ -222,7 +222,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			if (!mapInfo.isOpenEmpty()) 
 			{
 				GridCell current = mapInfo.closeCheapestOpen();
-				//System.out.println("Closing " + current);
+//				System.out.println("Closing " + current);
 //				System.out.println("h: " +  mapInfo.getHCost(current) + " g: " + mapInfo.getGCost(current));
 
 				// If this node has a higher g cost than the incumbent plan, discard it.
@@ -269,10 +269,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 					}
 
 					// Increment number of expansions.
-					expansionCount++;
+				
 
 					// Insert expansion delay into sliding window.
 					int expansionDelay = expansionCount - mapInfo.getExpansionNumber(current);
+//					System.out.println("expansionCount: " + expansionCount + 
+//							" expansionDelay: " + expansionDelay + " settling " + 
+//							(expansionCount <= expansionCountForSettling));
 					expansionDelayWindow.push(expansionDelay);
 
 					// Calculate expansion interval.
@@ -280,14 +283,17 @@ public class DeadlineAwareSearch implements PlanningAgent
 					long expansionTimeDelta = timeCurrent - timeAtLastExpansion;
 					expansionTimeWindow.push(expansionTimeDelta);
 					timeAtLastExpansion = timeCurrent;
+					expansionCount++;
 
 
 				}
 				else /* expansionCount > settlingCount && dCheapest > dMax */
 				{
 //					System.out.println("Pruning " + current.getCoord());
-//					System.out.println("Pruning cell, expansion count = " + expansionCount + ", settleCount = " + expansionCountForSettling);
-					mapInfo.pruneCell(current);
+					//System.out.println("Pruning cell " + current);
+					//mapInfo.printCell(current);
+					//if (mapInfo.getCumulativeError(current) > 0)
+						mapInfo.pruneCell(current);
 
 				}
 			}
@@ -296,12 +302,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 				// Open list is empty, so we need to repopulate it.
 				if (!mapInfo.isPrunedEmpty())
 				{
+					//expansionCount = 0;
+					expansionCountForSettling = SETTLING_EXPANSION_COUNT + expansionCount;
 					int exp = calculateExpansionsRemaining();
 					mapInfo.recoverPrunedStates(exp);
 					expansionDelayWindow.reset();
 					expansionTimeWindow.reset();
 
-					expansionCountForSettling = expansionCount + SETTLING_EXPANSION_COUNT;
+
 					//System.out.println("Depruning - new settling limit = " + expansionCountForSettling);
 				}
 				else
@@ -341,7 +349,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 					
 					// We have hooked up with the DAS partial solution! 
 					// Get the upstream from the DAS mapInfo IFF it is cheaper from this point
-					DASPathToNodeIsCheaper = mapInfo.getGCost(cell) < pathCost;
+					DASPathToNodeIsCheaper = mapInfo.getGCost(cell) + pathCost 
+							< incumbentPlan.getCost();
 					if (DASPathToNodeIsCheaper)
 					{
 						while (cell != null) 
@@ -358,7 +367,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 						System.out.println("pathNew cost: " + pathCost + 
 								" incumbentPlan: " + incumbentPlan.getCost());
 						
-						System.out.println("Hybrid solution found! Greedy nodes: " + countGreedy + " DAS nodes: " + countDAS);
+						System.out.println("Hybrid solution found! Greedy nodes: "
+						+ countGreedy + " DAS nodes: " + countDAS + " Cost: " + pathCost);
 						incumbentPlan = pathNew;
 						
 						break;
@@ -382,7 +392,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			//System.out.println("Generating " + cell + " from parent: " + parent);
 //					", expansionCount = " + expansionCount + " parent exp: " + mapInfo.getExpansionNumber(current));
 			// consider node if it can be entered and is not in closed or pruned list
-			//if (map.isBlocked(cell) == false)
+			if (map.isBlocked(cell) == false)
 			{
 				int gCost = mapInfo.getGCost(parent) + (int)map.cost(parent, cell);
 				int hCost = (int)map.hCost(cell, goal);
