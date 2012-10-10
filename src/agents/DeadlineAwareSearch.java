@@ -71,7 +71,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private boolean foundDASSolution = false;
 
 	private GridCell lastGoal = null;
-	
+
 	private long timeDeadline = 0;
 
 	@Override
@@ -97,16 +97,16 @@ public class DeadlineAwareSearch implements PlanningAgent
 					plan == null ||			// no last path stored, have yet notr planned before?
 					map.getChangedEdges().size() > 0 ||	// map has had changes
 					!lastGoal.equals(goal);
-					
-					
+
+
 
 			if (bReplan)
 			// If there is no plan, generate one.
 			{
 
 				// TODO: base search buffer on the length of the solution.
-				
-				long timeCurrent = 	timer.getCurrentNanotime();
+
+				long timeCurrent = timer.getCurrentNanotime();
 				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) - SEARCH_END_TIME_OFFSET);
 				timeDeadline = timeCurrent + searchTime;
 
@@ -180,7 +180,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	 * 17) 	return incumbent
 	 */
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
-			GridCell goal) 
+			GridCell goal)
 	{
 
 		//System.out.println("Generating a new plan");
@@ -219,7 +219,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 		{
 			//System.out.println("\n************STARTING NEW ITERATION*****************\n");
 			//System.out.println("expansionCount/Settling = " + expansionCount + " / " + expansionCountForSettling);
-			if (!mapInfo.isOpenEmpty()) 
+			if (!mapInfo.isOpenEmpty())
 			{
 				GridCell current = mapInfo.closeCheapestOpen();
 //				System.out.println("Closing " + current);
@@ -261,20 +261,20 @@ public class DeadlineAwareSearch implements PlanningAgent
 					//System.out.println("-----> current = " + current);
 					SuccessorIterator neighborIter = map.getNextSuccessor(current);
 					GridCell neighbor;
-					
-					while ((neighbor = neighborIter.next()) != null) 
+
+					while ((neighbor = neighborIter.next()) != null)
 					{
 						//System.out.println(neighbor);
 						generateCell(map, goal, current, neighbor);
 					}
 
 					// Increment number of expansions.
-				
+
 
 					// Insert expansion delay into sliding window.
 					int expansionDelay = expansionCount - mapInfo.getExpansionNumber(current);
-//					System.out.println("expansionCount: " + expansionCount + 
-//							" expansionDelay: " + expansionDelay + " settling " + 
+//					System.out.println("expansionCount: " + expansionCount +
+//							" expansionDelay: " + expansionDelay + " settling " +
 //							(expansionCount <= expansionCountForSettling));
 					expansionDelayWindow.push(expansionDelay);
 
@@ -318,7 +318,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					break;
 				}
 
-				
+
 			}
 			//System.out.println("Time left: " + timeUntilDeadline);
 		}
@@ -346,31 +346,31 @@ public class DeadlineAwareSearch implements PlanningAgent
 				countGreedy++;
 				if (mapInfo.cellExists(cell))
 				{
-					
-					// We have hooked up with the DAS partial solution! 
+
+					// We have hooked up with the DAS partial solution!
 					// Get the upstream from the DAS mapInfo IFF it is cheaper from this point
-					DASPathToNodeIsCheaper = mapInfo.getGCost(cell) + pathCost 
+					DASPathToNodeIsCheaper = mapInfo.getGCost(cell) + pathCost
 							< incumbentPlan.getCost();
 					if (DASPathToNodeIsCheaper)
 					{
-						while (cell != null) 
+						while (cell != null)
 						{
 							//System.out.println("Prepending " + cell);
 							pathCost += cell.getCellCost();
 							pathNew.prependStep(cell);
 							cell = mapInfo.getParent(cell);
-	
+
 							countDAS++;
 						}
-						
+
 						pathNew.setCost(pathCost);
-						System.out.println("pathNew cost: " + pathCost + 
+						System.out.println("pathNew cost: " + pathCost +
 								" incumbentPlan: " + incumbentPlan.getCost());
-						
+
 						System.out.println("Hybrid solution found! Greedy nodes: "
 						+ countGreedy + " DAS nodes: " + countDAS + " Cost: " + pathCost);
 						incumbentPlan = pathNew;
-						
+
 						break;
 					}
 
@@ -396,7 +396,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 				int gCost = mapInfo.getGCost(parent) + (int)map.cost(parent, cell);
 				int hCost = (int)map.hCost(cell, goal);
-				
+
 				int dCheapestRaw = distanceCalculator.dCost(cell, goal);
 
 				if (!mapInfo.cellExists(cell))
@@ -440,7 +440,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 //				"\nexpansions remaining: " + exp +
 //				"\navgExpansionDelay: " + avgExpansionDelay +
 //				"\n dMax: " + dMax);
-		
+
 		//System.out.println("dMax: " + dMax);
 		return dMax;
 	}

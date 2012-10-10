@@ -5,7 +5,7 @@ Sebastian Sardina
 Andy Heng Xie
 Nitin Yadav
 
-Date: 
+Date:
 
 - August 2012 - release v2.6 (SS)
 - August 2012 - release v2.5 (Nitin Yadav & SS)
@@ -29,7 +29,7 @@ where
 You can also use the script run.sh:
 
 ./run.sh <conf-file>
-	
+
 
 ----------------------
 # Configuration file
@@ -59,7 +59,7 @@ agentclass=agents.MyRestartAStarAgent
 # Location of the agent JAR or binary
 agentloc=./
 
-		
+
 
 ----------------------
 # Eclipse Installation
@@ -67,7 +67,7 @@ agentloc=./
 
 1) Import the .zip file as an existing project.
 
-2) Add this jar files the Java Build Path configuration: 
+2) Add this jar files the Java Build Path configuration:
 		- lib/libJPathPlan-vX.Y.jar (where the path-planning algorithms are used)
 		- lib/Apparate-vX.Y.jar (where the path-planning algorithms are used)
 
@@ -75,12 +75,12 @@ agentloc=./
 
 	Main class:
 		pplanning.simviewer.view.Launcher
-		
+
 	Arguments:
 		config.properties
 
 4) Make sure ECLIPSE is using the SUN Java JRE to run your project (and not OpenJDK):
-	Check Project Properties / Java Build Path / Libraries 	
+	Check Project Properties / Java Build Path / Libraries
 If you have SUN Java installed somewhere else (e.g., in /opt/java), you need to register it
 into ECLIPSE so that it can be then selected in your project. You can do it in:
 	Windows / Preferences / Java / Installed JREs
@@ -90,25 +90,25 @@ Then you can go to your particular project and set to use that JRE version.
 ------------------
 # GUI Quick Start
 ------------------
-	
+
 	File->"Open Map" :
 		Opens a new map of file type "*.map"
 	File->"Open Script" :
 		Opens the script for the current map
 		Will replace the existing one if exists
-		
-		
-	Environment->"A*"|"MTD A*"|"LSS LTR A*"|"ALSS LTR A*" : 
+
+
+	Environment->"A*"|"MTD A*"|"LSS LTR A*"|"ALSS LTR A*" :
 		Which planner to use. These are the common planners.
 	Environment->"Others..." :
 		This allow you use other planners not listed above
 		This opens up a dialog box for you to enter <plannertype>
 	Environment->"Grid as Manhatten"|"Grid as Euclidean" :
 		Determines if the agent is allow to move diagonal
-	
-	
+
+
 	Layer->"Show Traversable Map"|"Show Terrain map" :
-		Show only the traversable area of the map or all details of the map	
+		Show only the traversable area of the map or all details of the map
 	Layer->"Show Start Position"|"Show Destination Position" :
 		Show the current location of the start and the destination
 	Layer->"Show Plan Path" :
@@ -117,16 +117,16 @@ Then you can go to your particular project and set to use that JRE version.
 		Show the path which the agent has traversed
 	Layer->"Show Expanded Node"|"Show Unexpanded Node" :
 		Show which location has been opened and which been closed
-	
-	
+
+
 	Run->"Loop" :
 		enable this to continuously step through the map, uncheck this to attempt to pause
 	Run->"Step" :
 		click to perform a single step on the map
 	Run->"Stop on Arrival" :
 		Check this to automatically stop looping once the agent has reach the destination
-		
-		
+
+
 	[Status Bar]->[Left] :
 		Shows the current step, and if it is running, pausing, stopped or errored
 	[Status Bar]->[Middle Right] :
@@ -135,8 +135,8 @@ Then you can go to your particular project and set to use that JRE version.
 	[Status Bar]->[Right Slider] :
 		Slide right to zoom in, left to zoom out.
 		Multiplier is shown on the left of the slider
-			
-			
+
+
 	Map :
 		To control the map, it use a combination of keyboard and mouse.
 		Generally, it require you to press a key and select where to apply it on the map
@@ -144,18 +144,18 @@ Then you can go to your particular project and set to use that JRE version.
 			Click: press a key and click where to apply it
 			Select: press a key and highlight the area to apply it
 			Drag: press a key and drag it around the map
-			
+
 		These are the current implemented functions:
-		
+
 			'q' [Select]: fill the select area with out of bound grids
 			'w' [Select]: fill the select area with water grids
 			'e' [Select]: fill the select area with ground grids
 			'r' [Select]: fill the select area with swamp grids
 			't' [Select]: fill the select area with tree grids
-			
+
 			's' [Click]: place the agent at the clicked location
 			'd' [Click]: place the goal at the clicked location
-			
+
 			'z' [Click]: zoom in at the given point
 			'x' [Click]: zoom out at the given point
 			'c' [Drag]: move the map around
@@ -166,7 +166,7 @@ Then you can go to your particular project and set to use that JRE version.
 # Map Scripting
 ----------------------
 
-	file name: "*.mapscript"	
+	file name: "*.mapscript"
 
 	Format:
 		- Commands are separated by line
@@ -195,37 +195,37 @@ Then you can go to your particular project and set to use that JRE version.
 				"PUTGOAL <X> <Y>" : place the goal at the new given location
 				"PUSHSTART <OFFSETX> <OFFSETY>" : move the start by the given offset amount
 				"PUSHGOAL <OFFSETX> <OFFSETY>" : move the goal by the given offset amount
-				
+
 		- A Command must have at least one action and at least one step or trigger subcommand
 		- A Command is executed only if at least one step AND one trigger is valid during that step
 			- if command does not have a step or trigger, it is consider that the step or trigger is always valid
 		- '#' at the start of the command with mark it as a comment
-		
+
 	Example:
 		On the seventh step, fill from <10, 10> to <100, 100> with trees:
 			STEP 7 FILLTREE 10 10 91 91
-			
+
 		When the start is within 5 step of the goal at <10, 10>, move the goal to <100, 100>:
 			STARTENTER 5 5 11 11 PUTGOAL 100 100
-			
+
 		After the 100 step, move the goal to the right at the rate of 1 move per 7 steps:
 			REPEAT 6 1 -6 100 0 PUSHGOAL 1 0
-		
+
 		Every 4 moves, move the start up one step and move the goal left one step
 			REPEAT 3 1 PUSHSTART 0 1 PUSHGOAL -1 0
-			
+
 		When the start is within 4 step of the goal at <10, 10> within 100 steps, move the goal to <20, 20>, else move it to <30, 30>:
 			STEP 1 100 STARTENTER 6 6 9 9 PUTGOAL 20 20
-			STEP 100 0 STARTENTER 6 6 9 9 PUTGOAL 30 30 
+			STEP 100 0 STARTENTER 6 6 9 9 PUTGOAL 30 30
 			# There is two commands
-		
+
 -----------
 # Bug
 -----------
 
 	- GUI occassionally locks up if the planner work is too intense
-	
-	
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 EOF
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

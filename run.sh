@@ -12,6 +12,8 @@ echo ================================================
 echo "$fileName"
 echo ================================================
 
+# -Djava.library.path=/home/rhys/uni/aopd/ass/2/aopd-ass2
+# -cp /home/rhys/uni/aopd/ass/2/aopd-ass2/lib/bin/agents Apparate
 
 echo
-java -cp bin/:lib/JPathPlan-v1.7.jar:lib/Apparate-v3.0.jar:lib/MyCoolAgent.jar pplanning.simviewer.controller.Launcher $fileName -
+java -Djava.library.path=lib/ -cp bin/:lib/JPathPlan-v1.7.jar:lib/Apparate-v3.0.jar:lib/MyCoolAgent.jar pplanning.simviewer.controller.Launcher $fileName -
