@@ -41,11 +41,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
-<<<<<<< HEAD
-	final private int SETTLING_EXPANSION_COUNT = 600;
-=======
 	final private int SETTLING_EXPANSION_COUNT = 10;
->>>>>>> origin/master
 
 	// Updating count that needs to be reached to indicate that we are settled.
 	private int expansionCountForSettling = SETTLING_EXPANSION_COUNT;
