@@ -4,40 +4,38 @@ import java.util.ArrayList;
 
 import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
 import au.rmit.ract.planning.pathplanning.entity.State;
-import au.rmit.ract.planning.pathplanning.entity.Plan;
-import au.rmit.ract.planning.pathplanning.entity.SearchDomain;
 import pplanning.interfaces.PlanningAgent;
 import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
 import pplanning.simviewer.model.SuccessorIterator;
 
-import java.io.PrintStream;
-import java.io.OutputStream;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
-
 public class DeadlineAwareSearch implements PlanningAgent
 {
+	// Store our persistent solutions.
 	private ComputedPlan plan;
 
+	// The old map info class with dynamic node allocation
 	//DasMapInfo mapInfo;
+	
+	// Use the map info class with static allocation!
 	FastDasMapInfo mapInfo;
 
-	// number of steps taken in current plan
+	// Number of steps taken in current plan
 	private int stepNo = 0;
 
+	// Conversion factor for MS (apparate interface) to nanosecond (our internal timing unit)
 	final private long MS_TO_NS_CONV_FACT = 1000000;
 
-	// Percentage of deadline to be used generating plan. (As opposed to moving
+	// Static amount of time to be used generating plan. (As opposed to moving
 	// along the plan afterwards.)
-	final private long SEARCH_END_TIME_OFFSET = 20000000;
+	final private long SEARCH_END_TIME_OFFSET = 20000000; // 20ms
 
-	// Should the open and closed sets be regenerated?
+	// Should the open and closed sets (graphics only!! - not in the search) be regenerated?
 	boolean shouldUpdateOpen = false;
 	boolean shouldUpdateClosed = false;
 
+	// The following members are used to determine the depth estimate (d^cheapest) heuristic to use
 	private enum GridType { MANHATTAN, CHESSBOARD }
-
 	private DistanceCalculator distanceCalculator = null;
 
 	// r_default. Used before conExpansionIntervals has settled.
@@ -58,12 +56,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private SlidingWindow expansionTimeWindow = new SlidingWindow(
 			EXPANSION_DELAY_WINDOW_LENGTH);
 
-	// For timing
-	//final ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
-
 	long timeAtLastExpansion;
-	//long countExpansionsAtLastDifferentMeasurement;
-	//long timePerExpansion = 1;
 
 	private int expansionCount = 0;
 	HRTimer timer = new HRTimer();
