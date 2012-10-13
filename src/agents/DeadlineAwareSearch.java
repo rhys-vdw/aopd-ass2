@@ -229,11 +229,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 //				// If this node has a higher g cost than the incumbent plan, discard it.
 				// GS: commented out this code so that DAS solutions can be visualised!
-//				if (incumbentPlan != null
-//						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
-//					//System.out.println("Not bothering to explore cell " + current);
-//					continue;
-//				}
+				if (incumbentPlan != null
+						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
+					//System.out.println("Not bothering to explore cell " + current);
+					continue;
+				}
 
 				if (expansionCount > expansionCountForSettling)
 				{
