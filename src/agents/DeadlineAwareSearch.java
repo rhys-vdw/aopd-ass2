@@ -227,12 +227,12 @@ public class DeadlineAwareSearch implements PlanningAgent
 //				System.out.println("h: " +  mapInfo.getHCost(current) + " g: " + mapInfo.getGCost(current));
 
 //				// If this node has a higher g cost than the incumbent plan, discard it.
-				// GS: commented out this code so that DAS solutions can be visualised!
-//				if (incumbentPlan != null
-//						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
-//					//System.out.println("Not bothering to explore cell " + current);
-//					continue;
-//				}
+				// GS: comment out this code so that DAS solutions can be visualised!
+				if (incumbentPlan != null
+						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
+					//System.out.println("Not bothering to explore cell " + current);
+					continue;
+				}
 
 				if (expansionCount > expansionCountForSettling)
 				{
@@ -250,11 +250,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 				if (current == goal)
 				{
 					System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
-<<<<<<< HEAD
-					foundDASSolution = true;
-					incumbentPlan = mapInfo.computePlan(goal);
-					return(incumbentPlan);
-=======
 					if (!foundDASSolution)
 					{
 						// If this is the first time DAS has found a solution, we should switch 
@@ -269,10 +264,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 						// If there is no previous plan, or the new path is no better
 						incumbentPlan = mapInfo.computePlan(goal);
 					}
-				
-
-					//return(incumbentPlan);
->>>>>>> origin/master
 				}
 				else if ( (expansionCount <= expansionCountForSettling) ||
 						(dCheapestWithError <= dMax)) // <?

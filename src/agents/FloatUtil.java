@@ -15,4 +15,31 @@ public class FloatUtil {
 		}
 		return (a > b) ? 1 : -1;
 	}
+	
+	public static boolean lessThan(float a, float b)
+	{
+		return(compare(a,b) == -1);
+	}
+	
+	public static boolean greaterThan(float a, float b)
+	{
+		return(compare(a,b) == 1);
+	}
+	
+	public static boolean equal(float a, float b)
+	{
+		return(compare(a,b) == 0);
+	}
+	
+	public static boolean greaterThanOrEqual(float a, float b)
+	{
+		return(compare(a,b) != -1);
+	}
+	
+	public static boolean lessThanOrEqual(float a, float b)
+	{
+		return(compare(a,b) != 1);
+	}
+	
+	
 }
