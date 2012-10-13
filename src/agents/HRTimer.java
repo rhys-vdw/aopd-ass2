@@ -17,8 +17,7 @@ public class HRTimer
 		
 		long conDiffsMX[] = new long[1000];
 		long conDiffsC[] = new long[1000];
-		
-		System.out.println("Now timing C Timer");
+
 		for (int n = 0; n < 1000; n++)
 		{
 			conDiffsC[n] = Math.abs(timer.getCurrentNanotime() - timer.getCurrentNanotime());
@@ -26,13 +25,21 @@ public class HRTimer
 			
 		}
 		
+		long totalMX = 0 ;
+		long totalC = 0;
+		
+		System.out.println("Average difference between two calls of timing function of 1000 runs");
 		for (int n = 0; n < 1000; n++)
 		{
+			totalMX += conDiffsMX[n];
+			totalC += conDiffsC[n];
 			// Tried around both ways - makes no difference.. C is faster :)
-			System.out.println("C: " + conDiffsC[n]);
-			System.out.println("MX: " + conDiffsMX[n]);
+			//System.out.println("C: " + conDiffsC[n]);
+			//System.out.println("MX: " + conDiffsMX[n]);
 			
 		}
+		System.out.println("C: " + totalC/1000);
+		System.out.println("ThreadMX: " + totalMX/1000);
 	}
 
 	static

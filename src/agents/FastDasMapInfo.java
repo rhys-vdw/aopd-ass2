@@ -39,6 +39,9 @@ public class FastDasMapInfo {
 
 	// Priority queues for open and pruned sets.
 	private PriorityQueue<GridCell> openQueue;
+	
+	private HComparator hComp;
+	private WeightedHFComparator weightedHComp;
 	private PriorityQueue<GridCell> prunedQueue;
 
 	// Cell properties.
@@ -76,10 +79,19 @@ public class FastDasMapInfo {
 		// Initialize queues for open and pruned sets.
 		this.openQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY,
 				new FComparator(this));
+<<<<<<< HEAD
 		this.prunedQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY,
 				new FComparator(this));
 				//new HComparator(this));//WeightedHFComparator(this, 1.5f));
 				//new WeightedHFComparator(this, 1.5f));
+=======
+		
+		hComp = new HComparator(this);
+		weightedHComp = new WeightedHFComparator(this, 1000f); // W=1000, obliterate G initially
+		this.prunedQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY, weightedHComp);
+				//WeightedHFComparator(this, 1.5f));
+
+>>>>>>> origin/master
 	}
 
 	public ComputedPlan computePlan(GridCell goal)
@@ -240,7 +252,7 @@ public class FastDasMapInfo {
 			throw new IllegalStateException("Cannot prune cell " + cell +
 					" - not in closed set.");
 		}
-
+		// GS: note that timePercentRemaining is no longer used!
 		// Remove from open set.
 		closedCount--;
 
@@ -248,9 +260,27 @@ public class FastDasMapInfo {
 		GridCoord gc = cell.getCoord();
 		sets[gc.getX()][gc.getY()] = CellSetMembership.PRUNED;
 
-		// Add to pruned priority queue.
 		prunedQueue.offer(cell);
 
+	}
+	
+	void NotifySolutionFound()
+	{
+		weightedHComp.setWeight(1.0f);
+		int szPrunedQueue = prunedQueue.size();
+		GridCell conCells[] = new GridCell[szPrunedQueue];
+//		System.out.println("After Solution Found: Size of pruned " + szPrunedQueue);
+		for (int n = 0; n < szPrunedQueue; n++)
+		{
+			
+			conCells[n] = prunedQueue.poll();
+		}
+		
+		for (int n = 0; n < szPrunedQueue; n++)
+		{
+			//System.out.println("Readding " + iterCells);
+			prunedQueue.offer(conCells[n]);
+		}
 	}
 
 	public boolean isPrunedEmpty()
@@ -271,31 +301,18 @@ public class FastDasMapInfo {
 		int count = 0;
 		while (expansionsRemaining > 0 && prunedQueue.size() > 0)
 		{
-			//count++;
 			GridCell cell = prunedQueue.poll();
-//			System.out.println("Just popped: " + cell + " from the pruned set");
-//			printCell(cell);
-			//GridCell topOfPruned = prunedQueue.peek();
-			//System.out.println("New top of pruned: " + topOfPruned);
-			//printCell(topOfPruned);
-
 			expansionsRemaining -= getDCheapestWithError(cell);
 
 			// Set set attribute to opened.
 			GridCoord gc = cell.getCoord();
 			sets[gc.getX()][gc.getY()] = CellSetMembership.OPEN;
-			//expansionNumbers[gc.getX()][gc.getY()] = count++;
 
 			// Add to opened priority queue.
-			//GridCell topOfOpen = openQueue.peek();
-			//System.out.println("Current top of open set: " + topOfOpen);
 			openQueue.offer(cell);
-			//System.out.println("Pushed " + cell + " onto open set");
-			//topOfOpen = openQueue.peek();
-			//System.out.println("New top of open set: " + topOfOpen);
 		}
-		//System.out.println("Recovered " + count + " nodes");
 	}
+	
 
 	public GridCell getParent(GridCell cell) {
 		GridCoord gc = cell.getCoord();

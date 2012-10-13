@@ -36,4 +36,9 @@ public class WeightedHFComparator implements Comparator<GridCell> {
 		int hCompare = FloatUtil.compare(mapInfo.getHCost(a), mapInfo.getHCost(b));
 		return (hCompare == 0) ? -1 : hCompare;
 	}
+	
+	public void setWeight(float weight)
+	{
+		this.weight = weight;
+	}
 }
