@@ -16,6 +16,9 @@ public class FloatUtil {
 		return (a > b) ? 1 : -1;
 	}
 	
+	/**
+	 * The following are easier interfaces available for this class
+	 */
 	public static boolean lessThan(float a, float b)
 	{
 		return(compare(a,b) == -1);

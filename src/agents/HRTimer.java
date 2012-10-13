@@ -3,12 +3,25 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.lang.Math;
 
+/**
+ * This library is used to query the System High Resolution Timer
+ * It should be compiled into a shared object, which needs to be in
+ * the LD_LIBRARY_PATH
+ * 
+ * TODO: Provide a __WIN32__ function in the C code! 
+ */
+
 public class HRTimer 
 {
 	private native void print();
 	
+	/**
+	 * Interface to the C function
+	 */
 	public native long getCurrentNanotime();
 	final static ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
+	
+	// Test application!
 	public static void main(String[] args)
 	{
 		assert threadMX.isCurrentThreadCpuTimeSupported();

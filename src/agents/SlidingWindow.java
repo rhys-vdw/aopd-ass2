@@ -7,9 +7,8 @@ import java.util.Arrays;
  *
  * @author geoff
  *
- * This class is necessary because java does not have a straight queue container!
  * We want a circular queue, where, if the container is 'full', addition of a new object
- * will cause the oldest item to be removed, and the new item, to be inserted at the
+ * will cause the oldest item to be removed, and the new item to be inserted at the
  * beginning.
  *
  * Would have preferred to define the class using generics, but you cant instantiate a generic array in java!
@@ -60,9 +59,6 @@ public class SlidingWindow
 
 		// Add the new value to the sum
 		m_sum += _newEntry;
-		//System.out.print("adding " + _newEntry + " sum = " + m_sum);
-
-
 	}
 
 	public void printAll()

@@ -5,10 +5,12 @@ package agents;
 import java.lang.String;
 
 
-/*
+/**
  * Singleton class for printout debug data
  * Should have some options for debug level, ie, to remove traces from performance critical parts
  * but keep traces for non critical sections
+ * 
+ * No longer used
  */
 final class Trace 
 {

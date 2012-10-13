@@ -1,8 +1,8 @@
 Compilation instructions for libHRTimer
 
 gcc -I${JAVA_HOME}/include  -shared libHRTimer.c -o libHRTimer.so -fPIC -lrt
-
+note that -lrt needs to be at the end!
 Note also that libHRTimer.so needs to be in your LD_LIBRARY_PATH
 
-note that -lrt needs to be at the end!
+
 
