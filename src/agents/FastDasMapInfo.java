@@ -15,51 +15,55 @@ import pplanning.simviewer.model.GridCoord;
 
 import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
 
-/**
- * A class to store metadata about the current map.
- *
- * Direct access to CellInfo instances cannot be provided to ensure that a cell
- * is always present in the open queue when it is in the open set.
- *
- * Nodes that are in the open set cannot be altered. Later this will probably
- * need to be changed, but for standard A* this is fine.
- *
- * I have used assertions instead of exceptions for speed (since we can disable
- * them on run).
- */
-public class FastDasMapInfo {
 
-	// Used in the case of tiebreakers after f and h.
-	//static Random rand = new Random(System.nanoTime());
-	// Added this data for debugging - probably not useful in our actual algorithm,
-	// is just to aid analysis.
+/**
+ * We are using a mapsized array for each attribute, so that we can allocate 
+ * all of the storage at construction time, rather than dynamically
+ * It is felt that this could be a performance restriction.
+ * The old implementation, storing everything in Node and pushing/popping
+ * these nodes onto a priority queue, is in the DasCellInfo class, but 
+ * has not been maintained for a while.
+ * 
+ * It is probably a more readable/maintainable implementation, but the suspicion is that
+ * the dynamic allocation of nodes causes performance issues. 
+ * 
+ * Note that each attribute given to a node will have to have an array allocated for 
+ * to cover each node.
+ **/
+public class FastDasMapInfo 
+{
 	GridDomain map;
 
 	private int closedCount = 0;
 
 	// Priority queues for open and pruned sets.
 	private PriorityQueue<GridCell> openQueue;
-	
-	private HComparator hComp;
+
 	private WeightedHFComparator weightedHComp;
 	private PriorityQueue<GridCell> prunedQueue;
 
+	
 	// Cell properties.
-	private CellSetMembership[][] sets;
-	private GridCell[][]          parents;
-	private int[][]               gCosts;
-	private int[][]               hCosts;
-	private int[][]               dCheapestRaws;
-	private float[][]             dCheapestWithErrors;
-	private int[][]               dErrors;
-	private int[][]               expansionNumbers;
-	private int[][]               cumulativeErrors;
-	private int[][]               depths;
+	private CellSetMembership[][] sets; 					// Set membership of each node
+	private GridCell[][]          parents;					// Parents of each node
+	private int[][]               gCosts;					// G Costs of each node
+	private int[][]               hCosts;					// H Estimate of each node
+	private int[][]               dCheapestRaws;			// Initial D Cheapest value of each node
+	private float[][]             dCheapestWithErrors;		// Error corrected d^cheapest of each node
+	private int[][]               dErrors;					// Error present (vs heuristic) of each node
+	private int[][]               expansionNumbers;		// Expansion number stamped on each node
+	private int[][]               cumulativeErrors;		// Error experienced so far, to this node, from the start point
+	private int[][]               depths;					// Depth of each node, from the start point
 
-	private final int INITIAL_QUEUE_CAPACITY = 11;
+	// Used to initialise the priority queues - arbitrary value
+	// Does not seem to have an impact on performance.
+	private final int INITIAL_QUEUE_CAPACITY = 1000;
 
-	//public int lowestDCheapest = Integer.MAX_VALUE;
-
+	
+	/**
+	 * Constructor for the map info class
+	 * @param map
+	 */
 	public FastDasMapInfo(GridDomain map) {
 		this.map = map;
 		int width = map.getWidth();
@@ -80,11 +84,8 @@ public class FastDasMapInfo {
 		this.openQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY,
 				new FComparator(this));
 		
-		hComp = new HComparator(this);
 		weightedHComp = new WeightedHFComparator(this, 1000f); // W=1000, obliterate G initially
 		this.prunedQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY, weightedHComp);
-				//WeightedHFComparator(this, 1.5f));
-
 	}
 
 	public ComputedPlan computePlan(GridCell goal)
