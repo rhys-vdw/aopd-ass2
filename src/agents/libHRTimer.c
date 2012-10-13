@@ -7,7 +7,7 @@
 JNIEXPORT void JNICALL Java_agents_HRTimer_print
   (JNIEnv* env, jobject obj)
 {
-   printf(" C says hello - printing") ;
+	printf(" C says hello - printing") ;
 }
 
 JNIEXPORT jlong JNICALL Java_agents_HRTimer_getCurrentNanotime

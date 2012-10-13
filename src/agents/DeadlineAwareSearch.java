@@ -258,9 +258,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 						// If there is no previous plan, or the new path is no better
 						incumbentPlan = mapInfo.computePlan(goal);
 					}
-				
-
-					//return(incumbentPlan);
 				}
 				else if ( (expansionCount <= expansionCountForSettling) ||
 						(dCheapestWithError <= dMax)) // <?
