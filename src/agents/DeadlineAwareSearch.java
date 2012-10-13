@@ -20,7 +20,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 {
 	private ComputedPlan plan;
 
-	//DasMapInfo mapInfo;
 	FastDasMapInfo mapInfo;
 
 	// number of steps taken in current plan
@@ -42,7 +41,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
-	final private int SETTLING_EXPANSION_COUNT = 200;
+	final private int SETTLING_EXPANSION_COUNT = 600;
 
 	// Updating count that needs to be reached to indicate that we are settled.
 	private int expansionCountForSettling = SETTLING_EXPANSION_COUNT;
@@ -251,7 +250,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 					System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
 					foundDASSolution = true;
 					incumbentPlan = mapInfo.computePlan(goal);
-					//return(incumbentPlan);
+					return(incumbentPlan);
 				}
 				else if ( (expansionCount <= expansionCountForSettling) ||
 						(dCheapestWithError <= dMax)) // <?

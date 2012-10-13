@@ -77,8 +77,9 @@ public class FastDasMapInfo {
 		this.openQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY,
 				new FComparator(this));
 		this.prunedQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY,
-				new HComparator(this));//WeightedHFComparator(this, 1.5f));
-
+				new FComparator(this));
+				//new HComparator(this));//WeightedHFComparator(this, 1.5f));
+				//new WeightedHFComparator(this, 1.5f));
 	}
 
 	public ComputedPlan computePlan(GridCell goal)
