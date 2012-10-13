@@ -83,7 +83,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 		// TODO: need to take extra time into account.
 		try {
-			previousTimeLeft = timeLeft;
 			
 			if (distanceCalculator == null)
 			{
@@ -111,7 +110,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 
 				// TODO: base search buffer on the length of the solution.
-
+				previousTimeLeft = timeLeft;
 				long timeCurrent = timer.getCurrentNanotime();
 				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) - SEARCH_END_TIME_OFFSET);
 				timeDeadline = timeCurrent + searchTime;
