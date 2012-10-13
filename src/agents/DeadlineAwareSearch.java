@@ -42,7 +42,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// r_default. Used before conExpansionIntervals has settled.
 	// This is the number of expansions to perform before the sliding window is deemed 'settled'
-	final private int SETTLING_EXPANSION_COUNT = 200;
+	final private int SETTLING_EXPANSION_COUNT = 10;
 
 	// Updating count that needs to be reached to indicate that we are settled.
 	private int expansionCountForSettling = SETTLING_EXPANSION_COUNT;
@@ -73,12 +73,18 @@ public class DeadlineAwareSearch implements PlanningAgent
 	private GridCell lastGoal = null;
 
 	private long timeDeadline = 0;
+	
+	private long previousTimeLeft = 0;
+
 
 	@Override
 	public GridCell getNextMove(GridDomain map, GridCell start, GridCell goal,
 			int stepLeft, long stepTime, long timeLeft) {
 
+		// TODO: need to take extra time into account.
 		try {
+			previousTimeLeft = timeLeft;
+			
 			if (distanceCalculator == null)
 			{
 				GridType gridType = checkGridType(map);
@@ -96,8 +102,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 			boolean bReplan =
 					plan == null ||			// no last path stored, have yet notr planned before?
 					map.getChangedEdges().size() > 0 ||	// map has had changes
-					!lastGoal.equals(goal);
-
+					!lastGoal.equals(goal) ||
+					timeLeft > previousTimeLeft;
 
 
 			if (bReplan)
@@ -202,12 +208,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 		ComputedPlan incumbentPlan = null;
 		incumbentPlan = speedierSearch(map, start,goal);
 
-		//assert threadMX.isCurrentThreadCpuTimeSupported();
-		//threadMX.setThreadCpuTimeEnabled(true);
-
-		//long timeAfterGreedy = timer.getCurrentNanotime();
-		//System.out.println("time after greedy: " + timeAfterGreedy);
-		//System.out.println("time left: " + timeUntilDeadline);
+		long timeAfterGreedy = timer.getCurrentNanotime();
+//		System.out.println("time after greedy: " + timeAfterGreedy);
+//		System.out.println("time left: " + (timeDeadline - timeAfterGreedy) );
 
 		mapInfo.addStartCell(start, hCost, dCost);
 
@@ -225,23 +228,23 @@ public class DeadlineAwareSearch implements PlanningAgent
 //				System.out.println("Closing " + current);
 //				System.out.println("h: " +  mapInfo.getHCost(current) + " g: " + mapInfo.getGCost(current));
 
-				// If this node has a higher g cost than the incumbent plan, discard it.
-				if (incumbentPlan != null
-						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
-					//System.out.println("Not bothering to explore cell " + current);
-					continue;
-				}
+//				// If this node has a higher g cost than the incumbent plan, discard it.
+				// GS: commented out this code so that DAS solutions can be visualised!
+//				if (incumbentPlan != null
+//						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) {
+//					//System.out.println("Not bothering to explore cell " + current);
+//					continue;
+//				}
 
-				// TODO: Moved these calculations up here, for debugging purposes.. They should really be calculated under the elsif case,
-				// for maintainability
 				if (expansionCount > expansionCountForSettling)
 				{
 
 					dCheapestWithError = mapInfo.getDCheapestWithError(current);
 					dMax = calculateMaxReachableDepth();
 
+//					System.out.println(current + " h: " + mapInfo.getHCost(current));
 //					System.out.println("d^cheapest = " + dCheapestWithError +
-//					           "\ndMax = " + dMax);
+//					           "\ndMax = " + dMax );
 				}
 
 				// If the current state is a goal state, and the cost to get there was cheaper
@@ -249,8 +252,22 @@ public class DeadlineAwareSearch implements PlanningAgent
 				if (current == goal)
 				{
 					System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
-					foundDASSolution = true;
-					incumbentPlan = mapInfo.computePlan(goal);
+					if (!foundDASSolution)
+					{
+						// If this is the first time DAS has found a solution, we should switch 
+						// the pruned list to sort by f(n) instead of h(n) to converge on optimal
+						mapInfo.NotifySolutionFound();
+						foundDASSolution = true;
+					}
+					
+					if ( incumbentPlan == null || 
+							mapInfo.getGCost(current) < incumbentPlan.getCost())
+					{
+						// If there is no previous plan, or the new path is no better
+						incumbentPlan = mapInfo.computePlan(goal);
+					}
+				
+
 					//return(incumbentPlan);
 				}
 				else if ( (expansionCount <= expansionCountForSettling) ||
@@ -289,11 +306,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 				else /* expansionCount > settlingCount && dCheapest > dMax */
 				{
+					//double timePercentRemaining = 1.0f-((double)timer.getCurrentNanotime() / (double)timeDeadline);
+					//System.out.println(timePercentRemaining);
 //					System.out.println("Pruning " + current.getCoord());
 					//System.out.println("Pruning cell " + current);
 					//mapInfo.printCell(current);
 					//if (mapInfo.getCumulativeError(current) > 0)
-						mapInfo.pruneCell(current);
+					mapInfo.pruneCell(current);
 
 				}
 			}
@@ -326,7 +345,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 
 		// This is where we make a hybrid speedier/DAS plan!
-		if (!foundDASSolution && incumbentPlan != null)
+		if (/*!foundDASSolution && */ incumbentPlan != null)
 		{
 			ComputedPlan pathNew = new ComputedPlan();
 			int pathCost = 0;
@@ -377,7 +396,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 				}
 			}
 			return incumbentPlan;
-
 		}
 		else
 		{
