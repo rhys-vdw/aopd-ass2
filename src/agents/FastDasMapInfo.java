@@ -54,6 +54,10 @@ public class FastDasMapInfo
 	// Used to initialise the priority queues - arbitrary value
 	// Does not seem to have an impact on performance.
 	private final int INITIAL_QUEUE_CAPACITY = 1000;
+	
+	
+	// Flag whether to switch from h(n) to f(n) for DAS search after first solution found
+	private static boolean switchPrunedAfterSolutionFound = true;
 
 	
 	/**
@@ -79,9 +83,11 @@ public class FastDasMapInfo
 		// Initialize queues for open and pruned sets.
 		this.openQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY,
 				new FComparator(this));
-		
+	
+
 		weightedHComp = new WeightedHFComparator(this, 1000f); // W=1000, obliterate G initially
 		this.prunedQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY, weightedHComp);
+		
 	}
 
 	/**
@@ -293,19 +299,22 @@ public class FastDasMapInfo
 	 */
 	void NotifySolutionFound()
 	{
-		weightedHComp.setWeight(1.0f);
-		int szPrunedQueue = prunedQueue.size();
-		GridCell conCells[] = new GridCell[szPrunedQueue];
-		for (int n = 0; n < szPrunedQueue; n++)
+		if (switchPrunedAfterSolutionFound)
 		{
+			weightedHComp.setWeight(1.0f);
+			int szPrunedQueue = prunedQueue.size();
+			GridCell conCells[] = new GridCell[szPrunedQueue];
+			for (int n = 0; n < szPrunedQueue; n++)
+			{
+				
+				conCells[n] = prunedQueue.poll();
+			}
 			
-			conCells[n] = prunedQueue.poll();
-		}
-		
-		for (int n = 0; n < szPrunedQueue; n++)
-		{
-			//System.out.println("Readding " + iterCells);
-			prunedQueue.offer(conCells[n]);
+			for (int n = 0; n < szPrunedQueue; n++)
+			{
+				//System.out.println("Readding " + iterCells);
+				prunedQueue.offer(conCells[n]);
+			}
 		}
 	}
 
