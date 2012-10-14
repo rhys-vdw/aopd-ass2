@@ -13,20 +13,20 @@ import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
 
 
 /**
- * We are using a mapsized array for each attribute, so that we can allocate 
+ * We are using a mapsized array for each attribute, so that we can allocate
  * all of the storage at construction time, rather than dynamically
  * It is felt that this could be a performance restriction.
  * The old implementation, storing everything in Node and pushing/popping
- * these nodes onto a priority queue, is in the DasCellInfo class, but 
+ * these nodes onto a priority queue, is in the DasCellInfo class, but
  * has not been maintained for a while.
- * 
+ *
  * It is probably a more readable/maintainable implementation, but the suspicion is that
- * the dynamic allocation of nodes causes performance issues. 
- * 
- * Note that each attribute given to a node will have to have an array allocated for 
+ * the dynamic allocation of nodes causes performance issues.
+ *
+ * Note that each attribute given to a node will have to have an array allocated for
  * to cover each node.
  **/
-public class FastDasMapInfo 
+public class FastDasMapInfo
 {
 	GridDomain map;
 
@@ -38,24 +38,23 @@ public class FastDasMapInfo
 	private WeightedHFComparator weightedHComp;
 	private PriorityQueue<GridCell> prunedQueue;
 
-	
+
 	// Cell properties.
-	private CellSetMembership[][] sets; 					// Set membership of each node
-	private GridCell[][]          parents;					// Parents of each node
-	private int[][]               gCosts;					// G Costs of each node
-	private int[][]               hCosts;					// H Estimate of each node
-	private int[][]               dCheapestRaws;			// Initial D Cheapest value of each node
-	private float[][]             dCheapestWithErrors;		// Error corrected d^cheapest of each node
-	private int[][]               dErrors;					// Error present (vs heuristic) of each node
-	private int[][]               expansionNumbers;		// Expansion number stamped on each node
-	private int[][]               cumulativeErrors;		// Error experienced so far, to this node, from the start point
-	private int[][]               depths;					// Depth of each node, from the start point
+	private CellSetMembership[][] sets;                // Set membership of each node
+	private GridCell[][]          parents;             // Parents of each node
+	private int[][]               gCosts;              // G Costs of each node
+	private int[][]               hCosts;              // H Estimate of each node
+	private int[][]               dCheapestRaws;       // Initial D Cheapest value of each node
+	private float[][]             dCheapestWithErrors; // Error corrected d^cheapest of each node
+	private int[][]               dErrors;             // Error present (vs heuristic) of each node
+	private int[][]               expansionNumbers;    // Expansion number stamped on each node
+	private int[][]               cumulativeErrors;    // Error experienced so far, to this node, from the start point
+	private int[][]               depths;              // Depth of each node, from the start point
 
 	// Used to initialise the priority queues - arbitrary value
 	// Does not seem to have an impact on performance.
 	private final int INITIAL_QUEUE_CAPACITY = 1000;
 
-	
 	/**
 	 * Constructor for the map info class
 	 * @param map
@@ -79,7 +78,7 @@ public class FastDasMapInfo
 		// Initialize queues for open and pruned sets.
 		this.openQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY,
 				new FComparator(this));
-		
+
 		weightedHComp = new WeightedHFComparator(this, 1000f); // W=1000, obliterate G initially
 		this.prunedQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY, weightedHComp);
 	}
@@ -91,7 +90,6 @@ public class FastDasMapInfo
 	 */
 	public ComputedPlan computePlan(GridCell goal)
 	{
-
 		//Trace.print("Generating new incumbent plan...");
 
 		ComputedPlan plan = new ComputedPlan();
@@ -153,7 +151,7 @@ public class FastDasMapInfo
 		openQueue.offer(cell);
 
 	}
-	
+
 	/**
 	 * Set the node's search tree (DAS related) parameters
 	 * @param cell
@@ -176,22 +174,22 @@ public class FastDasMapInfo
 
 		// Calculate depth data and error based on parent
 		parents[x][y] = parent;
-		if (parent != null) 
+		if (parent != null)
 		{
 			// Initialise the depth to 1 after the parent
 			depths[x][y] = getDepth(parent) + 1;
-			
+
 			// Initialise the d_error for this node.
 			int dError =  dCheapestRaw - getDCheapestRaw(parent) + 1;
 			dErrors[x][y] = dError;
-			
+
 			// Append this error to the end of this subtree
 			cumulativeErrors[x][y] = getCumulativeError(parent) + dError;
-			
+
 			// Calculate the nodes d^cheapest value
 			dCheapestWithErrors[x][y] = calculateDCheapestWithError(cell);
-		} 
-		else 
+		}
+		else
 		{
 			dCheapestWithErrors[x][y] = dCheapestRaw;
 		}
@@ -284,11 +282,11 @@ public class FastDasMapInfo
 		prunedQueue.offer(cell);
 
 	}
-	
+
 	/**
 	 * Point to react to behaviour when the first solution is found
-	 * In this case, we re sort the pruned list, after setting it's 
-	 * weight to 1.0. this means we will start searching near the 
+	 * In this case, we re sort the pruned list, after setting it's
+	 * weight to 1.0. this means we will start searching near the
 	 * beginning of the search space first.
 	 */
 	void NotifySolutionFound()
@@ -298,10 +296,10 @@ public class FastDasMapInfo
 		GridCell conCells[] = new GridCell[szPrunedQueue];
 		for (int n = 0; n < szPrunedQueue; n++)
 		{
-			
+
 			conCells[n] = prunedQueue.poll();
 		}
-		
+
 		for (int n = 0; n < szPrunedQueue; n++)
 		{
 			//System.out.println("Readding " + iterCells);
@@ -342,11 +340,11 @@ public class FastDasMapInfo
 		}
 	}
 
-	
+
 	/**
 	 * The following are a series of accessors/mutators for the various arrays of data
 	 */
-	
+
 	public GridCell getParent(GridCell cell) {
 		GridCoord gc = cell.getCoord();
 		return parents[gc.getX()][gc.getY()];
@@ -365,7 +363,7 @@ public class FastDasMapInfo
 		GridCoord gc = cell.getCoord();
 		return gCosts[gc.getX()][gc.getY()];
 	}
-	
+
 	private void setGCost(GridCell cell, int gCost) {
 		switch (getSetMembership(cell)) {
 			case NONE:
@@ -387,10 +385,10 @@ public class FastDasMapInfo
 			}
 		}
 	}
-	
+
 	/**
 	 * This function changes the G cost of a node that is already queued.
-	 * Note that it is EXPENSIVE due to removing an arbitrary node from 
+	 * Note that it is EXPENSIVE due to removing an arbitrary node from
 	 * either of the priority queues.
 	 */
 	private void setQueuedGCost(GridCell cell, int gCost, PriorityQueue<GridCell> queue) {
@@ -410,7 +408,7 @@ public class FastDasMapInfo
 		// Reinsert node sorted.
 		queue.offer(cell);
 	}
-	
+
 	public int getHCost(GridCell cell) {
 		GridCoord gc = cell.getCoord();
 		return hCosts[gc.getX()][gc.getY()];
@@ -430,7 +428,7 @@ public class FastDasMapInfo
 		GridCoord gc = cell.getCoord();
 		return cumulativeErrors[gc.getX()][gc.getY()];
 	}
-	
+
 	public float getDCheapestWithError(GridCell cell) {
 		GridCoord gc = cell.getCoord();
 		float dCheapestWithError = dCheapestWithErrors[gc.getX()][gc.getY()];
@@ -441,30 +439,30 @@ public class FastDasMapInfo
 		GridCoord gc = cell.getCoord();
 		return expansionNumbers[gc.getX()][gc.getY()];
 	}
-	
-	public CellSetMembership getSetMembership(GridCell cell) 
+
+	public CellSetMembership getSetMembership(GridCell cell)
 	{
 		GridCoord gc = cell.getCoord();
 		CellSetMembership set = sets[gc.getX()][gc.getY()];
 		return set == null ? CellSetMembership.NONE : set;
 	}
-	
+
 	/**
 	 * End of simple accessors/mutators
 	 */
 
-	
+
 	/**
 	 * Calculate average single step error.
 	 */
-	private float calculateAverageError(GridCell cell) 
+	private float calculateAverageError(GridCell cell)
 	{
 		if (getDepth(cell) == 0) {
 			return 0;
 		}
 		return (float)(getCumulativeError(cell) / getDepth(cell));
 	}
-	
+
 
 	/**
 	 * Calculate the d^cheapest value for a cell, as per the DAS paper
@@ -477,13 +475,13 @@ public class FastDasMapInfo
 		float result;
 
 		// Check if the average error up to this node from the subtree, is < 1
-		if (FloatUtil.lessThan(avgError, 1.0f)) 
+		if (FloatUtil.lessThan(avgError, 1.0f))
 		{
 			// If so, d^cheapest = dCheapest(s) / (1 - AvgError), as per DAS paper
 			float dCheapest = (float) getDCheapestRaw(cell);
 			result = dCheapest / (1.0f - avgError);
-		} 
-		else 
+		}
+		else
 		{
 			// Otherwise, return infinity
 			result = Float.POSITIVE_INFINITY;
@@ -567,7 +565,7 @@ public class FastDasMapInfo
 
 	public boolean equals() { return false; }
 
-	
+
 	/**
 	 * The following methods are used by the apparate application for display purposes.
 	 */

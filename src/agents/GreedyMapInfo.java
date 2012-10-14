@@ -7,17 +7,17 @@ import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
 import pplanning.simviewer.model.GridCoord;
 
-public class GreedyMapInfo 
+public class GreedyMapInfo
 {
 
 	private GreedyCellInfo[][] cells;
 	private PriorityQueue<GreedyCellInfo> openQueue;
-	
+
 	// Added this data for debugging - probably not useful in our actual algorithm,
 	// is just to aid analysis.
 	private int width;
 	private int height;
-	
+
 	private int nClosedCount = 0;
 
 	public GreedyMapInfo(GridDomain map) {
@@ -26,7 +26,7 @@ public class GreedyMapInfo
 		this.cells = new GreedyCellInfo[width][height];
 		this.openQueue = new PriorityQueue<GreedyCellInfo>();
 	}
-	
+
 	public ComputedPlan computePlan(GridCell goal) {
 		ComputedPlan plan = new ComputedPlan();
 
@@ -45,7 +45,7 @@ public class GreedyMapInfo
 		plan.setCost(getGCost(goal));
 		return plan;
 	}
-	
+
 	public void add(GridCell cell, float gCost, float hCost) {
 		// should only be called when no cell already exists in array
 		assert getCellInfo(cell) == null;
@@ -55,12 +55,12 @@ public class GreedyMapInfo
 		cells[cell.getCoord().getX()][cell.getCoord().getY()] = cellInfo;
 		openQueue.offer(cellInfo);
 	}
-	
+
 	public void add(GridCell cell, float gCost, float hCost, GridCell parent) {
 		add(cell, gCost, hCost);
 		setParent(cell, parent);
 	}
-	
+
 	/**
 	 * Returns true if there are no cells in the open set.
 	 * @return true if there are no cells in the open set
@@ -76,7 +76,7 @@ public class GreedyMapInfo
 	public int openCount() {
 		return openQueue.size();
 	}
-	
+
 	/*
 	 * This function just points out that we need a structure for closed list.
 	 * It is only used for debugging of the output of closed list.
@@ -96,8 +96,8 @@ public class GreedyMapInfo
 		assert(cellInfo != null);
 
 		cellInfo.setCellMembership(CellSetMembership.CLOSED);
-		
-		// We will have better closed list management, but for now, just tally the number of times we close an entry - 
+
+		// We will have better closed list management, but for now, just tally the number of times we close an entry -
 		// this will help with analysis.
 		++nClosedCount;
 
@@ -190,5 +190,5 @@ public class GreedyMapInfo
 		if (cells == null) Trace.print("cells is null");
 		return cells[cell.getCoord().getX()][cell.getCoord().getY()];
 	}
-	
+
 }
