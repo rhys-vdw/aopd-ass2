@@ -16,7 +16,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// The old map info class with dynamic node allocation
 	//DasMapInfo mapInfo;
-	
+
 	// Use the map info class with static allocation!
 	FastDasMapInfo mapInfo;
 
@@ -35,7 +35,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 	boolean shouldUpdateClosed = false;
 
 	// The following members are used to determine the depth estimate (d^cheapest) heuristic to use
-	private enum GridType { MANHATTAN, CHESSBOARD }
 	private DistanceCalculator distanceCalculator = null;
 
 	// r_default. Used before conExpansionIntervals has settled.
@@ -61,7 +60,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// Current expansion number (E_curr)
 	private int expansionCount = 0;
-	
+
 	// C Timer called via JNI Interface.
 	HRTimer timer = new HRTimer();
 
@@ -74,7 +73,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	// The current deadline in nanoseconds
 	private long timeDeadline = 0;
-	
+
 	// The time remaining on the previous call to getNextMove from Apparate. In milliseconds.
 	private long previousTimeLeft = 0;
 
@@ -87,32 +86,25 @@ public class DeadlineAwareSearch implements PlanningAgent
 			int stepLeft, long stepTime, long timeLeft) {
 
 		try {
-			// Determine our distance heuristic method
-			if (distanceCalculator == null)
-			{
-				GridType gridType = checkGridType(map);
-				if (gridType == GridType.CHESSBOARD)
-				{
-					distanceCalculator = new ChessboardDistanceCalculator();
-				}
-				else if (gridType == GridType.MANHATTAN)
-				{
-					distanceCalculator = new ManhattanDistanceCalculator();
-				}
+
+			if (distanceCalculator == null) {
+				distanceCalculator = GridUtil.createDistanceCalculator(map);
 			}
 
-			/**
-			 We need to replan iff
-				- we dont have a plan
-				- the map has changed
-			 	- the goal has moved
-			 	- the time remaining has been increased
-			 Note the assumption that a time increase is intended to give us enough time for an improved plan!!
-			 This is not necessarily a valid assumption, but determining whether to replan is a separate issue!
+			/* We need to replan iff
+			 *  - we dont have a plan
+			 *  - the map has changed
+			 *  - the goal has moved
+			 *  - the time remaining has been increased
+			 *
+			 * Note the assumption that a time increase is intended to give us enough
+			 * time for an improved plan!
+			 * This is not necessarily a valid assumption, but determining whether to
+			 * replan is a separate issue!
 			 */
 			boolean bReplan =
-					plan == null ||			// no last path stored, have yet notr planned before?
-					map.getChangedEdges().size() > 0 ||	// map has had changes
+					plan == null ||
+					map.getChangedEdges().size() > 0 ||
 					!lastGoal.equals(goal) ||
 					timeLeft > previousTimeLeft;
 
@@ -124,7 +116,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				previousTimeLeft = timeLeft;
 				long timeCurrent = timer.getCurrentNanotime();
 				long searchTime = (long) ((timeLeft * MS_TO_NS_CONV_FACT) - SEARCH_END_TIME_OFFSET);
-				
+
 				// Initialise the deadline, which is the time by which we must return a solution
 				timeDeadline = timeCurrent + searchTime;
 
@@ -165,44 +157,43 @@ public class DeadlineAwareSearch implements PlanningAgent
 	/*
 	 * Algorithm description
 	 * This follows the paper of Dionne, Taylor, Ruml [2011] - Deadline-Aware Search
-	 * 1) 	Initialise Open with starting state
-	 * 2) 	Initialise Pruned with empty structure
-	 * 3) 	Initialise Incumbent plan with NULL
-	 * 4) 	while (current time < deadline)
-	 * 		{
-	 * 5)		if Open is not empty
-	 * 			{
-	 * 6)			max_reachable_depth = calculate_d_bound()
-	 * 7)			state s = open.pop()
-	 * 8) 			if goal(s) && s > incumbent
-	 *  			{
-	 * 9) 				incumbent = s
-	 *   			}
-	 * 10) 			else if cheapest_solution_depth < max_reachable_depth
-	 *   			{
-	 * 11) 				s' = for each child of s
-	 *   				{
-	 * 12) 					open.push(s')
-	 *   				}
-	 *   			}
-	 * 13) 			else
-	 *   			{
-	 * 14) 				pruned.push(s)
-	 *   			}
-	 *   		}
-	 * 15) 		else
-	 *   		{
-	 * 16) 			recover_pruned_states(open, pruned)
-	 *   		}
-	 *   	}
-	 *
-	 * 17) 	return incumbent
+	 * 1)    Initialise Open with starting state
+	 * 2)    Initialise Pruned with empty structure
+	 * 3)    Initialise Incumbent plan with NULL
+	 * 4)    while (current time < deadline)
+	 *       {
+	 * 5)        if Open is not empty
+	 *           {
+	 * 6)             max_reachable_depth = calculate_d_bound()
+	 * 7)             state s = open.pop()
+	 * 8)             if goal(s) && s > incumbent
+	 *                {
+	 * 9)                 incumbent = s
+	 *                }
+	 * 10)            else if cheapest_solution_depth < max_reachable_depth
+	 *                {
+	 * 11)                s' = for each child of s
+	 *                    {
+	 * 12)                    open.push(s')
+	 *                    }
+	 *                }
+	 * 13)            else
+	 *                {
+	 * 14)                pruned.push(s)
+	 *                }
+	 *            }
+	 * 15)        else
+	 *            {
+	 * 16)            recover_pruned_states(open, pruned)
+	 *            }
+	 *       }
+	 * 17)   return incumbent
 	 */
 	private ComputedPlan generatePlan(GridDomain map, GridCell start,
 			GridCell goal)
 	{
 		//mapInfo = new DasMapInfo(map);
-		
+
 		// TODO: Investigate potential performance improvement by moving this construction outside of the
 		// application execution
 		mapInfo = new FastDasMapInfo(map);
@@ -217,31 +208,29 @@ public class DeadlineAwareSearch implements PlanningAgent
 		mapInfo.addStartCell(start, hCost, dCost);
 
 		timeAtLastExpansion = timer.getCurrentNanotime();
-		
+
 		// Arbitrary initialisations! Should have no effect on behaviour.
 		float dCheapestWithError = 1;
 		int dMax = 2000;
-		
-		/**
-		 * Here is our main DAS application loop
+
+		/* Here is our main DAS application loop
 		 * We run until our time has expired
 		 */
 		while (timeDeadline - timer.getCurrentNanotime() > 0)
 		{
 			if (!mapInfo.isOpenEmpty())
 			{
-				/**
-				 * There are nodes in the open set! Grab the one with the lowest f(n).
+				/* There are nodes in the open set! Grab the one with the lowest f(n).
 				 * current is now the current node being examined
 				 */
-				
+
 				GridCell current = mapInfo.closeCheapestOpen();
 
 
 				// GS: comment out this code so that DAS solutions can be visualised!
 
 				if (incumbentPlan != null
-						&& mapInfo.getGCost(current) > incumbentPlan.getCost()) 
+						&& mapInfo.getGCost(current) > incumbentPlan.getCost())
 				{
 					// If this node has a higher g cost than the incumbent plan, discard it.
 					continue;
@@ -258,23 +247,22 @@ public class DeadlineAwareSearch implements PlanningAgent
 				if (current == goal)
 				{
 					System.out.println("DAS Found path to goal! cost = " + mapInfo.getGCost(current));
-					
-					 /**
-					  * First, check if this is the first solution that DAS has found.
-					  *	This can be useful for several 'tricks' not included in the DAS
-					  *	Algorithm including switching how the pruned set is sorted.
-					  *	We switch from a h(n) sort, to f(n) sort
+
+					 /* First, check if this is the first solution that DAS has found.
+					  * This can be useful for several 'tricks' not included in the DAS
+					  * Algorithm including switching how the pruned set is sorted.
+					  * We switch from a h(n) sort, to f(n) sort
 					  */
 					if (!foundDASSolution)
 					{
-						// If this is the first time DAS has found a solution, we should switch 
+						// If this is the first time DAS has found a solution, we should switch
 						// the pruned list to sort by f(n) instead of h(n) to converge on optimal
 						mapInfo.NotifySolutionFound();
 						foundDASSolution = true;
 					}
-					
+
 					// If this is an improved solution, compute the path, ready to give it back to Apparate
-					if ( incumbentPlan == null || 
+					if ( incumbentPlan == null ||
 							mapInfo.getGCost(current) < incumbentPlan.getCost())
 					{
 						incumbentPlan = mapInfo.computePlan(goal);
@@ -283,11 +271,10 @@ public class DeadlineAwareSearch implements PlanningAgent
 				else if ( (expansionCount <= expansionCountForSettling) ||
 						(dCheapestWithError <= dMax)) // <?
 				{
-					/**
-					 * We have deemed that the expected length of the cheapest solution (d^cheapest)
+					/* We have deemed that the expected length of the cheapest solution (d^cheapest)
 					 * for the current node is within our performance bounds (d_max)
 					 */
-					
+
 					// Generate all neighboring cells.
 					SuccessorIterator neighborIter = map.getNextSuccessor(current);
 					GridCell neighbor;
@@ -298,47 +285,44 @@ public class DeadlineAwareSearch implements PlanningAgent
 						generateCell(map, goal, current, neighbor);
 					}
 
-					/**
-					 * Here, we calculate the expansion delay, which is our vacillation evaluation
+					/* Here, we calculate the expansion delay, which is our vacillation evaluation
 					 * The expansion delay is equal to the current expansion number (e_curr), minus
 					 * that which was appended to the current node when it was generated.
 					 * A low number means that the search is not vacillating
 					 * A high number means that the search is vacillating
-					 * 
+					 *
 					 * This is the first part of our performance estimate
 					 */
-					
+
 					int expansionDelay = expansionCount - mapInfo.getExpansionNumber(current);
 
 					// Insert expansion delay into sliding window.
 					expansionDelayWindow.push(expansionDelay);
 
-					
-					/**
-					 * Next we calculate our delta time between expansions and insert the delta into
+
+					/* Next we calculate our delta time between expansions and insert the delta into
 					 * the sliding window for an average time delta.
-					 * 
+					 *
 					 * This is the second part of our performance estimate
 					 */
-					
+
 					long timeCurrent = 	timer.getCurrentNanotime();
 					long expansionTimeDelta = timeCurrent - timeAtLastExpansion;
-					
+
 					// Insert time delta into sliding window.
 					expansionTimeWindow.push(expansionTimeDelta);
-					
+
 					timeAtLastExpansion = timeCurrent;
-					
+
 					// Increment number of expansions.
 					expansionCount++;
 				}
 				else /* expansionCount > settlingCount && dCheapest > dMax */
 				{
 
-					/**
-					 * The goal is deemed unreachable from this node, if we pursue our current
+					/* The goal is deemed unreachable from this node, if we pursue our current
 					 * search behaviour.
-					 * 
+					 *
 					 * Adjust our search behaviour by pruning this node
 					 */
 					mapInfo.pruneCell(current);
@@ -347,15 +331,13 @@ public class DeadlineAwareSearch implements PlanningAgent
 			}
 			else
 			{
-				/**
-				 * Open list is empty, so we need to repopulate it. 
-				 */
+				// Open list is empty, so we need to repopulate it.
 				if (!mapInfo.isPrunedEmpty())
 				{
 					expansionCountForSettling = SETTLING_EXPANSION_COUNT + expansionCount;
 					int exp = calculateExpansionsRemaining();
 					mapInfo.recoverPrunedStates(exp);
-					
+
 					// Reset our performance metrics
 					expansionDelayWindow.reset();
 					expansionTimeWindow.reset();
@@ -382,7 +364,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 			int pathCost = 0;
 			int countGreedy = 0;
 			int countDAS = 0;
-			
+
 			// Used to track the cost between start point and current node
 			boolean DASPathToNodeIsCheaper = false;
 
@@ -436,7 +418,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 
 	/**
 	 * This function is to generate a nominated node, and put it on the open set
-	 * We initialise the appropriate values here 
+	 * We initialise the appropriate values here
 	 * @param map
 	 * @param goal
 	 * @param parent
@@ -449,11 +431,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 			{
 				// Set the G cost equal to the G cost of a nodes parent + the transit cost of this node
 				int gCost = mapInfo.getGCost(parent) + (int)map.cost(parent, cell);
-				
+
 				// Set the H cost to the Apparate provided H estimate
 				int hCost = (int)map.hCost(cell, goal);
 
-				// d_cheapest cannot be assumed to be the same as h.. 
+				// d_cheapest cannot be assumed to be the same as h..
 				int dCheapestRaw = distanceCalculator.dCost(cell, goal);
 
 				// If we already have this cell in our open, closed, or pruned list, ignore it...
@@ -467,7 +449,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 				{
 					// Shorter path to node found.
 					mapInfo.setPathToCell(cell, gCost, expansionCount, parent);
-					
+
 					// If node was closed, put it back into the open list. The new cost
 					// might make it viable. Pruned cells needn't be reopened as their
 					// dCheapest value is unaffected.
@@ -557,30 +539,8 @@ public class DeadlineAwareSearch implements PlanningAgent
 			}
 		}
 
-		return(incumbentPlan);
+		return incumbentPlan;
 	}
-
-
-	/**
-	 * Determine whether grid is four or eight directional. This is expensive,
-	 * only ever call it once per execution.
-	 * TODO: Is there a better way to do this?
-	 */
-	private GridType checkGridType(GridDomain map) {
-		// Get center cell (so that it is not on the perimeter)
-		GridCell cell = map.getCell(map.getWidth() / 2, map.getHeight() / 2);
-
-		// Judge map type on number of successors.
-		int successorCount = map.getSuccessors(cell).size();
-		if (successorCount == 8) {
-			return GridType.CHESSBOARD;
-		}
-
-		assert successorCount == 4;
-
-		return GridType.MANHATTAN;
-	}
-	
 
 	/**
 	 * The following functions are purely for Apparate debug output

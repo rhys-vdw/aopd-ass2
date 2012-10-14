@@ -2,7 +2,12 @@ package agents;
 
 import pplanning.simviewer.model.GridCell;
 import pplanning.simviewer.model.GridDomain;
+import java.lang.IllegalArgumentException;
 
+/**
+ * A helper class to help search algorithms handle search domains with different
+ * connectivity.
+ */
 public class GridUtil {
 	final static int[][] MANHATTAN_SUCCESSORS = {
 		{ 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } };
@@ -28,11 +33,36 @@ public class GridUtil {
 	}
 
 	/**
+	 * Get a distance calculator object for given map.
+	 * @param map the map
+	 */
+	public static DistanceCalculator createDistanceCalculator(GridDomain map) {
+		Connectivity connectivity = checkConnectivity(map);
+		return getDistanceCalculator(connectivity);
+	}
+
+	/**
+	 * Get a distance calculator object for a map of given connectivity.
+	 * @param connectivity the connectivity of the map
+	 */
+	public static DistanceCalculator getDistanceCalculator(Connectivity connectivity) {
+		switch (connectivity) {
+			case MANHATTAN:
+				return new ManhattanDistanceCalculator();
+			case CHESSBOARD:
+				return new ChessboardDistanceCalculator();
+			default:
+				throw new IllegalArgumentException(
+						"No distance calculator found for '" + connectivity + "'!");
+		}
+	}
+
+	/**
 	 * Determine whether grid is four or eight directional. This is expensive,
 	 * only ever call it once per execution.
 	 * TODO: Is there a better way to do this?
 	 */
-	private Connectivity checkConnectivity(GridDomain map) {
+	public static Connectivity checkConnectivity(GridDomain map) {
 		// Get center cell (so that it is not on the perimeter)
 		GridCell cell = map.getCell(map.getWidth() / 2, map.getHeight() / 2);
 
