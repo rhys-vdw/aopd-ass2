@@ -1,5 +1,8 @@
 package agents;
 
+// Only used for post processing statistics
+//import java.io.BufferedWriter;
+//import java.io.FileWriter;
 import java.util.ArrayList;
 
 import au.rmit.ract.planning.pathplanning.entity.ComputedPlan;
@@ -77,7 +80,11 @@ public class DeadlineAwareSearch implements PlanningAgent
 	// The time remaining on the previous call to getNextMove from Apparate. In milliseconds.
 	private long previousTimeLeft = 0;
 
+	private ComputedPlan incumbentPlan = null;
 
+	// This code is purely for performance measurement after the application - not internal performance
+	//PerformanceMeasure metrics[] = new PerformanceMeasure[1000000];
+	
 	/**
 	 * This is the interface function called by Apparate.
 	 */
@@ -143,6 +150,20 @@ public class DeadlineAwareSearch implements PlanningAgent
 				return start;
 			}
 
+			// The below code is purely for post application analysis.
+//			FileWriter fstream = new FileWriter("metrics.txt");
+//			BufferedWriter out = new BufferedWriter(fstream);
+//
+//			for (PerformanceMeasure metric : metrics)
+//			{
+//				if (metric != null)
+//				{
+//					//out.write(metric.cell.toString());
+//					out.write(metric.dCheapestWithError + ",");
+//					out.write( metric.dMax + " \n");
+//				}
+//			}
+//			
 			// Return the next step in the path.
 			return (GridCell) plan.getStep(stepNo++);
 		}
@@ -193,17 +214,19 @@ public class DeadlineAwareSearch implements PlanningAgent
 			GridCell goal)
 	{
 		//mapInfo = new DasMapInfo(map);
+		System.out.println("New DAS");
 
 		// TODO: Investigate potential performance improvement by moving this construction outside of the
 		// application execution
 		mapInfo = new FastDasMapInfo(map);
 
 		// Construct an initial greedy plan
-		ComputedPlan incumbentPlan = null;
+
 		incumbentPlan = speedierSearch(map, start,goal);
 
 		// Initialize open set with start node.
-		int hCost = (int)map.hCost(start, goal);
+		//int hCost = (int)map.hCost(start, goal);
+		int hCost = (int)map.getMinCost() * distanceCalculator.dCost(start,goal);
 		int dCost = distanceCalculator.dCost(start, goal);
 		mapInfo.addStartCell(start, hCost, dCost);
 
@@ -212,6 +235,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 		// Arbitrary initialisations! Should have no effect on behaviour.
 		float dCheapestWithError = 1;
 		int dMax = 2000;
+		
+		// Used for post processing statistics
+//		int performanceCount = 0;
 
 		/* Here is our main DAS application loop
 		 * We run until our time has expired
@@ -225,7 +251,6 @@ public class DeadlineAwareSearch implements PlanningAgent
 				 */
 
 				GridCell current = mapInfo.closeCheapestOpen();
-
 
 				// GS: comment out this code so that DAS solutions can be visualised!
 
@@ -241,6 +266,9 @@ public class DeadlineAwareSearch implements PlanningAgent
 				{
 					dCheapestWithError = mapInfo.getDCheapestWithError(current);
 					dMax = calculateMaxReachableDepth();
+					
+//					metrics[performanceCount++] = new PerformanceMeasure(current, (int) dCheapestWithError,
+//							dMax);
 				}
 
 				// If the current state is a goal state
@@ -398,7 +426,7 @@ public class DeadlineAwareSearch implements PlanningAgent
 						System.out.println("pathNew cost: " + pathCost +
 								" incumbentPlan: " + incumbentPlan.getCost());
 
-						System.out.println("Hybrid solution found! Greedy nodes: "
+						System.out.println("Hybrid solution found! Previous solution nodes: "
 						+ countGreedy + " DAS nodes: " + countDAS + " Cost: " + pathCost);
 						incumbentPlan = pathNew;
 
@@ -433,13 +461,14 @@ public class DeadlineAwareSearch implements PlanningAgent
 				int gCost = mapInfo.getGCost(parent) + (int)map.cost(parent, cell);
 
 				// Set the H cost to the Apparate provided H estimate
-				int hCost = (int)map.hCost(cell, goal);
+				//int hCost = (int)map.hCost(cell, goal);
+				int hCost = (int) (map.getMinCost() * distanceCalculator.dCost(cell, goal));
 
 				// d_cheapest cannot be assumed to be the same as h..
 				int dCheapestRaw = distanceCalculator.dCost(cell, goal);
 
 				// If we already have this cell in our open, closed, or pruned list, ignore it...
-				if (!mapInfo.cellExists(cell))
+				if (!mapInfo.cellExists(cell) && gCost < incumbentPlan.getCost())
 				{
 					// Node has not been seen before, add it to the open set.
 					mapInfo.add(cell, gCost, hCost, dCheapestRaw, expansionCount, parent);
@@ -526,17 +555,22 @@ public class DeadlineAwareSearch implements PlanningAgent
 				break;
 			}
 
-			for (State neighbor : map.getSuccessors(current))
+			// Here we have changed the successor generation to match that of the DAS search
+			// This is much more likely to create a collision between the greedy path and
+			// the DAS path (a good thing for short deadlines!!!)
+			SuccessorIterator neighborIter = map.getNextSuccessor(current);
+			GridCell neighbor;
+			while ((neighbor = neighborIter.next()) != null)
 			{
 				if (map.isBlocked(neighbor) == false &&
-						mapInfo.isClosed((GridCell) neighbor) == false &&
-						mapInfo.isOpen((GridCell)neighbor) == false)
+					mapInfo.isClosed((GridCell) neighbor) == false &&
+					mapInfo.isOpen((GridCell)neighbor) == false)
 				{
 					float hNeighbor = map.hCost(neighbor, goal);
 					float gNeighbor = mapInfo.getGCost((GridCell)current) + map.cost(current, neighbor);
 					mapInfo.add((GridCell) neighbor, gNeighbor, hNeighbor, current);
 				}
-			}
+			}			
 		}
 
 		return incumbentPlan;

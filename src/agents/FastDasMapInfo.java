@@ -83,7 +83,7 @@ public class FastDasMapInfo
 		this.openQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY,
 				new FComparator(this));
 
-		weightedHComp = new WeightedHFComparator(this, 1000f); // W=1000, obliterate G initially
+		weightedHComp = new WeightedHFComparator(this, 1000); // W=1000, obliterate G initially
 		this.prunedQueue = new PriorityQueue<GridCell>(INITIAL_QUEUE_CAPACITY, weightedHComp);
 	}
 
@@ -341,6 +341,15 @@ public class FastDasMapInfo
 			// Set set attribute to opened.
 			GridCoord gc = cell.getCoord();
 			sets[gc.getX()][gc.getY()] = CellSetMembership.OPEN;
+			
+			// This is an attempt at an improvement where we try to reset
+			// error measurements when depruning, to not continue punishing 
+			// paths that have been pruned previously.
+			// It has not shown to have any effect, so has been stripped out
+			// for now
+//			cumulativeErrors[gc.getX()][gc.getY()] = 0;
+//			depths[gc.getX()][gc.getY()] = 0;
+//			dErrors[gc.getX()][gc.getY()] = 0;
 
 			// Add to opened priority queue.
 			openQueue.offer(cell);

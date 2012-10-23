@@ -61,19 +61,22 @@ public class GridUtil {
 	 * Determine whether grid is four or eight directional. This is expensive,
 	 * only ever call it once per execution.
 	 * TODO: Is there a better way to do this?
+	 * 
+	 * Note: It seems that performance is better with the chessboard heuristic in both cases
+	 * Always return chessboard calculator
 	 */
 	public static Connectivity checkConnectivity(GridDomain map) {
 		// Get center cell (so that it is not on the perimeter)
-		GridCell cell = map.getCell(map.getWidth() / 2, map.getHeight() / 2);
-
-		// Judge map type on number of successors.
-		int successorCount = map.getSuccessors(cell).size();
-		if (successorCount == 8) {
+//		GridCell cell = map.getCell(map.getWidth() / 2, map.getHeight() / 2);
+//
+//		// Judge map type on number of successors.
+//		int successorCount = map.getSuccessors(cell).size();
+//		if (successorCount == 8) {
 			return Connectivity.CHESSBOARD;
-		}
-
-		assert successorCount == 4;
-
-		return Connectivity.MANHATTAN;
+//		}
+//
+//		assert successorCount == 4;
+//
+//		return Connectivity.MANHATTAN;
 	}
 }
