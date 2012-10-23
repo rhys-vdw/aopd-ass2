@@ -1,7 +1,6 @@
 type octile
 height 512
 width 512
-cost
 ground 1
 tree +inf
 swamp 10
